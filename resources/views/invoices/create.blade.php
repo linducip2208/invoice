@@ -1,4 +1,4 @@
-<x-tabler.layout :title="__('Create Invoice')" :pretitle="__('Sales')">
+<x-tabler.layout :title="__('Create Invoice')" :pretitle="__('Sales')" :subtitle="__('3 steps: client → items → review')" :breadcrumbs="[['label' => __('Invoices'), 'url' => route('invoices.index')], ['label' => __('New')]]">
     <x-slot name="actions">
         <a href="{{ route('invoices.index') }}" class="btn">
             <x-ti name="arrow-left" /> {{ __('Back') }}
@@ -34,10 +34,12 @@
     <form method="POST" action="{{ route('invoices.store') }}" data-prevent-double-submit x-data="invoiceForm({{ Js::from([]) }}, {{ Js::from($products->keyBy('id')->toArray()) }})">
         @csrf
 
-        <!-- Client & Dates -->
+        <div class="row g-3 align-items-start">
+        <div class="col-lg-8">
+        <!-- Step 1 -->
         <div class="card mb-3">
             <div class="card-body">
-                <h3 class="card-title mb-3">{{ __('Client & Dates') }}</h3>
+                <div class="d-flex align-items-center gap-2 mb-3"><span class="badge bg-primary">1</span><h3 class="card-title mb-0">{{ __('Client & Dates') }}</h3></div>
                 <div class="row g-3">
                     <div class="col-md-6">
                         <x-tabler.field :label="__('Client *')" name="client_id">
@@ -142,7 +144,7 @@
         <!-- Items -->
         <div class="card mb-3">
             <div class="card-header">
-                <h3 class="card-title">{{ __('Items') }}</h3>
+                <div class="d-flex align-items-center gap-2"><span class="badge bg-primary">2</span><h3 class="card-title mb-0">{{ __('Items · drag to reorder') }}</h3></div>
                 <div class="card-actions">
                     <button type="button" @click="addItem()" class="btn btn-sm btn-primary">
                         <x-ti name="plus" /> {{ __('Add Row') }}
@@ -204,12 +206,14 @@
         <!-- Summary -->
         <div class="card mb-3">
             <div class="card-body">
+                <div class="d-flex align-items-center gap-2 mb-3"><span class="badge bg-primary">3</span><h3 class="card-title mb-0">{{ __('Tax, Discount & Notes') }}</h3></div>
                 <div class="row g-3">
-                    <div class="col-lg-6">
-                        <h3 class="card-title mb-3">{{ __('Tax & Discount') }}</h3>
+                    <div class="col-md-4">
                         <x-tabler.field :label="__('Tax Rate (%)')" name="tax_rate">
                             <input type="number" step="0.01" min="0" max="100" id="tax_rate" name="tax_rate" x-model.number="tax_rate" value="{{ old('tax_rate', 0) }}" class="form-control">
                         </x-tabler.field>
+                    </div>
+                    <div class="col-md-4">
                         <x-tabler.field :label="__('Discount Type')" name="discount_type">
                             <select id="discount_type" name="discount_type" x-model="discount_type" class="form-select">
                                 <option value="none">{{ __('None') }}</option>
@@ -217,46 +221,63 @@
                                 <option value="percent">{{ __('Percentage (%)') }}</option>
                             </select>
                         </x-tabler.field>
-                        <div x-show="discount_type !== 'none'">
-                            <x-tabler.field :label="__('Discount Value')" name="discount_value">
-                                <input type="number" step="0.01" min="0" id="discount_value" name="discount_value" x-model.number="discount_value" value="{{ old('discount_value', 0) }}" class="form-control">
-                            </x-tabler.field>
-                        </div>
                     </div>
-
-                    <div class="col-lg-6">
-                        <h3 class="card-title mb-3">{{ __('Summary') }}</h3>
-                        <div class="rounded bg-light p-3">
-                            <div class="d-flex justify-content-between small mb-1"><span class="text-muted">{{ __('Subtotal') }}</span><span class="fw-semibold" x-text="formatCurrency(subtotal)"></span></div>
-                            <div class="d-flex justify-content-between small mb-1" x-show="taxAmount > 0"><span class="text-muted">{{ __('Tax') }} <span x-text="'(' + tax_rate + '%)'"></span></span><span x-text="formatCurrency(taxAmount)"></span></div>
-                            <div class="d-flex justify-content-between small mb-1" x-show="discountAmount > 0"><span class="text-muted">{{ __('Discount') }}</span><span class="text-danger fw-semibold" x-text="'-' + formatCurrency(discountAmount)"></span></div>
-                            <div class="d-flex justify-content-between h4 border-top pt-2 mt-2 mb-0">
-                                <span>{{ __('Total') }}</span>
-                                <span x-text="formatCurrency(total)"></span>
-                            </div>
-                        </div>
+                    <div class="col-md-4" x-show="discount_type !== 'none'">
+                        <x-tabler.field :label="__('Discount Value')" name="discount_value">
+                            <input type="number" step="0.01" min="0" id="discount_value" name="discount_value" x-model.number="discount_value" value="{{ old('discount_value', 0) }}" class="form-control">
+                        </x-tabler.field>
                     </div>
                 </div>
 
                 <div class="row g-3 mt-1">
                     <div class="col-md-6">
                         <x-tabler.field :label="__('Notes')" name="notes">
-                            <textarea id="notes" name="notes" rows="4" class="form-control" placeholder="{{ __('Sparkly notes for your client…') }}">{{ old('notes') }}</textarea>
+                            <textarea id="notes" name="notes" rows="3" class="form-control" placeholder="{{ __('Notes for your client…') }}">{{ old('notes') }}</textarea>
                         </x-tabler.field>
                     </div>
                     <div class="col-md-6">
                         <x-tabler.field :label="__('Terms')" name="terms">
-                            <textarea id="terms" name="terms" rows="4" class="form-control" placeholder="{{ __('Payment terms…') }}">{{ old('terms') }}</textarea>
+                            <textarea id="terms" name="terms" rows="3" class="form-control" placeholder="{{ __('Payment terms…') }}">{{ old('terms') }}</textarea>
                         </x-tabler.field>
                     </div>
                 </div>
             </div>
         </div>
+        </div><!-- /col-lg-8 -->
 
-        <div class="d-flex align-items-center justify-content-end gap-2">
-            <a href="{{ route('invoices.index') }}" class="btn">{{ __('Cancel') }}</a>
-            <button type="submit" class="btn btn-primary"><x-ti name="plus" /> {{ __('Create Invoice') }}</button>
+        <!-- Sticky live document preview -->
+        <div class="col-lg-4">
+            <div class="card position-sticky" style="top: 1rem;">
+                <div class="card-header">
+                    <h3 class="card-title"><x-ti name="file-invoice" /> {{ __('Live preview') }}</h3>
+                    <div class="card-actions"><span class="badge bg-azure-lt">{{ __('Auto-updates') }}</span></div>
+                </div>
+                <div class="card-body">
+                    <div class="text-muted small">{{ __('Items') }}</div>
+                    <div class="fw-semibold mb-2"><span x-text="items.length"></span> {{ __('rows') }} · <span x-text="currency"></span></div>
+                    <template x-for="(item, index) in items" :key="item._uid">
+                        <div class="d-flex justify-content-between small mb-1">
+                            <span class="text-truncate me-2" x-text="(index + 1) + '. ' + (item.description || '{{ __('Untitled item') }}')"></span>
+                            <span class="fw-semibold text-nowrap" x-text="formatCurrency(lineTotal(index))"></span>
+                        </div>
+                    </template>
+                    <hr>
+                    <div class="d-flex justify-content-between small mb-1"><span class="text-muted">{{ __('Subtotal') }}</span><span class="fw-semibold" x-text="formatCurrency(subtotal)"></span></div>
+                    <div class="d-flex justify-content-between small mb-1" x-show="taxAmount > 0"><span class="text-muted">{{ __('Tax') }} <span x-text="'(' + tax_rate + '%)'"></span></span><span x-text="formatCurrency(taxAmount)"></span></div>
+                    <div class="d-flex justify-content-between small mb-1" x-show="discountAmount > 0"><span class="text-muted">{{ __('Discount') }}</span><span class="text-danger fw-semibold" x-text="'-' + formatCurrency(discountAmount)"></span></div>
+                    <div class="d-flex justify-content-between h3 border-top pt-2 mt-2 mb-1">
+                        <span>{{ __('Total') }}</span>
+                        <span x-text="formatCurrency(total)"></span>
+                    </div>
+                    <p class="text-muted small mb-3">{{ __('Client sees this total on PDF, email, and secure link.') }}</p>
+                    <div class="d-grid gap-2">
+                        <button type="submit" class="btn btn-primary"><x-ti name="plus" /> {{ __('Create Invoice') }}</button>
+                        <a href="{{ route('invoices.index') }}" class="btn">{{ __('Cancel') }}</a>
+                    </div>
+                </div>
+            </div>
         </div>
+        </div><!-- /row -->
     </form>
 
     <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.6/Sortable.min.js" defer></script>

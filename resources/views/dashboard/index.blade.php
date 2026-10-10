@@ -1,27 +1,36 @@
-<x-tabler.layout :title="__('Dashboard')" :pretitle="__('Workspace')" :subtitle="__('A professional overview of your receivables')">
+<x-tabler.layout :title="__('Dashboard')" :pretitle="__('Workspace')" :subtitle="__('Receivables at a glance — last 8 weeks')" :breadcrumbs="[['label' => workspace()?->name ?? __('Workspace')]]">
     <x-slot name="actions">
+        <a href="{{ route('reports.aging') }}" class="btn">
+            <x-ti name="hourglass" /> {{ __('Aging') }}
+        </a>
         <a href="{{ route('invoices.create') }}" class="btn btn-primary">
             <x-ti name="plus" /> {{ __('New Invoice') }}
         </a>
-        <a href="{{ route('quotes.create') }}" class="btn">
-            <x-ti name="plus" /> {{ __('New Quotation') }}
-        </a>
     </x-slot>
 
-    @php $currency = workspace()?->currency ?? 'IDR'; @endphp
+    @php
+        $currency = workspace()?->currency ?? 'IDR';
+        $fmt = fn($v) => $currency.' '.number_format((float) $v, 0, ',', '.');
+    @endphp
 
     <div class="row row-deck row-cards mb-3">
-        <x-tabler.stat :label="__('Collected')" :value="$currency . ' ' . number_format($totalRevenue, 0)" icon="wallet" />
-        <x-tabler.stat :label="__('Outstanding')" :value="$currency . ' ' . number_format($outstandingAmount, 0)" icon="hourglass" />
+        <x-tabler.stat :label="__('Collected (paid)')" :value="$fmt($totalRevenue)" icon="wallet" />
+        <x-tabler.stat :label="__('Outstanding')" :value="$fmt($outstandingAmount)" icon="hourglass" />
         <x-tabler.stat :label="__('Paid invoices')" :value="$paidCount" icon="check" />
-        <x-tabler.stat :label="__('Overdue')" :value="$overdueCount" icon="alert-circle" />
+        <x-tabler.stat :label="__('Overdue · act now')" :value="$overdueCount" icon="alert-circle" />
     </div>
 
     <div class="row row-deck row-cards mb-3">
         <div class="col-lg-8">
             <div class="card h-100">
                 <div class="card-header">
-                    <h3 class="card-title">{{ __('Collections (8 weeks)') }}</h3>
+                    <div>
+                        <h3 class="card-title mb-0">{{ __('Collections · last 8 weeks') }}</h3>
+                        <div class="text-muted small">{{ __('Recorded payments per week · live from your data') }}</div>
+                    </div>
+                    <div class="card-actions">
+                        <a href="{{ route('reports.cashflow') }}" class="btn btn-sm">{{ __('Cash flow') }}</a>
+                    </div>
                 </div>
                 <div class="card-body">
                     @php
@@ -39,6 +48,9 @@
                     @endphp
                     @if(array_sum($trend) > 0)
                         <svg viewBox="0 0 {{ $w }} {{ $h }}" class="w-100" style="height: 12rem;" role="img" aria-label="{{ __('Collections trend') }}">
+                            @for($g = 1; $g <= 3; $g++)
+                                <line x1="{{ $pad }}" x2="{{ $w - $pad }}" y1="{{ $pad + ($h - $pad * 2) * $g / 4 }}" y2="{{ $pad + ($h - $pad * 2) * $g / 4 }}" stroke="currentColor" opacity="0.12" />
+                            @endfor
                             <polygon points="{{ $area }}" fill="rgba(124,92,240,0.15)" />
                             <polyline points="{{ $line }}" fill="none" stroke="#7c5cf0" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round" />
                             @foreach($points as $i => $p)
@@ -60,7 +72,10 @@
         <div class="col-lg-4">
             <div class="card h-100">
                 <div class="card-header">
-                    <h3 class="card-title">{{ __('Overdue invoices') }}</h3>
+                    <div>
+                        <h3 class="card-title mb-0">{{ __('Needs attention') }}</h3>
+                        <div class="text-muted small">{{ __('Overdue invoices · oldest first') }}</div>
+                    </div>
                     <div class="card-actions">
                         <a href="{{ route('reports.aging') }}" class="btn btn-sm">{{ __('View') }}</a>
                     </div>
@@ -253,10 +268,10 @@
 
     @php
         $quickActions = [
-            ['label' => __('Add Client'), 'href' => route('clients.create'), 'icon' => 'users'],
-            ['label' => __('New Product'), 'href' => route('products.create'), 'icon' => 'package'],
-            ['label' => __('Recurring'), 'href' => route('recurring.create'), 'icon' => 'repeat'],
-            ['label' => __('Workspace'), 'href' => route('workspace.settings'), 'icon' => 'settings'],
+            ['label' => __('Add Client'), 'desc' => __('Customer + address'), 'href' => route('clients.create'), 'icon' => 'users'],
+            ['label' => __('New Product'), 'desc' => __('Price + tax preset'), 'href' => route('products.create'), 'icon' => 'package'],
+            ['label' => __('Recurring'), 'desc' => __('Autopilot schedule'), 'href' => route('recurring.create'), 'icon' => 'repeat'],
+            ['label' => __('Record payment'), 'desc' => __('Manual / partial'), 'href' => route('payments.index'), 'icon' => 'credit-card'],
         ];
     @endphp
     <div class="row row-deck row-cards">
@@ -267,7 +282,7 @@
                         <span class="avatar"><x-ti :name="$action['icon']" /></span>
                         <div>
                             <div class="fw-semibold">{{ $action['label'] }}</div>
-                            <div class="text-muted small">{{ __('Get started') }}</div>
+                            <div class="text-muted small">{{ $action['desc'] }}</div>
                         </div>
                     </div>
                 </a>
