@@ -1,5 +1,12 @@
 # CHANGELOG
 
+## 2026-10-10 (malam 5) — Landing premium + a11y AA penuh
+
+- Hero navy + kartu invoice melayang, editorial alternating, CTA band;
+  headline kontras terverifikasi; i18n batch
+- Axe 9/9 hijau (badge/alert/primary/footer/prose); 138/138 phpunit,
+  64/64 Playwright termasuk 11 viewport
+
 ## 2026-10-10 (malam 4) — Premium redesign (93/100 tetap)
 
 ### Redesign
