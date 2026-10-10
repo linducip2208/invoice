@@ -1,5 +1,29 @@
 # CHANGELOG
 
+## 2026-10-10 (malam 2) — Secure quote approval + financial integrity (93/100)
+
+### Keamanan approval (P0)
+
+- Endpoint instant accept/reject/sign DIHAPUS; diganti alur verified:
+  review read-only, OTP terikat (quote+revisi+recipient+purpose), halaman
+  consent eksplisit, mode portal approver, kebijakan high-risk
+- State machine withdrawn/revisi; evidence append-only + hash dokumen
+  kanonis + snapshot consent; konversi idempoten per (quote, revisi)
+- Tantangan hash-only (tidak ada OTP/token plaintext); throttle per-route+IP;
+  no-store/no-referrer; rotasi token; revokasi portal immediat; CSRF terbukti
+- 50/52 matrix hijau + E2E FLOW 1/2/3/5/6/8 dua viewport, nol console error
+
+### Finansial
+
+- Invarian teruji (total dari lines, balance, credit apply/cancel, late fee
+  sekali + reverse); late-fee TOCTOU dikunci; konversi pajak per-line
+- Tombol remind di aging; rotate-link invoice + quote
+
+### Dokumen
+
+- Threat model, state machine, test matrix, evidence, invariants,
+  payment gates, E2E workflow; FINAL-AUDIT 93/100 STAGING ONLY
+
 ## 2026-10-10 (malam) — Finalisasi enterprise: Tabler 100%, E2E, skor 88/100
 
 ### Migrasi UI

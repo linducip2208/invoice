@@ -59,13 +59,20 @@ eksplisit). Dibuktikan: `ClientTest::client_is_scoped_to_workspace`,
 | PDF download | `invoices.pdf` | auth | InvoiceService→PdfService | storage | OK* | — |
 | Kirim email | `invoices.send` | auth | EmailInvoiceController | email_logs, queue | PARTIAL | mailer=log default; butuh SMTP prod |
 | Public invoice (token) | `public.invoice.show` | publik | PublicInvoiceController | invoices.public_token | OK* | — |
-| Public quote accept/reject/sign | `public.quotes.*` | publik | PublicQuoteController | quotes | OK* | — |
+| Public quote accept/reject/sign | `public.quotes.*` (legacy) | — | DIHAPUS — instant mutation tanpa identitas | — | REMOVED | diganti alur verified di bawah |
+| Quote lifecycle (send/withdraw/reopen/rotate) | `quotes.send/withdraw/reopen/rotate-link` | auth | QuoteController + QuoteApprovalService | quotes (+revision) | OK | QuoteApprovalTest |
+| Public quote review (read-only) | `public.quote.show` | publik | PublicQuoteController@show | quotes.public_token | OK | a1–a7 + E2E FLOW 1 |
+| OTP approval (verified channel) | `public.quote.otp.*` | publik | QuoteApprovalService | challenges (hash-only) | OK | b8–b14, f48–f52 + docs |
+| Portal approver approval | `public.quote.confirm*` | portal guard | PublicQuoteController + service | approval_events | OK | b15–b17 + E2E FLOW 2 |
+| High-risk portal-only policy | workspace settings | auth | requiresPortalApproval | workspaces.threshold | OK | b18–b19 |
+| Quote evidence + history | `quotes.show` card | auth | QuoteApprovalEvent | approval_events | OK | c24, c32, e46 |
+| Conversion policy (manual/auto-draft) | workspace settings | auth | QuoteConversionService | invoices.quote_revision | OK | d33–d40 + E2E FLOW 5 |
 | Client portal login/dashboard | `portal.*` | portal guard | PortalAuthController | client_portal_users | OK* | — |
 | Embed invoice/widget | `embed.*` | publik/auth | EmbedController | invoices | OK* | — |
 | Invoice attachments | `invoices.attachments.*` | auth | InvoiceAttachmentController | invoice_attachments | OK* | — |
 | Invoice comments | `invoices.comments.*` | auth | InvoiceCommentController | invoice_comments | OK* | author-only delete |
 | Reminders schedule/cancel | `invoices.reminders.*` | auth | InvoiceReminderController + scheduler | invoice_reminders | OK* | hourly scheduler |
-| Late fees apply/reverse | `invoices.late-fees.*` | auth | InvoiceLateFeeController, LateFeeApplier | invoice_late_fees | OK* | TOCTOU didokumentasikan |
+| Late fees apply/reverse | `invoices.late-fees.*` | auth | InvoiceLateFeeController, LateFeeApplier | invoice_late_fees | OK | lock+recheck, FinancialInvariantsTest |
 | Tax details (PPh23) | `invoices.tax-details.*` | auth | InvoiceTaxDetailController | invoice_tax_details | OK* | — |
 | WhatsApp preview/send | `invoices.whatsapp.*` | auth | WhatsappSendController | whatsapp_logs | PARTIAL | butuh provider WA |
 | QRIS generate/show/cancel | `invoices.qris.*` | auth | QrisController | qris_codes | PARTIAL | butuh provider QRIS |
@@ -111,12 +118,9 @@ eksplisit). Dibuktikan: `ClientTest::client_is_scoped_to_workspace`,
 | Marketplace | `marketplace.index` | auth | static view | — | STUB | transparan "Coming Soon Q3 2026" |
 | Feature scaffolds | `feature.coming` | auth | ComingSoonController | — | STUB | 6 link sidebar, transparan |
 
-## Bukti pengujian (revisi finalisasi 2026-10-10)
+## Bukti pengujian (revisi quote-approval 2026-10-10)
 
-- `php artisan test`: **74 passed, 0 failed** (Client 6 · Invoice 8 · Payment 5 ·
-  Blog 8 · Pseo 10 · Workspace 4 · Webhook 9 · EfakturXml 2 · Money 5 ·
-  Isolation 4 · Export 3 · Dashboard 1 · InvoiceFlow 1 · Pwa 3 ·
-  NavIntegrity 4 · BackupRestore 1).
+- `php artisan test`: **128 passed, 0 failed** (lama 74 + QuoteApproval 50 + FinancialInvariants 4).
 - Playwright nyata: **14/14** (7 skenario × desktop+mobile), nol console error,
   overflow 0, 5 screenshot di `docs/audit/shots/`.
 - UI: Tabler 100% halaman aktif (132 MIGRATED + EXEMPT sah); sidebar 44/44 PASS.

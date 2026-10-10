@@ -14,7 +14,7 @@ langganan + plan limits backend, tim + 2FA + API token + webhook keluar,
 client portal publik, blog + SEO/PSEO, PWA installable, dark mode.
 
 Status per fitur + bukti uji: `docs/audit/FEATURE-MATRIX.md`.
-Skor audit: **88/100, STAGING ONLY** (`docs/audit/FINAL-AUDIT.md`).
+Skor audit: **93/100, STAGING ONLY** (`docs/audit/FINAL-AUDIT.md`).
 Keterbatasan jujur: `docs/audit/KNOWN-LIMITATIONS.md`.
 
 ## Mulai cepat
@@ -33,8 +33,8 @@ Login dev (local saja): `superadmin@invocely.test / superadmin123`,
 ## Perintah penting
 
 ```bash
-php artisan test                 # 74 tests, sqlite memory
-npx playwright test              # 14 E2E browser (butuh server + e2e.sqlite, lihat tests-e2e/)
+php artisan test                 # 128 tests, sqlite memory
+npx playwright test              # E2E browser (butuh server + e2e.sqlite, lihat tests-e2e/)
 npm run build                    # build aset produksi
 php artisan schedule:run         # scheduler (cron tiap menit di prod)
 php artisan queue:work           # worker antrean

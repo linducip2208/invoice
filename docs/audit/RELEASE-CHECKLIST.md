@@ -2,10 +2,11 @@
 
 ## Sudah hijau (bukti di TEST-EVIDENCE.md)
 
-- [x] 73 automated tests + 14/14 E2E browser tanpa console error
-- [x] Tabler 100% UI aktif; sidebar 44/44 route PASS; /docs 15/15 akurat
-- [x] Isolasi tenant multi-resource; webhook replay/amount/signature-code
-- [x] Backup + restore teruji; `npm audit` 0; build + validate bersih
+- [x] 128 automated tests + 30 E2E browser tanpa console error
+- [x] Tabler 100% UI aktif; sidebar 44/44 route PASS; /docs akurat + quotations
+- [x] Quote approval 50/52 + E2E flows; isolasi tenant; webhook replay/amount/signature-code
+- [x] Backup + restore teruji; migrasi quote rollback/re-apply bersih; `npm audit` 0
+- [x] CSRF terbukti (curl 419); rate limiters per-route+IP; secret tak bocor ke log
 
 ## Wajib sebelum production publik
 

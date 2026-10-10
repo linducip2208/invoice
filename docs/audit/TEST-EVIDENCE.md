@@ -1,26 +1,27 @@
-# TEST EVIDENCE (2026-10-10)
+# TEST EVIDENCE (2026-10-10, revisi quote-approval)
 
 ## Automated (phpunit, sqlite :memory:, fakes)
 
-73 passed / 0 failed / 234 assertions. Suite: Client 6 · Invoice 8 ·
-Payment 5 · Blog 8 · Pseo 10 · Workspace 4 · Webhook 9 · EfakturXml 2 ·
-Money 5 · Isolation 4 · Export 3 · Dashboard 1 · InvoiceFlow 1 · Pwa 3 ·
-NavIntegrity 4.
+128 passed / 0 failed / 420 assertions. Suite lama 74 + QuoteApproval 50 +
+FinancialInvariants 4.
 
 ## Browser E2E (Playwright 1.64 + Chromium, server lokal + e2e.sqlite)
 
-14/14 passed (7 skenario × desktop 1366×768 + mobile 390×844), NOL console
-error: guest redirect, login+KPI, client CRUD+reload, invoice create+total,
-mobile nav, dark-mode persist, public pages. Overflow horizontal = 0 di
-5 screenshot (`docs/audit/shots/`): desktop-dashboard, mobile-dashboard,
-desktop-invoice-create, mobile-clients, desktop-docs.
+Semua hijau, NOL console error: app.spec (guest redirect, login+KPI, client
+CRUD+reload, invoice create+total, mobile nav, dark-mode persist, public
+pages) + quote-approval.spec (FLOW 1 review read-only, FLOW 2 portal approval
++ idempoten, FLOW 3 outsider/CSRF, FLOW 5 konversi idempoten, FLOW 6
+decline+withdraw, FLOW 8 mobile) × desktop 1366×768 + mobile 390×844.
+Overflow 0 + screenshot di `docs/audit/shots/`.
 
 ## Gates lain
 
-- `npm run build`: sukses. `composer validate`: valid. `php artisan route:list`: 301.
-- `npm audit`: 0 vulnerabilities (setelah audit fix).
-- `node --check sw.js`: OK. `php -l` pada file diubah: bersih.
-- Pint: TIDAK dijalankan repo-wide (200-file churn pre-existing; didokumentasikan,
-  bukan disembunyikan). CI tidak memaksakan pint agar gate tetap merekam status nyata.
-- CI (`.github/workflows/ci.yml`): phpunit + vite build. E2E tidak di CI
-  (butuh browser download; dijalankan lokal, bukti di sini).
+- `npm run build`: sukses. `composer validate`: valid.
+- `php artisan route:list`: 301+ (endpoint quote baru + throttle).
+- `npm audit`: 0 vulnerabilities.
+- `node --check sw.js`: OK. Migrasi quote: up/down/up bersih di DB sekali pakai.
+- CSRF: curl POST tanpa origin → 419; browser same-origin mengikuti rantai
+  redirect aman (Laravel 13 Sec-Fetch-Site, terdokumentasi di threat model).
+- Pint repo-wide: ditunda eksplisit (200-file churn pre-existing).
+- CI: phpunit + vite build. E2E di mesin lokal (butuh browser + server),
+  bukti di sini + INVOICE-WORKFLOW-E2E.md.

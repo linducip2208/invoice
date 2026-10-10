@@ -29,6 +29,13 @@ Thumbs.db
 # License pairing v3 — encrypted lock file, never commit
 storage/app/.license.lock
 
+# Laravel runtime cache/views/sessions (regenerable, may contain
+# throttle counters and other host-specific state)
+storage/framework/cache/data/
+storage/framework/sessions/
+storage/framework/views/
+storage/logs/*.log
+
 # Playwright E2E artifacts (traces, screenshots on failure, local report)
 test-results/
 tests-e2e/report/

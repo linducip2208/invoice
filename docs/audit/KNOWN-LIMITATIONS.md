@@ -14,6 +14,19 @@ di sini, bukan diklaim lulus.
 - ~~CSV formula injection~~ → safeCell + test.
 - ~~npm audit 8 vuln~~ → 0 setelah audit fix.
 
+## 0b. Ditutup dalam misi quote-approval (2026-10-10)
+
+- ~~Instant accept/reject/sign tanpa identitas~~ → endpoint legacy dihapus;
+  approval butuh portal approver atau OTP + consent (50/52 tests + E2E).
+- ~~Reject tanpa guard~~ → reject butuh identitas terverifikasi + alasan tercatat.
+- ~~Signature image = otoritas~~ → kini data pelengkap; level evidence eksplisit.
+- ~~Quote numbering race~~ → lock + retry (dipertahankan dari misi lalu).
+- ~~Late-fee TOCTOU~~ → lock + recheck dalam transaksi.
+- ~~Throttle key berbagi per IP~~ → named limiters per-route+IP.
+- ~~Portal user revoked tetap login~~ → login gate + middleware immediat.
+- ~~Migrasi rollback tak teruji~~ → 5 migrasi quote rollback+re-apply bersih.
+- ~~CSRF tak terbukti~~ → curl 419 tanpa origin + E2E; Laravel 13 Sec-Fetch-Site didokumentasikan.
+
 ## 1. BLOCKED — butuh kredensial / layanan eksternal
 
 | # | Item | Dampak | Jalan keluar |
