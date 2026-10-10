@@ -6,12 +6,19 @@ use App\Models\Subscription;
 use App\Models\SubscriptionInvoice;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 
 class BillingWebhookController extends Controller
 {
     public function handle(Request $request, string $gateway): JsonResponse
     {
+        // NOTE: provider signature verification (HMAC/shared secret) is NOT
+        // performed here because no gateway secrets are configured in this
+        // codebase. Until secrets are configured, treat this endpoint as
+        // untrusted input: never extend subscriptions or record revenue
+        // without the idempotency + state guards below. See
+        // docs/audit/KNOWN-LIMITATIONS.md (webhook signature = BLOCKED).
         Log::info('Billing webhook', ['gateway' => $gateway, 'body' => $request->all()]);
 
         $externalSubId = $this->extractSubscriptionId($gateway, $request);
@@ -28,18 +35,39 @@ class BillingWebhookController extends Controller
 
         $event = $this->extractEvent($gateway, $request);
 
-        match ($event) {
-            'invoice.paid', 'subscription.renewed' => $this->markPaid($subscription, $request),
-            'invoice.payment_failed'               => $this->markPastDue($subscription, $request),
-            'subscription.cancelled'               => $this->markCancelled($subscription),
-            default                                => null,
-        };
+        DB::transaction(function () use ($event, $subscription, $request) {
+            // Re-lock inside the transaction so concurrent deliveries
+            // serialize instead of double-extending the period.
+            $subscription = Subscription::where('id', $subscription->id)->lockForUpdate()->firstOrFail();
+
+            match ($event) {
+                'invoice.paid', 'subscription.renewed' => $this->markPaid($subscription, $request),
+                'invoice.payment_failed'               => $this->markPastDue($subscription, $request),
+                'subscription.cancelled'               => $this->markCancelled($subscription),
+                default                                => null,
+            };
+        });
 
         return response()->json(['status' => 'ok']);
     }
 
     protected function markPaid(Subscription $sub, Request $request): void
     {
+        $externalInvoiceId = $request->input('invoice_id') ?? $request->input('id');
+
+        // Idempotency: a retried/replayed delivery with the same external
+        // invoice id must not extend the period twice.
+        if ($externalInvoiceId && SubscriptionInvoice::where('subscription_id', $sub->id)
+                ->where('external_invoice_id', $externalInvoiceId)
+                ->where('status', 'paid')
+                ->exists()) {
+            Log::warning('Billing webhook replay ignored', [
+                'subscription_id' => $sub->id,
+                'external_invoice_id' => $externalInvoiceId,
+            ]);
+            return;
+        }
+
         $period = $sub->billing_period === 'yearly' ? now()->addYear() : now()->addMonth();
 
         $sub->update([
@@ -52,7 +80,7 @@ class BillingWebhookController extends Controller
         SubscriptionInvoice::create([
             'subscription_id'     => $sub->id,
             'workspace_id'        => $sub->workspace_id,
-            'external_invoice_id' => $request->input('invoice_id') ?? $request->input('id'),
+            'external_invoice_id' => $externalInvoiceId,
             'reference_no'        => 'SUB-' . $sub->id . '-' . now()->format('YmdHis'),
             'amount'              => (float) ($request->input('amount') ?? $request->input('amount_paid') ?? 0),
             'currency'            => $sub->currency,

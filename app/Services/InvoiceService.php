@@ -12,17 +12,46 @@ class InvoiceService
         protected PdfService $pdfService,
     ) {}
 
+    /**
+     * Generate the next invoice number for a workspace.
+     *
+     * The workspace row is locked (SELECT ... FOR UPDATE) inside the
+     * transaction so concurrent requests serialize on the counter instead
+     * of reading the same value and colliding on the
+     * unique(workspace_id, invoice_no) constraint.
+     */
     public function generateInvoiceNo(Workspace $workspace): string
     {
         return DB::transaction(function () use ($workspace) {
-            $workspace->refresh();
-            $next = $workspace->next_invoice_no;
-            $workspace->increment('next_invoice_no');
+            $locked = Workspace::where('id', $workspace->id)->lockForUpdate()->firstOrFail();
+            $next = $locked->next_invoice_no;
+            $locked->increment('next_invoice_no');
 
             $date = now()->format('Ymd');
             $padded = str_pad((string) $next, 4, '0', STR_PAD_LEFT);
 
-            return $workspace->invoice_prefix . $date . '-' . $padded;
+            return $locked->invoice_prefix . $date . '-' . $padded;
+        });
+    }
+
+    /**
+     * Generate the next quotation number for a workspace.
+     * Same locking strategy as invoices; scoped per workspace (the old
+     * global Quote::count()+1 collided across workspaces).
+     */
+    public function generateQuoteNo(Workspace $workspace): string
+    {
+        return DB::transaction(function () use ($workspace) {
+            Workspace::where('id', $workspace->id)->lockForUpdate()->firstOrFail();
+
+            $count = \App\Models\Quote::withoutGlobalScope('workspace')
+                ->where('workspace_id', $workspace->id)
+                ->count() + 1;
+
+            $date = now()->format('Ymd');
+            $padded = str_pad((string) $count, 4, '0', STR_PAD_LEFT);
+
+            return 'Q-' . $date . '-' . $padded;
         });
     }
 

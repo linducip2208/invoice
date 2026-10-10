@@ -9,7 +9,7 @@
     <table width="100%" cellpadding="0" cellspacing="0" style="background: #FFF8FE; background-image: linear-gradient(135deg, #FFE4F1 0%, #EDE9FE 50%, #E0F2FE 100%); padding: 32px 0;">
         <tr>
             <td align="center">
-                <table width="600" cellpadding="0" cellspacing="0" style="background-color: #ffffff; border-radius: 20px; overflow: hidden; box-shadow: 0 20px 50px -12px rgba(167, 139, 250, 0.35);">
+                <table width="600" cellpadding="0" cellspacing="0" style="width: 100%; max-width: 600px; background-color: #ffffff; border-radius: 20px; overflow: hidden; box-shadow: 0 20px 50px -12px rgba(167, 139, 250, 0.35);">
                     <!-- Rainbow ribbon -->
                     <tr>
                         <td style="height: 5px; background: linear-gradient(90deg, #FF7AC6 0%, #A78BFA 25%, #7DD3FC 50%, #86EFAC 75%, #FCD34D 100%);"></td>

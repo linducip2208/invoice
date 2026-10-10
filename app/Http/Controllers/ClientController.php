@@ -52,6 +52,7 @@ class ClientController extends Controller
             'tax_id' => ['nullable', 'string', 'max:100'],
             'notes' => ['nullable', 'string'],
             'is_active' => ['boolean'],
+            'no_reminders' => ['boolean'],
         ]);
 
         Client::create($validated);
@@ -94,6 +95,7 @@ class ClientController extends Controller
             'tax_id' => ['nullable', 'string', 'max:100'],
             'notes' => ['nullable', 'string'],
             'is_active' => ['boolean'],
+            'no_reminders' => ['boolean'],
         ]);
 
         $client->update($validated);

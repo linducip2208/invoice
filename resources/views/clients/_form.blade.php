@@ -69,4 +69,13 @@
         <textarea id="notes" name="notes" rows="3" class="mt-1 block w-full input-unicorn rounded-xl px-4 py-2">{{ old('notes', $client?->notes) }}</textarea>
         <x-input-error :messages="$errors->get('notes')" class="mt-2" />
     </div>
+
+    <div class="md:col-span-2">
+        <label class="inline-flex items-center gap-2.5 text-sm font-medium text-purple-700 cursor-pointer">
+            <input type="hidden" name="no_reminders" value="0" />
+            <input type="checkbox" name="no_reminders" value="1" @checked(old('no_reminders', $client?->no_reminders ?? false)) class="rounded border-purple-300 text-pink-500 focus:ring-pink-300" style="width: 1.1rem; height: 1.1rem;" />
+            {{ __('Do not send payment reminders to this client') }}
+        </label>
+        <x-input-error :messages="$errors->get('no_reminders')" class="mt-2" />
+    </div>
 </div>

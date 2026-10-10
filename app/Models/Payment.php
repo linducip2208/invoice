@@ -14,6 +14,7 @@ class Payment extends Model
         'invoice_id', 'workspace_id', 'payment_gateway_id', 'gateway_transaction_id',
         'amount', 'payment_date', 'payment_method', 'channel',
         'gateway_status', 'gateway_raw', 'reference_no', 'notes',
+        'bank_reconcile_line_id',
     ];
 
     protected function casts(): array

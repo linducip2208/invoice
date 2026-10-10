@@ -6,6 +6,7 @@ use App\Models\CreditNote;
 use App\Models\Invoice;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Validation\Rule;
 
 class CreditNoteController extends Controller
 {
@@ -41,8 +42,11 @@ class CreditNoteController extends Controller
 
     public function store(Request $request)
     {
+        $workspaceId = workspace()?->id;
+        abort_unless($workspaceId, 403);
+
         $validated = $request->validate([
-            'invoice_id' => 'required|exists:invoices,id',
+            'invoice_id' => ['required', Rule::exists('invoices', 'id')->where('workspace_id', $workspaceId)],
             'reason'     => 'required|string|max:300',
             'amount'     => 'required|numeric|min:0.01',
             'currency'   => 'required|string|size:3',
@@ -51,23 +55,36 @@ class CreditNoteController extends Controller
         ]);
 
         $invoice = Invoice::findOrFail($validated['invoice_id']);
+        abort_unless($invoice->workspace_id === $workspaceId, 403);
 
         if ($validated['amount'] > $invoice->balance_due) {
             return back()->withErrors(['amount' => 'Jumlah tidak boleh melebihi sisa tagihan invoice.'])->withInput();
         }
 
-        $cn = CreditNote::create([
-            'workspace_id' => $invoice->workspace_id,
-            'invoice_id'   => $invoice->id,
-            'credit_no'    => CreditNote::nextNumber($invoice->workspace_id),
-            'reason'       => $validated['reason'],
-            'amount'       => $validated['amount'],
-            'currency'     => $validated['currency'],
-            'issued_at'    => $validated['issued_at'],
-            'status'       => 'draft',
-            'notes'        => $validated['notes'] ?? null,
-            'created_by'   => auth()->id(),
-        ]);
+        // Retry on unique(workspace_id, credit_no) collision: the number is
+        // count-based, so a concurrent request may grab the same value.
+        $cn = null;
+        foreach (range(1, 3) as $attempt) {
+            try {
+                $cn = CreditNote::create([
+                    'workspace_id' => $invoice->workspace_id,
+                    'invoice_id'   => $invoice->id,
+                    'credit_no'    => CreditNote::nextNumber($invoice->workspace_id),
+                    'reason'       => $validated['reason'],
+                    'amount'       => $validated['amount'],
+                    'currency'     => $validated['currency'],
+                    'issued_at'    => $validated['issued_at'],
+                    'status'       => 'draft',
+                    'notes'        => $validated['notes'] ?? null,
+                    'created_by'   => auth()->id(),
+                ]);
+                break;
+            } catch (\Illuminate\Database\QueryException $e) {
+                if ($attempt === 3 || ! str_contains($e->getMessage(), 'credit_no')) {
+                    throw $e;
+                }
+            }
+        }
 
         return redirect()->route('credit-notes.show', $cn)->with('success', 'Credit note dibuat sebagai draft.');
     }

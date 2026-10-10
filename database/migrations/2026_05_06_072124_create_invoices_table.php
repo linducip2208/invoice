@@ -51,9 +51,10 @@ return new class extends Migration
 
     public function down(): void
     {
-        Schema::table('recurring_invoices', function (Blueprint $table) {
-            $table->dropForeign(['last_invoice_id']);
-        });
+        // NOTE: recurring_invoices.last_invoice_id was created as a plain
+        // unsignedBigInteger WITHOUT a foreign key constraint, so there is
+        // nothing to drop here (dropForeign would throw). That column is
+        // removed by its own table migration's down().
         Schema::dropIfExists('invoices');
     }
 };

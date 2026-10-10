@@ -13,7 +13,8 @@ class Invoice extends Model
 
     protected $fillable = [
         'workspace_id', 'client_id', 'invoice_no', 'status',
-        'recurring_invoice_id', 'template', 'primary_color', 'accent_color',
+        'recurring_invoice_id', 'template', 'invoice_layout_id',
+        'primary_color', 'accent_color',
         'issue_date', 'due_date', 'subtotal', 'tax_rate',
         'tax_amount', 'discount_type', 'discount_value', 'discount_amount',
         'total', 'amount_paid', 'balance_due', 'currency',

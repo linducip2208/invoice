@@ -53,4 +53,13 @@ class WorkspaceTest extends TestCase
 
         $response->assertSessionHasErrors('name');
     }
+
+    #[Test]
+    public function missing_page_renders_branded_404(): void
+    {
+        $response = $this->get('/definitely-missing-page-xyz');
+
+        $response->assertStatus(404);
+        $response->assertSee('404');
+    }
 }

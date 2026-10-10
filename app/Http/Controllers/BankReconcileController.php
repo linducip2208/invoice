@@ -122,10 +122,9 @@ class BankReconcileController extends Controller
                     'workspace_id'   => $line->workspace_id,
                     'invoice_id'     => $line->matched_invoice_id,
                     'amount'         => $line->amount,
-                    'currency'       => 'IDR',
                     'payment_date'   => $line->trx_date,
                     'payment_method' => 'bank_transfer',
-                    'reference'      => substr($line->description, 0, 200),
+                    'reference_no'   => substr($line->description, 0, 100),
                     'notes'          => "Auto-matched from {$batch->bank_name}",
                     'bank_reconcile_line_id' => $line->id,
                 ]);

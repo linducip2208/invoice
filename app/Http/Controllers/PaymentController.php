@@ -8,6 +8,7 @@ use App\Models\PaymentGateway;
 use App\Services\PaymentGatewayService;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Redirect;
 use Illuminate\View\View;
@@ -192,6 +193,12 @@ class PaymentController extends Controller
     // ─── WEBHOOK: Receive callback from payment gateway ───────────────────
     public function webhook(Request $request, string $gateway)
     {
+        // NOTE: provider signature verification is NOT performed here (no
+        // gateway secrets configured in this codebase). The guards below —
+        // transactional row lock, replay short-circuit, and never trusting
+        // the request amount — limit what an unsigned caller can do, but
+        // full verification remains BLOCKED on provider credentials. See
+        // docs/audit/KNOWN-LIMITATIONS.md.
         Log::info('Payment webhook received', ['gateway' => $gateway, 'body' => $request->all()]);
 
         $transactionId = $this->extractTransactionId($gateway, $request);
@@ -200,22 +207,51 @@ class PaymentController extends Controller
             return response()->json(['status' => 'transaction_id not found'], 400);
         }
 
-        $payment = Payment::where('gateway_transaction_id', $transactionId)->first();
+        $status = $this->extractWebhookStatus($gateway, $request);
 
-        if (!$payment) {
+        $exists = Payment::where('gateway_transaction_id', $transactionId)->exists();
+        if (!$exists) {
             return response()->json(['status' => 'payment not found'], 404);
         }
 
-        $status = $this->extractWebhookStatus($gateway, $request);
-        $payment->update([
-            'gateway_status' => $status,
-            'gateway_raw'    => $request->all(),
-        ]);
+        DB::transaction(function () use ($transactionId, $status, $gateway, $request) {
+            // Lock the row so concurrent deliveries serialize.
+            $payment = Payment::where('gateway_transaction_id', $transactionId)->lockForUpdate()->first();
 
-        if (in_array($status, ['settlement', 'capture', 'success', 'PAID', 'SUCCESS'])) {
-            $payment->update(['amount' => $this->extractWebhookAmount($gateway, $request, $payment)]);
-            $this->recalculateInvoice($payment->invoice);
-        }
+            if (!$payment) {
+                return;
+            }
+
+            // Replay guard: an already-settled payment stays settled.
+            if (in_array($payment->gateway_status, ['settlement', 'capture', 'success', 'PAID', 'SUCCESS'])) {
+                Log::warning('Payment webhook replay ignored', [
+                    'payment_id' => $payment->id,
+                    'gateway' => $gateway,
+                ]);
+                return;
+            }
+
+            $payment->update([
+                'gateway_status' => $status,
+                'gateway_raw'    => $request->all(),
+            ]);
+
+            if (in_array($status, ['settlement', 'capture', 'success', 'PAID', 'SUCCESS'])) {
+                // The stored amount (created server-side with the invoice)
+                // is authoritative. Never overwrite it with the request
+                // amount — an unsigned caller could otherwise settle an
+                // invoice for less than owed. Only log mismatches.
+                $claimed = $this->extractWebhookAmount($gateway, $request, $payment);
+                if (abs($claimed - (float) $payment->amount) > 0.01) {
+                    Log::warning('Payment webhook amount mismatch; keeping stored amount', [
+                        'payment_id' => $payment->id,
+                        'stored' => (float) $payment->amount,
+                        'claimed' => $claimed,
+                    ]);
+                }
+                $this->recalculateInvoice($payment->invoice);
+            }
+        });
 
         return response()->json(['status' => 'ok']);
     }

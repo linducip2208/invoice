@@ -1,3 +1,10 @@
+<IfModule mod_mime.c>
+    # PWA manifest must be served as application/manifest+json for
+    # installability checks in Chromium-based browsers.
+    AddType application/manifest+json .webmanifest
+    AddType application/javascript .js
+</IfModule>
+
 <IfModule mod_rewrite.c>
     <IfModule mod_negotiation.c>
         Options -MultiViews -Indexes

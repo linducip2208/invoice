@@ -14,7 +14,7 @@ class Client extends Model
     protected $fillable = [
         'workspace_id', 'name', 'company_name', 'email', 'phone',
         'address', 'city', 'state', 'country', 'postal_code',
-        'tax_id', 'notes', 'view_token', 'is_active',
+        'tax_id', 'notes', 'view_token', 'is_active', 'no_reminders',
     ];
 
     protected static function booted(): void
