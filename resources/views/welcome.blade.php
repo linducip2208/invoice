@@ -26,10 +26,10 @@
                     <a href="{{ route('pricing') }}" class="btn btn-outline-light btn-lg">{{ __('See pricing') }}</a>
                 </div>
                 <p class="small mt-3 mb-0 text-muted">{{ __('Free plan included · No credit card to start · Cancel anytime') }}</p>
-                <div class="d-flex gap-4 mt-3 pt-3 border-top border-white opacity-75" style="--tblr-border-opacity: .2;">
-                    <div><div class="h2 mb-0">61%</div><div class="small text-muted">{{ __('collected on sample invoice') }}</div></div>
-                    <div><div class="h2 mb-0">4</div><div class="small text-muted">{{ __('steps: work → cash') }}</div></div>
-                    <div><div class="h2 mb-0">8</div><div class="small text-muted">{{ __('ID gateways supported') }}</div></div>
+                <div class="d-flex flex-wrap gap-4 mt-3 pt-3 border-top border-white opacity-75" style="--tblr-border-opacity: .2;">
+                    <div><div class="h2 mb-0 text-white">61%</div><div class="small text-muted">{{ __('collected on sample invoice') }}</div></div>
+                    <div><div class="h2 mb-0 text-white">4</div><div class="small text-muted">{{ __('steps: work → cash') }}</div></div>
+                    <div><div class="h2 mb-0 text-white">8</div><div class="small text-muted">{{ __('ID gateways supported') }}</div></div>
                 </div>
             </div>
             <div class="col-lg-7">
@@ -102,7 +102,7 @@
     </div>
 
     {{-- CAPABILITIES: definition list, not 6 identical cards --}}
-    <div class="row g-4 mb-5 align-items-start">
+    <div class="row mb-5 align-items-start">
         <div class="col-lg-4">
             <div class="page-pretitle">{{ __('Capabilities') }}</div>
             <h2 class="h1 mb-2">{{ __('Everything around the invoice') }}</h2>
@@ -227,7 +227,7 @@
     </div>
 
     {{-- FAQ: plain accordion without outer card --}}
-    <div class="row g-4 mb-5">
+    <div class="row mb-5">
         <div class="col-lg-4">
             <h3 class="h2 mb-2">{{ __('Questions, answered') }}</h3>
             <p class="text-muted">{{ __('Honest answers — no fine-print surprises.') }}</p>

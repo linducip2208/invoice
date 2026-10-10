@@ -45,10 +45,10 @@
                 @php $isPopular = $plan->slug === 'pro'; @endphp
                 <div class="col-md-4">
                     <div class="card h-100 {{ $isPopular ? 'card-active' : '' }}">
-                        @if($isPopular)
-                            <div class="ribbon ribbon-top bg-primary">{{ __('Popular') }}</div>
-                        @endif
                         <div class="card-body">
+                            @if($isPopular)
+                                <span class="badge bg-primary text-white mb-2">{{ __('Most popular') }}</span>
+                            @endif
                             <h3 class="card-title">{{ $plan->name }}</h3>
                             <p class="text-muted">{{ $plan->tagline }}</p>
                             <div class="mb-3">

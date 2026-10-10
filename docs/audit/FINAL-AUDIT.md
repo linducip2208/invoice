@@ -1,6 +1,7 @@
 # FINAL AUDIT — Invocely (revisi quote-approval 2026-10-10)
 
-Branch `main`. 128 automated tests + 30 E2E browser, semua hijau.
+Branch `main`. 138 automated tests + 64 E2E browser, semua hijau
+(rerun penuh ronde 2, bukti: REDESIGN-TEST-RESULTS.md).
 
 ## Skor acceptance (berbasis bukti)
 
@@ -24,9 +25,13 @@ Branch `main`. 128 automated tests + 30 E2E browser, semua hijau.
 **Keputusan: STAGING ONLY (93/100).** Menuju production: secret provider +
 sandbox (B1/B2) + PWA device. Rincian: RELEASE-CHECKLIST.md.
 
-## Adendum redesign frontend (2026-10-10)
+## Adendum redesign frontend ronde 2 (2026-10-10)
 
-Sidebar IA 8 grup, landing rewrite tanpa klaim palsu, dashboard donat+aging,
-superadmin shell terpisah, kontras AA terverifikasi axe (9/9),
-138/138 phpunit, 64/64 Playwright, 11 viewport overflow 0.
-Detail: FRONTEND-*.md. Skor tidak berubah (93): temuan baru nihil kritis.
+Rerun penuh pasca-perbaikan: 138/138 phpunit, 64/64 Playwright (fresh
+reseed), overflow 0 di 11 viewport + zoom 200%, 8 screenshot direview
+manual. Temuan ronde 2 sudah diperbaiki: overflow `row-deck` landing,
+kontras angka metrik hero, badge pricing terpotong, konflik
+`x-show`/`d-flex` di preview invoice. Detail: REDESIGN-TEST-RESULTS.md.
+Axe WCAG 2A/2AA serius-nol (8/8); screen-reader manusia + PWA device nyata
++ sandbox gateway tetap manual/blocked — skor tidak berubah (93):
+temuan baru nihil kritis.

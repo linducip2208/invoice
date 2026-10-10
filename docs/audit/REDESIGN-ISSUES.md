@@ -24,4 +24,18 @@
 7. Lihat juga FRONTEND-BEFORE-AFTER.md (temuan ronde sebelumnya, selesai).
 
 Gate tersisa (bukan desain): secret webhook, gateway sandbox (B1/B2),
-PWA device nyata, zoom 200% + screen reader — lihat FINAL-AUDIT.md.
+PWA device nyata, screen reader manusia — lihat FINAL-AUDIT.md.
+
+## Ronde 2 (2026-10-10, sudah diperbaiki + hijau 64/64)
+
+8. `welcome.blade.php` capabilities/FAQ: `row g-4`/`row-deck` overflow
+   4–23px di ≤768px (`row-deck` memaksa kolom jadi flex) → `row` biasa.
+9. Hero metrics `.h2` hitam di navy → `text-white`.
+10. `pricing/index.blade.php`: ribbon `Popular` terpotong → badge inline.
+11. `invoices/create.blade.php`, `invoices/edit.blade.php`,
+    `invoice-layouts/builder.blade.php`: `x-show` kalah vs
+    `.d-flex`/`.d-grid !important` → display utility kondisional.
+12. Zoom 200%: overflow 0. PWA: manifest + ikon + sw.js OK (install device
+    nyata tetap manual). Payment: `WebhookSignatureVerifier` + 403 +
+    lock/replay/stored-amount terverifikasi di kode; sandbox live BLOCKED
+    (butuh kredensial asli).

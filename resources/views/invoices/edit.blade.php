@@ -174,8 +174,8 @@
                         <h3 class="card-title mb-3">{{ __('Summary') }}</h3>
                         <div class="rounded bg-light p-3">
                             <div class="d-flex justify-content-between small mb-1"><span class="text-muted">{{ __('Subtotal') }}</span><span class="fw-semibold" x-text="formatCurrency(subtotal)"></span></div>
-                            <div class="d-flex justify-content-between small mb-1" x-show="taxAmount > 0"><span class="text-muted">{{ __('Tax') }} <span x-text="'(' + tax_rate + '%)'"></span></span><span x-text="formatCurrency(taxAmount)"></span></div>
-                            <div class="d-flex justify-content-between small mb-1" x-show="discountAmount > 0"><span class="text-muted">{{ __('Discount') }}</span><span class="text-danger fw-semibold" x-text="'-' + formatCurrency(discountAmount)"></span></div>
+                            <div class="justify-content-between small mb-1" x-show="taxAmount > 0" :class="{ 'd-flex': taxAmount > 0 }"><span class="text-muted">{{ __('Tax') }} <span x-text="'(' + tax_rate + '%)'"></span></span><span x-text="formatCurrency(taxAmount)"></span></div>
+                            <div class="justify-content-between small mb-1" x-show="discountAmount > 0" :class="{ 'd-flex': discountAmount > 0 }"><span class="text-muted">{{ __('Discount') }}</span><span class="text-danger fw-semibold" x-text="'-' + formatCurrency(discountAmount)"></span></div>
                             <div class="d-flex justify-content-between h4 border-top pt-2 mt-2 mb-0">
                                 <span>{{ __('Total') }}</span>
                                 <span x-text="formatCurrency(total)"></span>

@@ -2,7 +2,8 @@
 
 ## Sudah hijau (bukti di TEST-EVIDENCE.md)
 
-- [x] 128 automated tests + 30 E2E browser tanpa console error
+- [x] 138 automated tests (451 assertions) + 64 E2E browser tanpa console error
+  (rerun penuh 2026-10-10 ronde 2, bukti di REDESIGN-TEST-RESULTS.md)
 - [x] Tabler 100% UI aktif; sidebar 44/44 route PASS; /docs akurat + quotations
 - [x] Quote approval 50/52 + E2E flows; isolasi tenant; webhook replay/amount/signature-code
 - [x] Backup + restore teruji; migrasi quote rollback/re-apply bersih; `npm audit` 0

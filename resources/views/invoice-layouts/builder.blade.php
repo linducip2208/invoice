@@ -116,7 +116,7 @@
                     </div>
                     <div class="card-body">
                         <div x-show="!selectedBlock" class="text-muted small">{{ __('Pilih block di canvas untuk edit properti.') }}</div>
-                        <div x-show="selectedBlock" class="d-grid gap-3">
+                        <div x-show="selectedBlock" class="gap-3" :class="{ 'd-grid': selectedBlock }">
                             <div class="small text-muted fw-bold" x-text="selectedBlock?.type"></div>
                             <template x-for="(propValue, propKey) in (selectedBlock?.props ?? {})" :key="propKey">
                                 <div>

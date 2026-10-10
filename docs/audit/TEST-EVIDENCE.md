@@ -20,7 +20,7 @@ Overflow 0 + screenshot di `docs/audit/shots/`.
 ## Gates lain
 
 - `npm run build`: sukses. `composer validate`: valid.
-- `php artisan route:list`: 301+ (endpoint quote baru + throttle).
+- `php artisan route:list`: 310.
 - `npm audit`: 0 vulnerabilities.
 - `node --check sw.js`: OK. Migrasi quote: up/down/up bersih di DB sekali pakai.
 - CSRF: curl POST tanpa origin → 419; browser same-origin mengikuti rantai
