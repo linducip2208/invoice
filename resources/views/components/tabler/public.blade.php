@@ -4,8 +4,17 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
     <meta name="csrf-token" content="{{ csrf_token() }}">
-    <title>{{ trim($__env->yieldContent('title')) ? $__env->yieldContent('title') . ' — ' : '' }}{{ branding('app_name') }}</title>
-    @hasSection('meta')@yield('meta')@endif
+    <title>{{ ($title ?? null) ? $title . ' — ' : '' }}{{ branding('app_name') }}</title>
+    <meta name="description" content="{{ $metaDescription ?? '' }}">
+    <meta property="og:title" content="{{ ($title ?? null) ? $title . ' — ' : '' }}{{ branding('app_name') }}">
+    <meta property="og:description" content="{{ $metaDescription ?? '' }}">
+    <meta property="og:type" content="{{ $ogType ?? 'website' }}">
+    <meta property="og:url" content="{{ url()->current() }}">
+    <meta property="og:site_name" content="{{ branding('app_name') }}">
+    @if(!empty($publishedTime))
+        <meta property="article:published_time" content="{{ $publishedTime }}">
+    @endif
+    <meta name="twitter:card" content="summary_large_image">
     <link rel="canonical" href="{{ url()->current() }}">
     <link rel="manifest" href="/manifest.webmanifest">
     <meta name="theme-color" content="#7c5cf0">

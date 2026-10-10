@@ -1,91 +1,129 @@
-<x-admin-layout title="{{ $workspace->name }}">
-    <div class="glass-card p-6">
-        <div class="flex items-start justify-between gap-4 flex-wrap">
-            <div>
-                <h3 class="h-display heading-gradient text-2xl font-bold">{{ $workspace->name }}</h3>
-                <p class="text-sm text-purple-500 mt-1">{{ $workspace->email }} · {{ $workspace->city }}, {{ $workspace->country }}</p>
-                <div class="mt-3 flex items-center gap-2 flex-wrap text-sm">
-                    <span class="pill pill-purple">{{ $workspace->subscription?->plan?->name ?? 'Free' }}</span>
-                    <span class="pill pill-{{ $workspace->subscription?->status === 'active' ? 'emerald' : 'amber' }}">{{ ucfirst($workspace->subscription?->status ?? '—') }}</span>
-                    @if($workspace->subscription?->payment_method === 'manual')<span class="pill pill-pink">💸 Manual</span>@endif
-                    <span class="text-xs text-purple-400">Period ends: {{ $workspace->subscription?->current_period_ends_at?->format('d M Y') ?? '∞' }}</span>
-                </div>
+<x-tabler.layout :title="$workspace->name" :pretitle="__('Superadmin')">
+    <x-slot name="actions">
+        <a href="{{ route('admin.workspaces.index') }}" class="btn">
+            <x-ti name="arrow-left" /> {{ __('Back to Workspaces') }}
+        </a>
+    </x-slot>
+
+    <div class="card mb-3">
+        <div class="card-body">
+            <h3 class="card-title">{{ $workspace->name }}</h3>
+            <div class="text-muted">{{ $workspace->email }} · {{ $workspace->city }}, {{ $workspace->country }}</div>
+            <div class="mt-2 d-flex align-items-center gap-2 flex-wrap">
+                <span class="badge bg-blue-lt">{{ $workspace->subscription?->plan?->name ?? __('Free') }}</span>
+                @if($workspace->subscription?->status)
+                    <x-tabler.status-badge :status="$workspace->subscription->status" />
+                @endif
+                @if($workspace->subscription?->payment_method === 'manual')
+                    <span class="badge bg-pink-lt">{{ __('Manual') }}</span>
+                @endif
+                <span class="text-muted small">{{ __('Period ends') }}: {{ $workspace->subscription?->current_period_ends_at?->format('d M Y') ?? '∞' }}</span>
             </div>
         </div>
     </div>
 
-    <!-- Manual Assign Plan -->
-    <div class="mt-6 gradient-border-card">
-        <div class="inner">
-            <h3 class="h-display font-bold text-lg text-purple-900 mb-1">⚡ Assign Plan Manual</h3>
-            <p class="text-sm text-purple-500 mb-4">Override subscription langsung — tanpa user perlu transfer / submit bukti.</p>
-
-            <form method="POST" action="{{ route('admin.workspaces.assign-plan', $workspace) }}" class="grid grid-cols-1 md:grid-cols-5 gap-3">
+    <div class="card mb-3">
+        <div class="card-header">
+            <h3 class="card-title">{{ __('Assign Plan Manually') }}</h3>
+        </div>
+        <div class="card-body">
+            <p class="text-muted mb-3">{{ __('Override the subscription directly — no transfer or proof submission needed.') }}</p>
+            <form method="POST" action="{{ route('admin.workspaces.assign-plan', $workspace) }}">
                 @csrf
-                <div class="md:col-span-2">
-                    <label class="text-xs font-bold text-purple-700">Plan *</label>
-                    <select name="plan_id" required class="input-premium w-full mt-1">
-                        @foreach($plans as $p)
-                            <option value="{{ $p->id }}" {{ $workspace->subscription?->plan_id === $p->id ? 'selected' : '' }}>{{ $p->name }}</option>
-                        @endforeach
-                    </select>
+                <div class="row g-2">
+                    <div class="col-md-4">
+                        <x-tabler.field :label="__('Plan')" name="plan_id" required>
+                            <select id="plan_id" name="plan_id" required class="form-select @error('plan_id') is-invalid @enderror">
+                                @foreach($plans as $p)
+                                    <option value="{{ $p->id }}" @selected($workspace->subscription?->plan_id === $p->id)>{{ $p->name }}</option>
+                                @endforeach
+                            </select>
+                        </x-tabler.field>
+                    </div>
+                    <div class="col-md-3">
+                        <x-tabler.field :label="__('Period')" name="billing_period" required>
+                            <select id="billing_period" name="billing_period" required class="form-select @error('billing_period') is-invalid @enderror">
+                                <option value="monthly">{{ __('Monthly') }}</option>
+                                <option value="yearly">{{ __('Yearly') }}</option>
+                                <option value="free">{{ __('Free (no period)') }}</option>
+                            </select>
+                        </x-tabler.field>
+                    </div>
+                    <div class="col-md-3">
+                        <x-tabler.field :label="__('Currency')" name="currency" required>
+                            <select id="currency" name="currency" required class="form-select @error('currency') is-invalid @enderror">
+                                <option value="IDR">IDR</option>
+                                <option value="USD">USD</option>
+                            </select>
+                        </x-tabler.field>
+                    </div>
+                    <div class="col-md-2">
+                        <x-tabler.field :label="__('Days valid')" name="period_days">
+                            <input type="number" id="period_days" name="period_days" placeholder="{{ __('30 / 365 / custom') }}" class="form-control @error('period_days') is-invalid @enderror">
+                        </x-tabler.field>
+                    </div>
                 </div>
-                <div>
-                    <label class="text-xs font-bold text-purple-700">Period *</label>
-                    <select name="billing_period" required class="input-premium w-full mt-1">
-                        <option value="monthly">Monthly</option>
-                        <option value="yearly">Yearly</option>
-                        <option value="free">Free (no period)</option>
-                    </select>
-                </div>
-                <div>
-                    <label class="text-xs font-bold text-purple-700">Currency *</label>
-                    <select name="currency" required class="input-premium w-full mt-1">
-                        <option value="IDR">IDR</option>
-                        <option value="USD">USD</option>
-                    </select>
-                </div>
-                <div>
-                    <label class="text-xs font-bold text-purple-700">Days valid</label>
-                    <input type="number" name="period_days" placeholder="30 / 365 / custom" class="input-premium w-full mt-1">
-                </div>
-                <label class="flex items-center gap-2 text-sm text-purple-700 md:col-span-3">
-                    <input type="checkbox" name="mark_paid" value="1" class="rounded border-purple-300">
-                    Tandai sebagai sudah dibayar (generate invoice record)
+                <label class="form-check">
+                    <input type="checkbox" name="mark_paid" value="1" class="form-check-input">
+                    <span class="form-check-label">{{ __('Mark as paid (generate an invoice record)') }}</span>
                 </label>
-                <div class="md:col-span-2 flex justify-end">
-                    <button class="btn-glow">⚡ Assign & Activate</button>
+                <div class="mt-3 d-flex justify-content-end">
+                    <button type="submit" class="btn btn-primary">
+                        <x-ti name="refresh" /> {{ __('Assign & Activate') }}
+                    </button>
                 </div>
             </form>
-
-            <div class="mt-4 p-3 rounded-xl bg-amber-50 border border-amber-200 text-xs text-amber-800">
-                ⚠️ <strong>Use case:</strong> kalau user sudah transfer offline (di luar /billing/manual flow), kasih akses langsung di sini. Atau kasih komp gratis untuk user khusus.
+            <div class="alert alert-warning mt-3 mb-0" role="alert">
+                <div class="d-flex">
+                    <div><x-ti name="alert-circle" /></div>
+                    <div>{{ __('Use this when the user paid offline (outside the manual billing flow), or to grant a complimentary plan.') }}</div>
+                </div>
             </div>
         </div>
     </div>
 
-    <div class="mt-6 grid grid-cols-1 md:grid-cols-2 gap-4">
-        <div class="glass-card p-5">
-            <h4 class="h-display font-bold text-lg mb-3">👥 Team Members ({{ $workspace->users->count() }})</h4>
-            <ul class="text-sm space-y-1">
-                @forelse($workspace->users as $u)
-                    <li class="flex items-center justify-between"><span>{{ $u->name }} <span class="text-purple-400">· {{ $u->email }}</span></span><span class="pill pill-purple text-[10px]">{{ $u->pivot->role }}</span></li>
-                @empty
-                    <li class="text-purple-400">Belum ada anggota.</li>
-                @endforelse
-            </ul>
+    <div class="row row-cards">
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-header">
+                    <h3 class="card-title">{{ __('Team Members') }} ({{ $workspace->users->count() }})</h3>
+                </div>
+                <div class="list-group list-group-flush">
+                    @forelse($workspace->users as $u)
+                        <div class="list-group-item d-flex align-items-center justify-content-between">
+                            <span>{{ $u->name }} <span class="text-muted">· {{ $u->email }}</span></span>
+                            <span class="badge bg-blue-lt">{{ $u->pivot->role }}</span>
+                        </div>
+                    @empty
+                        <div class="list-group-item text-muted">{{ __('No members yet.') }}</div>
+                    @endforelse
+                </div>
+            </div>
         </div>
-        <div class="glass-card p-5">
-            <h4 class="h-display font-bold text-lg mb-3">💳 Billing History</h4>
-            @if($workspace->subscription?->invoices?->isNotEmpty())
-                <table class="w-full text-sm">
-                    @foreach($workspace->subscription->invoices->sortByDesc('created_at') as $inv)
-                        <tr class="border-b border-purple-100/50"><td class="py-2">{{ $inv->paid_at?->format('d M Y') ?? '—' }}</td><td class="font-mono text-xs">{{ $inv->reference_no }}</td><td class="text-right font-bold">{{ $inv->currency }} {{ number_format($inv->amount, 0) }}</td><td class="text-right"><span class="pill pill-{{ $inv->status === 'paid' ? 'emerald' : 'amber' }}">{{ $inv->status }}</span></td></tr>
-                    @endforeach
-                </table>
-            @else
-                <p class="text-purple-400 text-sm">Belum ada billing history.</p>
-            @endif
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-header">
+                    <h3 class="card-title">{{ __('Billing History') }}</h3>
+                </div>
+                @if($workspace->subscription?->invoices?->isNotEmpty())
+                    <div class="table-responsive">
+                        <table class="table table-vcenter card-table">
+                            <tbody>
+                                @foreach($workspace->subscription->invoices->sortByDesc('created_at') as $inv)
+                                    <tr>
+                                        <td class="text-muted">{{ $inv->paid_at?->format('d M Y') ?? '—' }}</td>
+                                        <td><code>{{ $inv->reference_no }}</code></td>
+                                        <td class="text-end fw-semibold">{{ $inv->currency }} {{ number_format($inv->amount, 0) }}</td>
+                                        <td class="text-end"><x-tabler.status-badge :status="$inv->status" /></td>
+                                    </tr>
+                                @endforeach
+                            </tbody>
+                        </table>
+                    </div>
+                @else
+                    <div class="card-body text-muted">{{ __('No billing history yet.') }}</div>
+                @endif
+            </div>
         </div>
     </div>
-</x-admin-layout>
+</x-tabler.layout>

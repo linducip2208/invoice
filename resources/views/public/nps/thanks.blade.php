@@ -1,22 +1,21 @@
-<!DOCTYPE html>
-<html lang="id">
-<head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Terima kasih!</title>
-    @vite(['resources/css/app.css'])
-</head>
-<body class="font-sans min-h-screen flex items-center justify-center px-4" style="background: linear-gradient(135deg, #FFF8FE 0%, #FFE4F1 50%, #EDE9FE 100%);">
-    <div class="max-w-md w-full">
-        <div class="card-unicorn-glow !p-10 text-center sparkles-bg">
-            <p class="text-6xl mb-4 animate-unicorn-float">🦄</p>
-            <h1 class="font-display text-3xl font-bold text-rainbow mb-3">Terima kasih!</h1>
-            <p class="text-purple-600">Feedback kamu sangat berharga buat tim kami. Kami baca semua, dan terus tingkatkan kualitas service.</p>
-            @if($nps->score >= 9)
-                <p class="text-pink-600 font-bold mt-6 text-lg">✨ Wah, kamu salah satu klien favorit kami! ✨</p>
-            @endif
+<x-tabler.public :title="__('Thank you!')" :meta-description="__('Thank you for your feedback.')">
+    @push('head')
+        <meta name="robots" content="noindex, nofollow">
+    @endpush
+
+    <div class="row justify-content-center">
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-body text-center">
+                    <div class="mb-2 text-success"><x-ti name="check" class="icon icon-lg" /></div>
+                    <h1 class="card-title justify-content-center">{{ __('Thank you!') }}</h1>
+                    <p class="text-muted">{{ __('Your feedback means a lot to our team. We read everything and keep improving our service quality.') }}</p>
+                    @if($nps->score >= 9)
+                        <div class="alert alert-success mt-3 mb-0">{{ __('You are one of our favorite clients!') }}</div>
+                    @endif
+                </div>
+            </div>
+            <p class="text-center text-muted mt-3">{{ __('Powered by') }} <a href="/" class="fw-bold">Invocely</a></p>
         </div>
-        <p class="text-center text-xs text-purple-400 mt-6">Powered by <a href="/" class="font-bold text-rainbow">Invocely</a></p>
     </div>
-</body>
-</html>
+</x-tabler.public>

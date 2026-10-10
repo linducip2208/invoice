@@ -1,66 +1,83 @@
-<x-admin-layout title="Buat Artikel">
-    <div class="max-w-4xl mx-auto">
-        <div class="card-unicorn">
-            <div class="rainbow-bar -mx-6 -mt-6 mb-6 rounded-t-2xl"></div>
-            <h3 class="font-display font-bold text-lg text-purple-900 mb-4">📝 Artikel Baru</h3>
+<x-tabler.layout :title="__('New Article')" :pretitle="__('Superadmin')">
+    <x-slot name="actions">
+        <a href="{{ route('admin.blog.index') }}" class="btn">
+            <x-ti name="arrow-left" /> {{ __('Back to Blog') }}
+        </a>
+    </x-slot>
 
-            <form method="POST" action="{{ route('admin.blog.store') }}" class="space-y-5">
+    <div class="card">
+        <div class="card-body">
+            <form method="POST" action="{{ route('admin.blog.store') }}">
                 @csrf
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
-                    <div class="md:col-span-2">
-                        <x-input-label :value="__('Judul *')" />
-                        <x-text-input name="title" class="block mt-1 w-full" required :value="old('title')" placeholder="Judul artikel..." />
-                        @error('title') <p class="text-sm text-rose-500 mt-1">{{ $message }}</p> @enderror
+                <div class="row g-2">
+                    <div class="col-12">
+                        <x-tabler.field :label="__('Title')" name="title" required>
+                            <input type="text" id="title" name="title" value="{{ old('title') }}" required
+                                placeholder="{{ __('Article title…') }}" class="form-control @error('title') is-invalid @enderror">
+                        </x-tabler.field>
                     </div>
-                    <div>
-                        <x-input-label :value="__('Kategori')" />
-                        <select name="category_id" class="block mt-1 w-full input-unicorn rounded-xl px-4 py-2">
-                            <option value="">— Tanpa Kategori —</option>
-                            @foreach($categories as $cat)
-                                <option value="{{ $cat->id }}" @selected(old('category_id') == $cat->id)>{{ $cat->name }}</option>
-                            @endforeach
-                        </select>
+                    <div class="col-md-6">
+                        <x-tabler.field :label="__('Category')" name="category_id">
+                            <select id="category_id" name="category_id" class="form-select @error('category_id') is-invalid @enderror">
+                                <option value="">{{ __('— No Category —') }}</option>
+                                @foreach($categories as $cat)
+                                    <option value="{{ $cat->id }}" @selected(old('category_id') == $cat->id)>{{ $cat->name }}</option>
+                                @endforeach
+                            </select>
+                        </x-tabler.field>
                     </div>
-                    <div>
-                        <x-input-label :value="__('Status')" />
-                        <select name="is_published" class="block mt-1 w-full input-unicorn rounded-xl px-4 py-2">
-                            <option value="1">Published</option>
-                            <option value="0" @selected(old('is_published', '1') === '0')>Draft</option>
-                        </select>
+                    <div class="col-md-6">
+                        <x-tabler.field :label="__('Status')" name="is_published">
+                            <select id="is_published" name="is_published" class="form-select @error('is_published') is-invalid @enderror">
+                                <option value="1">{{ __('Published') }}</option>
+                                <option value="0" @selected(old('is_published', '1') === '0')>{{ __('Draft') }}</option>
+                            </select>
+                        </x-tabler.field>
                     </div>
-                    <div>
-                        <x-input-label :value="__('Featured Image URL')" />
-                        <x-text-input name="featured_image" class="block mt-1 w-full" :value="old('featured_image')" placeholder="https://..." />
+                    <div class="col-md-6">
+                        <x-tabler.field :label="__('Featured Image URL')" name="featured_image">
+                            <input type="text" id="featured_image" name="featured_image" value="{{ old('featured_image') }}"
+                                placeholder="https://…" class="form-control @error('featured_image') is-invalid @enderror">
+                        </x-tabler.field>
                     </div>
-                    <div>
-                        <x-input-label :value="__('Tanggal Publish')" />
-                        <x-text-input name="published_at" type="datetime-local" class="block mt-1 w-full" :value="old('published_at', now()->format('Y-m-d\TH:i'))" />
+                    <div class="col-md-6">
+                        <x-tabler.field :label="__('Publish Date')" name="published_at">
+                            <input type="datetime-local" id="published_at" name="published_at" value="{{ old('published_at', now()->format('Y-m-d\TH:i')) }}"
+                                class="form-control @error('published_at') is-invalid @enderror">
+                        </x-tabler.field>
                     </div>
-                    <div>
-                        <x-input-label :value="__('Meta Title')" />
-                        <x-text-input name="meta_title" class="block mt-1 w-full" :value="old('meta_title')" placeholder="SEO title..." />
+                    <div class="col-md-6">
+                        <x-tabler.field :label="__('Meta Title')" name="meta_title">
+                            <input type="text" id="meta_title" name="meta_title" value="{{ old('meta_title') }}"
+                                placeholder="{{ __('SEO title…') }}" class="form-control @error('meta_title') is-invalid @enderror">
+                        </x-tabler.field>
                     </div>
-                    <div>
-                        <x-input-label :value="__('Meta Description')" />
-                        <x-text-input name="meta_description" class="block mt-1 w-full" :value="old('meta_description')" placeholder="SEO description..." />
+                    <div class="col-md-6">
+                        <x-tabler.field :label="__('Meta Description')" name="meta_description">
+                            <input type="text" id="meta_description" name="meta_description" value="{{ old('meta_description') }}"
+                                placeholder="{{ __('SEO description…') }}" class="form-control @error('meta_description') is-invalid @enderror">
+                        </x-tabler.field>
                     </div>
-                    <div class="md:col-span-2">
-                        <x-input-label :value="__('Excerpt')" />
-                        <textarea name="excerpt" rows="2" class="block mt-1 w-full input-unicorn rounded-xl px-4 py-2" placeholder="Ringkasan singkat...">{{ old('excerpt') }}</textarea>
+                    <div class="col-12">
+                        <x-tabler.field :label="__('Excerpt')" name="excerpt">
+                            <textarea id="excerpt" name="excerpt" rows="2" placeholder="{{ __('Short summary…') }}"
+                                class="form-control @error('excerpt') is-invalid @enderror">{{ old('excerpt') }}</textarea>
+                        </x-tabler.field>
                     </div>
-                    <div class="md:col-span-2">
-                        <x-input-label :value="__('Konten *')" />
-                        <textarea name="content" rows="20" required class="block mt-1 w-full input-unicorn rounded-xl px-4 py-2 font-mono text-sm" placeholder="Tulis konten HTML...">{{ old('content') }}</textarea>
-                        @error('content') <p class="text-sm text-rose-500 mt-1">{{ $message }}</p> @enderror
-                        <p class="text-xs text-purple-400 mt-1">Gunakan HTML untuk formatting. Contoh: &lt;h2&gt;, &lt;p&gt;, &lt;ul&gt;, &lt;strong&gt;, dll.</p>
+                    <div class="col-12">
+                        <x-tabler.field :label="__('Content')" name="content" required :help="__('Use HTML for formatting, e.g. <h2>, <p>, <ul>, <strong>.')">
+                            <textarea id="content" name="content" rows="20" required placeholder="{{ __('Write HTML content…') }}"
+                                class="form-control font-monospace @error('content') is-invalid @enderror">{{ old('content') }}</textarea>
+                        </x-tabler.field>
                     </div>
                 </div>
-
-                <div class="flex items-center justify-end gap-3 pt-4 border-t border-purple-100">
-                    <a href="{{ route('admin.blog.index') }}" class="btn-unicorn-secondary">Batal</a>
-                    <button type="submit" class="btn-unicorn">✦ Simpan Artikel</button>
+                <div class="d-flex justify-content-end gap-2 pt-2 border-top">
+                    <a href="{{ route('admin.blog.index') }}" class="btn">{{ __('Cancel') }}</a>
+                    <button type="submit" class="btn btn-primary">
+                        <x-ti name="check" /> {{ __('Save Article') }}
+                    </button>
                 </div>
             </form>
         </div>
     </div>
-</x-admin-layout>
+</x-tabler.layout>

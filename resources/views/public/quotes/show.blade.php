@@ -1,108 +1,90 @@
-<!DOCTYPE html>
-<html lang="id">
-<head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Quote {{ $quote->quote_no }} — {{ $quote->workspace?->name }}</title>
-    <link rel="preconnect" href="https://fonts.bunny.net">
-    <link href="https://fonts.bunny.net/css?family=quicksand:400,500,600,700|comfortaa:600,700&display=swap" rel="stylesheet">
-    @vite(['resources/css/app.css'])
-    <script src="https://cdn.jsdelivr.net/npm/signature_pad@4.2.0/dist/signature_pad.umd.min.js" defer></script>
-</head>
-<body class="font-sans" style="background: linear-gradient(135deg, #FFF8FE 0%, #FFE4F1 50%, #EDE9FE 100%); min-height: 100vh;">
+<x-tabler.public :title="__('Quote :no', ['no' => $quote->quote_no])" :meta-description="__('Quote :no from :ws', ['no' => $quote->quote_no, 'ws' => $quote->workspace?->name])">
+    @push('head')
+        <meta name="robots" content="noindex, nofollow">
+        <script src="https://cdn.jsdelivr.net/npm/signature_pad@4.2.0/dist/signature_pad.umd.min.js" defer></script>
+    @endpush
 
-<div class="max-w-4xl mx-auto px-4 py-8">
+    <x-tabler.alert />
 
-    @if(session('success'))
-        <div class="rounded-2xl bg-emerald-50 border-2 border-emerald-200 p-4 text-emerald-800 mb-4">✓ {{ session('success') }}</div>
-    @endif
-    @if(session('error'))
-        <div class="rounded-2xl bg-rose-50 border-2 border-rose-200 p-4 text-rose-800 mb-4">⚠️ {{ session('error') }}</div>
-    @endif
-
-    {{-- Header --}}
-    <div class="card-unicorn-glow !p-8 mb-6">
-        <div class="flex items-start justify-between flex-wrap gap-4">
-            <div>
-                <p class="text-xs uppercase tracking-[0.2em] text-purple-400 mb-1">{{ __('Penawaran dari') }}</p>
-                <h1 class="font-display text-2xl font-bold text-purple-900">{{ $quote->workspace?->name }}</h1>
-                @if($quote->workspace?->address)
-                    <p class="text-sm text-purple-500 mt-1">{{ $quote->workspace->address }}</p>
-                @endif
+    <div class="card mb-3">
+        <div class="card-body">
+            <div class="row g-3">
+                <div class="col-md-6">
+                    <div class="subheader">{{ __('Quote from') }}</div>
+                    <h2 class="page-title">{{ $quote->workspace?->name }}</h2>
+                    @if($quote->workspace?->address)
+                        <p class="text-muted mb-0">{{ $quote->workspace->address }}</p>
+                    @endif
+                </div>
+                <div class="col-md-6 text-md-end">
+                    <div class="subheader">{{ __('No') }}</div>
+                    <p class="h2 mb-1">{{ $quote->quote_no }}</p>
+                    @php
+                        $statusBadge = match($quote->status) {
+                            'accepted','converted' => ['green', __('Accepted')],
+                            'rejected' => ['red', __('Rejected')],
+                            'expired' => ['yellow', __('Expired')],
+                            'sent' => ['blue', __('Sent')],
+                            default => ['yellow', __('Draft')],
+                        };
+                    @endphp
+                    <span class="badge bg-{{ $statusBadge[0] }}-lt">{{ $statusBadge[1] }}</span>
+                </div>
             </div>
-            <div class="text-right">
-                <p class="text-xs uppercase tracking-[0.2em] text-purple-400 mb-1">{{ __('No') }}</p>
-                <p class="font-display text-2xl font-bold text-rainbow">{{ $quote->quote_no }}</p>
-                @php
-                    $statusBadge = match($quote->status) {
-                        'accepted','converted' => ['emerald-100','emerald-700','✓ Diterima'],
-                        'rejected'             => ['rose-100','rose-700','✗ Ditolak'],
-                        'expired'              => ['gray-100','gray-600','— Kadaluarsa'],
-                        'sent'                 => ['sky-100','sky-700','📤 Terkirim'],
-                        default                => ['amber-100','amber-700','⏳ Draft'],
-                    };
-                @endphp
-                <span class="inline-block mt-2 text-xs px-3 py-1 rounded-full bg-{{ $statusBadge[0] }} text-{{ $statusBadge[1] }} font-bold">{{ $statusBadge[2] }}</span>
-            </div>
-        </div>
-
-        <hr class="border-purple-100 my-6">
-
-        <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
-            <div>
-                <p class="text-xs uppercase tracking-[0.2em] text-purple-400 mb-1">{{ __('Untuk') }}</p>
-                <p class="font-display font-bold text-purple-900 text-lg">{{ $quote->client?->company_name ?: $quote->client?->name }}</p>
-                @if($quote->client?->company_name)<p class="text-sm text-purple-600">{{ $quote->client->name }}</p>@endif
-                @if($quote->client?->email)<p class="text-sm text-purple-500">{{ $quote->client->email }}</p>@endif
-            </div>
-            <div>
-                <p class="text-xs uppercase tracking-[0.2em] text-purple-400 mb-1">{{ __('Detail') }}</p>
-                <p class="text-sm text-purple-700">📅 Issued: <strong>{{ $quote->issue_date->format('d M Y') }}</strong></p>
-                @if($quote->expiry_date)
-                    <p class="text-sm text-purple-700">⏰ Expires: <strong>{{ $quote->expiry_date->format('d M Y') }}</strong></p>
-                @endif
-                <p class="text-sm text-purple-700">💱 Mata uang: <strong>{{ $quote->currency }}</strong></p>
+            <hr>
+            <div class="row g-3">
+                <div class="col-md-6">
+                    <div class="subheader">{{ __('For') }}</div>
+                    <p class="fw-bold mb-0">{{ $quote->client?->company_name ?: $quote->client?->name }}</p>
+                    @if($quote->client?->company_name)<p class="text-muted mb-0">{{ $quote->client->name }}</p>@endif
+                    @if($quote->client?->email)<p class="text-muted mb-0">{{ $quote->client->email }}</p>@endif
+                </div>
+                <div class="col-md-6">
+                    <div class="subheader">{{ __('Details') }}</div>
+                    <p class="mb-1 text-muted"><x-ti name="calendar" /> {{ __('Issued') }}: <strong class="text-body">{{ $quote->issue_date->format('d M Y') }}</strong></p>
+                    @if($quote->expiry_date)
+                        <p class="mb-1 text-muted"><x-ti name="clock" /> {{ __('Expires') }}: <strong class="text-body">{{ $quote->expiry_date->format('d M Y') }}</strong></p>
+                    @endif
+                    <p class="mb-0 text-muted"><x-ti name="currency-dollar" /> {{ __('Currency') }}: <strong class="text-body">{{ $quote->currency }}</strong></p>
+                </div>
             </div>
         </div>
     </div>
 
-    {{-- Items --}}
-    <div class="card-unicorn !p-0 overflow-hidden mb-6">
-        <div class="p-5 border-b border-purple-100">
-            <h2 class="font-display font-bold text-lg text-purple-900">📋 {{ __('Detail Pekerjaan') }}</h2>
-        </div>
-        <div class="overflow-x-auto">
-            <table class="min-w-full">
-                <thead class="bg-gradient-to-r from-pink-50 via-purple-50 to-sky-50">
+    <div class="card mb-3">
+        <div class="card-header"><h3 class="card-title"><x-ti name="file-text" /> {{ __('Job Details') }}</h3></div>
+        <div class="table-responsive">
+            <table class="table table-vcenter card-table">
+                <thead>
                     <tr>
-                        <th class="px-4 py-2 text-left text-[11px] font-bold text-purple-700 uppercase">Deskripsi</th>
-                        <th class="px-4 py-2 text-right text-[11px] font-bold text-purple-700 uppercase w-20">Qty</th>
-                        <th class="px-4 py-2 text-right text-[11px] font-bold text-purple-700 uppercase w-32">Harga</th>
-                        <th class="px-4 py-2 text-right text-[11px] font-bold text-purple-700 uppercase w-32">Total</th>
+                        <th>{{ __('Description') }}</th>
+                        <th class="text-end">{{ __('Qty') }}</th>
+                        <th class="text-end">{{ __('Price') }}</th>
+                        <th class="text-end">{{ __('Total') }}</th>
                     </tr>
                 </thead>
                 <tbody>
                     @foreach($quote->items as $item)
-                        <tr class="border-t border-purple-100">
-                            <td class="px-4 py-3 text-purple-900">{{ $item['description'] }}</td>
-                            <td class="px-4 py-3 text-right text-purple-700">{{ number_format($item['quantity'], 2) }}</td>
-                            <td class="px-4 py-3 text-right text-purple-700">{{ number_format($item['unit_price'], 0) }}</td>
-                            <td class="px-4 py-3 text-right font-bold text-purple-900">{{ number_format($item['quantity'] * $item['unit_price'], 0) }}</td>
+                        <tr>
+                            <td>{{ $item['description'] }}</td>
+                            <td class="text-end">{{ number_format($item['quantity'], 2) }}</td>
+                            <td class="text-end">{{ number_format($item['unit_price'], 0) }}</td>
+                            <td class="text-end fw-bold">{{ number_format($item['quantity'] * $item['unit_price'], 0) }}</td>
                         </tr>
                     @endforeach
                 </tbody>
             </table>
         </div>
-        <div class="p-5 bg-gradient-to-br from-pink-50/40 to-purple-50/40 border-t border-purple-100">
-            <div class="flex justify-end">
-                <div class="w-full max-w-xs space-y-1.5 text-sm">
-                    <div class="flex justify-between"><span class="text-purple-500">Subtotal</span><span class="text-purple-900 font-semibold">{{ number_format($quote->subtotal, 0) }}</span></div>
+        <div class="card-footer">
+            <div class="row justify-content-end">
+                <div class="col-md-5">
+                    <div class="d-flex justify-content-between"><span class="text-muted">{{ __('Subtotal') }}</span><span class="fw-semibold">{{ number_format($quote->subtotal, 0) }}</span></div>
                     @if($quote->tax_amount > 0)
-                        <div class="flex justify-between"><span class="text-purple-500">PPN ({{ number_format($quote->tax_rate, 0) }}%)</span><span class="text-purple-900">{{ number_format($quote->tax_amount, 0) }}</span></div>
+                        <div class="d-flex justify-content-between"><span class="text-muted">{{ __('Tax') }} ({{ number_format($quote->tax_rate, 0) }}%)</span><span>{{ number_format($quote->tax_amount, 0) }}</span></div>
                     @endif
-                    <div class="flex justify-between border-t border-purple-200 pt-2 text-base">
-                        <span class="font-display font-bold text-purple-900">Total</span>
-                        <span class="font-display font-bold text-rainbow">{{ number_format($quote->total, 0) }} {{ $quote->currency }}</span>
+                    <div class="d-flex justify-content-between border-top pt-2 mt-2">
+                        <span class="fw-bold">{{ __('Total') }}</span>
+                        <span class="fw-bold">{{ number_format($quote->total, 0) }} {{ $quote->currency }}</span>
                     </div>
                 </div>
             </div>
@@ -110,160 +92,153 @@
     </div>
 
     @if($quote->notes || $quote->terms)
-        <div class="card-unicorn !p-6 mb-6 grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div class="row row-cards mb-3">
             @if($quote->notes)
-                <div>
-                    <p class="text-xs uppercase tracking-wider text-purple-400 mb-1">📝 {{ __('Catatan') }}</p>
-                    <p class="text-sm text-purple-700 whitespace-pre-line">{{ $quote->notes }}</p>
+                <div class="col-md-6">
+                    <div class="card h-100"><div class="card-body"><h4 class="subheader">{{ __('Notes') }}</h4><p class="mb-0 whitespace-pre-line">{{ $quote->notes }}</p></div></div>
                 </div>
             @endif
             @if($quote->terms)
-                <div>
-                    <p class="text-xs uppercase tracking-wider text-purple-400 mb-1">📜 {{ __('Syarat & Ketentuan') }}</p>
-                    <p class="text-sm text-purple-700 whitespace-pre-line">{{ $quote->terms }}</p>
+                <div class="col-md-6">
+                    <div class="card h-100"><div class="card-body"><h4 class="subheader">{{ __('Terms & Conditions') }}</h4><p class="mb-0 whitespace-pre-line">{{ $quote->terms }}</p></div></div>
                 </div>
             @endif
         </div>
     @endif
 
-    {{-- Action: sign or already signed --}}
     @if($isSigned)
-        <div class="card-unicorn-glow !p-8 mb-6 sparkles-bg">
-            <p class="text-3xl mb-3 text-center">✓</p>
-            <h3 class="font-display font-bold text-xl text-emerald-700 text-center">Quote sudah ditandatangani</h3>
-            @foreach($signatures as $sig)
-                <div class="mt-5 p-4 bg-white rounded-2xl border border-emerald-200">
-                    <div class="flex items-center justify-between flex-wrap gap-3">
-                        <div>
-                            <p class="font-bold text-purple-900">{{ $sig->signer_name }}</p>
-                            <p class="text-xs text-purple-500">{{ $sig->signer_email }} · {{ $sig->signed_at->format('d M Y, H:i') }}</p>
+        <div class="card mb-3">
+            <div class="card-body text-center">
+                <div class="mb-2 text-success"><x-ti name="check" class="icon icon-lg" /></div>
+                <h3 class="card-title justify-content-center">{{ __('Quote already signed') }}</h3>
+                @foreach($signatures as $sig)
+                    <div class="card mt-3">
+                        <div class="card-body">
+                            <div class="row g-2 align-items-center">
+                                <div class="col text-start">
+                                    <p class="fw-bold mb-0">{{ $sig->signer_name }}</p>
+                                    <p class="text-muted mb-0">{{ $sig->signer_email }} &middot; {{ $sig->signed_at->format('d M Y, H:i') }}</p>
+                                </div>
+                                <div class="col-auto">
+                                    @if($sig->signature_image_path)
+                                        <img src="{{ asset('storage/' . $sig->signature_image_path) }}" alt="{{ __('Signature') }}" class="img-responsive" style="max-height: 4rem;">
+                                    @elseif($sig->signature_typed)
+                                        <p class="fw-bold fst-italic h3 mb-0">{{ $sig->signature_typed }}</p>
+                                    @endif
+                                </div>
+                            </div>
                         </div>
-                        @if($sig->signature_image_path)
-                            <img src="{{ asset('storage/' . $sig->signature_image_path) }}" alt="Signature" class="max-h-16 bg-white">
-                        @elseif($sig->signature_typed)
-                            <p class="font-bold italic text-2xl text-purple-700" style="font-family: cursive;">{{ $sig->signature_typed }}</p>
-                        @endif
                     </div>
-                </div>
-            @endforeach
+                @endforeach
+            </div>
         </div>
-    @elseif(in_array($quote->status, ['draft','sent']))
-        <div class="card-unicorn !p-8 mb-6" x-data="signaturePad()">
-            <h3 class="font-display font-bold text-lg text-purple-900 mb-2">✍️ {{ __('Setujui Penawaran') }}</h3>
-            <p class="text-sm text-purple-600 mb-5">Tanda tangan untuk menerima quote ini. Setelah ditandatangani, akan otomatis dikonversi ke invoice.</p>
-
-            <form method="POST" action="{{ route('public.quote.sign', $quote->public_token) }}" @submit="onSubmit($event)">
-                @csrf
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-5">
-                    <div>
-                        <label class="block text-xs font-bold uppercase tracking-wider text-purple-700 mb-1">Nama *</label>
-                        <input type="text" name="signer_name" required maxlength="120"
-                               value="{{ old('signer_name', $quote->client?->name) }}"
-                               class="input-unicorn rounded-xl px-4 py-2 w-full">
-                    </div>
-                    <div>
-                        <label class="block text-xs font-bold uppercase tracking-wider text-purple-700 mb-1">Email *</label>
-                        <input type="email" name="signer_email" required
-                               value="{{ old('signer_email', $quote->client?->email) }}"
-                               class="input-unicorn rounded-xl px-4 py-2 w-full">
-                    </div>
-                </div>
-
-                <div class="mb-3">
-                    <div class="flex gap-2 mb-2">
-                        <button type="button" @click="mode = 'draw'" :class="mode === 'draw' ? 'btn-unicorn' : 'btn-unicorn-secondary'" class="text-xs">✏️ Gambar</button>
-                        <button type="button" @click="mode = 'type'" :class="mode === 'type' ? 'btn-unicorn' : 'btn-unicorn-secondary'" class="text-xs">⌨️ Ketik Nama</button>
-                    </div>
-
-                    <div x-show="mode === 'draw'">
-                        <div class="rounded-2xl border-2 border-purple-200 bg-white overflow-hidden">
-                            <canvas x-ref="canvas" class="block w-full" style="height: 200px; touch-action: none;"></canvas>
+    @elseif(in_array($quote->status, ['draft', 'sent']))
+        <div class="card mb-3" x-data="signaturePad()">
+            <div class="card-header"><h3 class="card-title"><x-ti name="pencil" /> {{ __('Approve Quote') }}</h3></div>
+            <div class="card-body">
+                <p class="text-muted">{{ __('Sign to accept this quote. Once signed, it will be converted to an invoice automatically.') }}</p>
+                <form method="POST" action="{{ route('public.quote.sign', $quote->public_token) }}" @submit="onSubmit($event)">
+                    @csrf
+                    <div class="row g-2 mb-3">
+                        <div class="col-md-6">
+                            <x-tabler.field :label="__('Name')" name="signer_name" :required="true">
+                                <input type="text" id="signer_name" name="signer_name" required maxlength="120" value="{{ old('signer_name', $quote->client?->name) }}" class="form-control @error('signer_name') is-invalid @enderror">
+                            </x-tabler.field>
                         </div>
-                        <div class="flex justify-between items-center mt-2">
-                            <p class="text-xs text-purple-400">Tarik untuk gambar tanda tangan</p>
-                            <button type="button" @click="clear()" class="text-xs text-rose-500 font-semibold hover:underline">🗑️ Bersihkan</button>
+                        <div class="col-md-6">
+                            <x-tabler.field :label="__('Email')" name="signer_email" :required="true">
+                                <input type="email" id="signer_email" name="signer_email" required value="{{ old('signer_email', $quote->client?->email) }}" class="form-control @error('signer_email') is-invalid @enderror">
+                            </x-tabler.field>
                         </div>
-                        <input type="hidden" name="signature_data" :value="signatureData">
                     </div>
-
-                    <div x-show="mode === 'type'" class="rounded-2xl border-2 border-purple-200 bg-white p-6">
-                        <input type="text" name="signature_typed" maxlength="120" placeholder="Ketik nama lengkapmu"
-                               class="w-full text-3xl text-center bg-transparent border-none focus:ring-0 italic text-purple-700"
-                               style="font-family: 'Brush Script MT', cursive;">
+                    <div class="mb-3">
+                        <div class="btn-group mb-2" role="group">
+                            <button type="button" @click="mode = 'draw'" :class="mode === 'draw' ? 'btn btn-primary btn-sm' : 'btn btn-sm'" class="btn btn-sm"><x-ti name="pencil" /> {{ __('Draw') }}</button>
+                            <button type="button" @click="mode = 'type'" :class="mode === 'type' ? 'btn btn-primary btn-sm' : 'btn btn-sm'" class="btn btn-sm"><x-ti name="keyboard" /> {{ __('Type Name') }}</button>
+                        </div>
+                        <div x-show="mode === 'draw'">
+                            <div class="form-control p-0 overflow-hidden">
+                                <canvas x-ref="canvas" class="d-block w-100" style="height: 200px; touch-action: none;"></canvas>
+                            </div>
+                            <div class="d-flex justify-content-between align-items-center mt-2">
+                                <p class="text-muted mb-0">{{ __('Draw your signature above') }}</p>
+                                <button type="button" @click="clear()" class="btn btn-sm btn-link text-danger">{{ __('Clear') }}</button>
+                            </div>
+                            <input type="hidden" name="signature_data" :value="signatureData">
+                        </div>
+                        <div x-show="mode === 'type'" class="form-control p-3">
+                            <input type="text" name="signature_typed" maxlength="120" placeholder="{{ __('Type your full name') }}" class="form-control-plaintext text-center fst-italic h3">
+                        </div>
+                        @error('signature_data')<div class="invalid-feedback d-block">{{ $message }}</div>@enderror
                     </div>
-                </div>
-
-                <div class="rounded-xl bg-amber-50 border border-amber-200 p-3 text-xs text-amber-800 mb-5">
-                    ℹ️ Dengan menandatangani, kamu menyatakan setuju dengan terms quote ini. IP & timestamp akan tercatat untuk verifikasi.
-                </div>
-
-                <div class="flex items-center justify-end gap-3">
-                    <form method="POST" action="{{ route('public.quote.reject', $quote->public_token) }}" onsubmit="return confirm('Yakin tolak quote ini?')" class="inline">
-                        @csrf
-                        <button type="submit" class="text-sm text-rose-500 font-semibold hover:underline">✗ Tolak Quote</button>
-                    </form>
-                    <button type="submit" class="btn-unicorn px-8">✦ Tanda Tangan & Setujui</button>
-                </div>
-            </form>
+                    <div class="alert alert-warning">{{ __('By signing, you agree to the terms of this quote. IP and timestamp are recorded for verification.') }}</div>
+                    <div class="d-flex align-items-center justify-content-end gap-3">
+                        <button type="submit" class="btn btn-primary"><x-ti name="check" /> {{ __('Sign & Approve') }}</button>
+                    </div>
+                </form>
+                <form method="POST" action="{{ route('public.quote.reject', $quote->public_token) }}" onsubmit="return confirm('{{ __('Are you sure you want to reject this quote?') }}')" class="mt-2 text-end">
+                    @csrf
+                    <button type="submit" class="btn btn-link text-danger btn-sm">{{ __('Reject Quote') }}</button>
+                </form>
+            </div>
         </div>
     @else
-        <div class="card-unicorn !p-6 text-center text-purple-500">
-            Quote ini sudah {{ $quote->status }}.
+        <div class="card">
+            <div class="card-body">
+                <x-tabler.empty icon="file-text" :title="__('Quote :status', ['status' => $quote->status])" />
+            </div>
         </div>
     @endif
 
-    <p class="text-center text-xs text-purple-400 mt-8">
-        Powered by <a href="/" class="font-bold text-rainbow">Invocely</a>
-    </p>
-</div>
+    <p class="text-center text-muted mt-3">{{ __('Powered by') }} <a href="/" class="fw-bold">Invocely</a></p>
 
-<script src="//unpkg.com/alpinejs" defer></script>
-<script>
-    function signaturePad() {
-        return {
-            mode: 'draw',
-            pad: null,
-            signatureData: '',
-            init() {
-                this.$nextTick(() => this.initPad());
-            },
-            initPad() {
-                if (typeof SignaturePad === 'undefined') {
-                    setTimeout(() => this.initPad(), 100);
-                    return;
-                }
-                const canvas = this.$refs.canvas;
-                const resize = () => {
-                    const ratio = window.devicePixelRatio || 1;
-                    canvas.width = canvas.offsetWidth * ratio;
-                    canvas.height = canvas.offsetHeight * ratio;
-                    canvas.getContext('2d').scale(ratio, ratio);
-                    if (this.pad) this.pad.clear();
-                };
-                window.addEventListener('resize', resize);
-                resize();
-                this.pad = new SignaturePad(canvas, {
-                    penColor: '#7C3AED',
-                    backgroundColor: 'rgba(0,0,0,0)',
-                });
-            },
-            clear() {
-                if (this.pad) this.pad.clear();
-                this.signatureData = '';
-            },
-            onSubmit(e) {
-                if (this.mode === 'draw') {
-                    if (this.pad && !this.pad.isEmpty()) {
-                        this.signatureData = this.pad.toDataURL('image/png');
-                    } else {
-                        e.preventDefault();
-                        alert('Silakan gambar tanda tangan, atau pilih mode "Ketik Nama".');
-                        return false;
+    @push('scripts')
+        <script>
+            function signaturePad() {
+                return {
+                    mode: 'draw',
+                    pad: null,
+                    signatureData: '',
+                    init() {
+                        this.$nextTick(() => this.initPad());
+                    },
+                    initPad() {
+                        if (typeof SignaturePad === 'undefined') {
+                            setTimeout(() => this.initPad(), 100);
+                            return;
+                        }
+                        const canvas = this.$refs.canvas;
+                        const resize = () => {
+                            const ratio = window.devicePixelRatio || 1;
+                            canvas.width = canvas.offsetWidth * ratio;
+                            canvas.height = canvas.offsetHeight * ratio;
+                            canvas.getContext('2d').scale(ratio, ratio);
+                            if (this.pad) this.pad.clear();
+                        };
+                        window.addEventListener('resize', resize);
+                        resize();
+                        this.pad = new SignaturePad(canvas, {
+                            penColor: '#206bc4',
+                            backgroundColor: 'rgba(0,0,0,0)',
+                        });
+                    },
+                    clear() {
+                        if (this.pad) this.pad.clear();
+                        this.signatureData = '';
+                    },
+                    onSubmit(e) {
+                        if (this.mode === 'draw') {
+                            if (this.pad && !this.pad.isEmpty()) {
+                                this.signatureData = this.pad.toDataURL('image/png');
+                            } else {
+                                e.preventDefault();
+                                alert(@json(__('Please draw your signature, or switch to "Type Name" mode.')));
+                                return false;
+                            }
+                        }
                     }
-                }
+                };
             }
-        };
-    }
-</script>
-</body>
-</html>
+        </script>
+    @endpush
+</x-tabler.public>
