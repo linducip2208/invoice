@@ -630,5 +630,22 @@
     "Record updated": "Data diperbarui",
     "Record created": "Data dibuat",
     "Record deleted": "Data dihapus",
-    "A professional overview of your receivables": "Ringkasan profesional piutang Anda"
+    "A professional overview of your receivables": "Ringkasan profesional piutang Anda",
+    "Paid invoices": "Invoice lunas",
+    "No collections yet": "Belum ada koleksi",
+    "Recorded payments will appear here as a weekly trend.": "Pembayaran tercatat tampil di sini sebagai tren mingguan.",
+    "Collections trend": "Tren koleksi",
+    "Client Views": "Dilihat klien",
+    "Attachments": "Lampiran",
+    "Log Email": "Log Email",
+    "Copied!": "Tersalin!",
+    "Upload": "Unggah",
+    "PDF": "PDF",
+    "Mark Sent": "Tandai terkirim",
+    "Views": "dilihat",
+    "First viewed": "Pertama dilihat",
+    "Last": "Terakhir",
+    "Belum dilihat klien.": "Belum dilihat klien.",
+    "Akan tercatat otomatis saat klien buka link publik.": "Akan tercatat otomatis saat klien buka link publik.",
+    "Belum ada lampiran.": "Belum ada lampiran."
 }
