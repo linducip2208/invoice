@@ -30,6 +30,23 @@ Alpine.start();
   });
 })();
 
+// Keyboard access to scrollable table regions (axe scrollable-region-focusable):
+// any .table-responsive that actually overflows becomes focusable with a label.
+function makeScrollableFocusable() {
+  document.querySelectorAll('.table-responsive').forEach((el) => {
+    if (el.scrollWidth > el.clientWidth + 1) {
+      el.setAttribute('tabindex', '0');
+      el.setAttribute('role', 'region');
+      if (!el.getAttribute('aria-label')) el.setAttribute('aria-label', 'Scrollable table');
+    } else {
+      el.removeAttribute('tabindex');
+      el.removeAttribute('role');
+    }
+  });
+}
+document.addEventListener('DOMContentLoaded', makeScrollableFocusable);
+window.addEventListener('resize', makeScrollableFocusable);
+
 // Prevent double-submit on financial forms (create invoice/payment/quote).
 document.addEventListener('submit', (e) => {
   const form = e.target;

@@ -37,4 +37,20 @@ abstract class TestCase extends BaseTestCase
             'currency' => $workspace->currency ?? 'IDR',
         ]);
     }
+
+    /**
+     * Attach an ACTIVE Business subscription (all feature flags on).
+     */
+    protected function giveBusinessPlan(Workspace $workspace): Subscription
+    {
+        $business = Plan::where('slug', 'business')->firstOrFail();
+
+        return Subscription::create([
+            'workspace_id' => $workspace->id,
+            'plan_id' => $business->id,
+            'status' => 'active',
+            'billing_period' => 'monthly',
+            'currency' => $workspace->currency ?? 'IDR',
+        ]);
+    }
 }

@@ -7,6 +7,11 @@ const PAGES = [
   ['login', '/login', false],
   ['quote-public', '/q/e2e-quote-token-000000000001', false],
   ['docs', '/docs', false],
+  ['invoices', '/invoices', true],
+  ['clients', '/clients', true],
+  ['payments', '/payments', true],
+  ['quotes', '/quotes', true],
+  ['settings', '/workspace/settings', true],
 ];
 
 test.beforeEach(async ({ page }) => {

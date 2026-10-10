@@ -145,9 +145,6 @@
                                 value="{{ old('quote_high_risk_threshold', $workspace->quote_high_risk_threshold) }}" class="form-control">
                         </x-tabler.field>
                     </div>
-                            @error('accent_color')<div class="invalid-feedback d-block">{{ $message }}</div>@enderror
-                        </x-tabler.field>
-                    </div>
                 </div>
             </div>
             <div class="card-footer text-end">

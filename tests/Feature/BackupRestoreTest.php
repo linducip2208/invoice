@@ -36,6 +36,11 @@ class BackupRestoreTest extends TestCase
     #[Test]
     public function backup_and_restore_round_trip(): void
     {
+        // Backups live on real disk (not :memory:): clear stale files from
+        // previous runs so the glob below only sees this test's backup.
+        foreach (glob(storage_path('app/backups/backup-*.sqlite')) ?: [] as $stale) {
+            @unlink($stale);
+        }
         $this->file = storage_path('app/e2e-restore-test.sqlite');
         @unlink($this->file);
         touch($this->file);
