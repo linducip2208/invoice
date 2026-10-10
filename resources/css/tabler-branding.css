@@ -121,6 +121,56 @@ body {
   .nav-link { min-height: 2.75rem; }
 }
 
+/* ---------- Landing premium ---------- */
+.landing-hero {
+  background:
+    radial-gradient(42rem 22rem at 85% -10%, rgba(124, 92, 240, 0.55), transparent 60%),
+    radial-gradient(30rem 18rem at -10% 110%, rgba(56, 189, 248, 0.35), transparent 60%),
+    linear-gradient(135deg, #141b33 0%, #1e2560 60%, #2c2a72 100%);
+  border-radius: 1.5rem;
+  padding: clamp(2rem, 5vw, 3.5rem);
+  color: #fff;
+  position: relative;
+  overflow: hidden;
+}
+.landing-hero .text-muted { color: rgba(255, 255, 255, 0.78) !important; }
+.landing-hero h1,
+.landing-hero h2,
+.landing-hero h3,
+.landing-hero .display-5,
+.landing-cta-band h1,
+.landing-cta-band h2,
+.landing-cta-band h3 { color: #fff; }
+.landing-hero .display-5 { letter-spacing: -0.02em; }
+.landing-cta-band {
+  background: linear-gradient(120deg, #1e2560 0%, #4c2fd6 70%, #6d4ae0 100%);
+  border-radius: 1.5rem;
+  padding: clamp(2rem, 5vw, 3rem);
+  color: #fff;
+  position: relative;
+  overflow: hidden;
+}
+.landing-cta-band .text-muted { color: rgba(255, 255, 255, 0.8) !important; }
+.landing-tint {
+  background: #f1f4fa;
+  border-radius: 1.5rem;
+  padding: clamp(1.5rem, 4vw, 2.5rem);
+}
+[data-bs-theme="dark"] .landing-tint { background: #1c2340; }
+.landing-shot {
+  border-radius: 1rem;
+  box-shadow: 0 24px 60px -24px rgba(20, 27, 51, 0.55);
+  border: 1px solid rgba(255, 255, 255, 0.14);
+}
+.icon-tile {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 2.75rem;
+  height: 2.75rem;
+  border-radius: 0.9rem;
+}
+
 /* Focus visibility (WCAG 2.2 AA) */
 :focus-visible {
   outline: 2px solid var(--tblr-primary);
