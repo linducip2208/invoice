@@ -1,0 +1,9 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(rm -rf storage/framework/views/*)",
+      "Bash(php artisan *)",
+      "PowerShell(Compress-Archive *)"
+    ]
+  }
+}
