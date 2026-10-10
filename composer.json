@@ -33,7 +33,8 @@
         },
         "files": [
             "app/Helpers/workspace.php",
-            "app/Helpers/branding.php"
+            "app/Helpers/branding.php",
+            "app/Helpers/money.php"
         ]
     },
     "autoload-dev": {

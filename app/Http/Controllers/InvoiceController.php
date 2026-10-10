@@ -159,8 +159,15 @@ class InvoiceController extends Controller
     {
         abort_unless($invoice->workspace_id === workspace()?->id, 403);
         $invoice->load(['items.product', 'client', 'payments', 'emailLogs', 'publicViews', 'attachments']);
+        $activity = \App\Models\AuditLog::with('user:id,name')
+            ->where('subject_type', Invoice::class)
+            ->where('subject_id', $invoice->id)
+            ->where('workspace_id', $invoice->workspace_id)
+            ->latest()
+            ->take(10)
+            ->get();
 
-        return view('invoices.show', compact('invoice'));
+        return view('invoices.show', compact('invoice', 'activity'));
     }
 
     public function edit(Invoice $invoice)

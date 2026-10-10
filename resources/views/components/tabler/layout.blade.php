@@ -60,39 +60,39 @@
                             'icon' => $icon, 'label' => $label, 'badge' => $badge,
                         ];
                         $sections = [
-                            __('Overview') => [
+                            __('WORKSPACE') => [
                                 $link('dashboard', 'dashboard', 'layout-dashboard', __('Dashboard')),
                                 $link('notifications.index', 'notifications.*', 'bell', __('Notifications')),
                             ],
-                            __('Sales') => [
+                            __('SALES') => [
                                 $link('invoices.index', 'invoices.*', 'file-invoice', __('Invoices')),
                                 $link('quotes.index', 'quotes.*', 'file-text', __('Quotations')),
-                                $link('clients.index', 'clients.*', 'users', __('Clients')),
+                                $link('clients.index', 'clients.*', 'users', __('Customers')),
                                 $link('products.index', 'products.*', 'package', __('Products & Services')),
                                 $link('projects.index', 'projects.*', 'briefcase', __('Projects')),
                                 $link('credit-notes.index', 'credit-notes.*', 'receipt-refund', __('Credit Notes')),
                             ],
-                            __('Payments & Finance') => [
+                            __('CASH FLOW') => [
                                 $link('payments.index', 'payments.*', 'credit-card', __('Payments')),
-                                $link('recurring.index', 'recurring.*', 'repeat', __('Recurring Billing')),
-                                $link('reports.aging', 'reports.aging', 'hourglass', __('Outstanding & Aging')),
-                                $link('bank-reconcile.index', 'bank-reconcile.*', 'building-bank', __('Bank Reconciliation')),
+                                $link('reports.aging', 'reports.aging', 'hourglass', __('Outstanding Invoices')),
+                                $link('recurring.index', 'recurring.*', 'repeat', __('Recurring Invoices')),
                                 $link('expenses.index', 'expenses.*', 'receipt', __('Expenses')),
+                                $link('bank-reconcile.index', 'bank-reconcile.*', 'building-bank', __('Reconciliation')),
                                 $link('accounting-exports.index', 'accounting-exports.*', 'file-export', __('Accounting Exports')),
                             ],
-                            __('Reports') => [
-                                $link('reports.index', 'reports.index', 'chart-bar', __('Financial Overview')),
+                            __('INSIGHTS') => [
+                                $link('reports.index', 'reports.index', 'chart-bar', __('Reports')),
                                 $link('reports.cashflow', 'reports.cashflow', 'chart-line', __('Cash Flow')),
                                 $link('reports.pl', 'reports.pl', 'chart-pie', __('Profit & Loss')),
                                 $link('reports.tax', 'reports.tax', 'percentage', __('Tax Reports')),
                             ],
-                            __('Automation') => [
+                            __('AUTOMATION') => [
                                 $link('ai-providers.index', 'ai-providers.*', 'robot', __('AI Providers')),
                                 $link('expenses.ocr.upload', 'expenses.ocr.*', 'scan', __('OCR Receipt')),
                                 $link('report-subscriptions.index', 'report-subscriptions.*', 'send', __('Scheduled Reports')),
                             ],
-                            __('Workspace') => [
-                                $link('workspace.settings', 'workspace.*', 'settings', __('Business Settings')),
+                            __('CONFIGURATION') => [
+                                $link('workspace.settings', 'workspace.*', 'settings', __('Company Settings')),
                                 $link('team.index', 'team.*', 'users', __('Team & Roles')),
                                 $link('invoice-layouts.index', 'invoice-layouts.*', 'template', __('Invoice Templates')),
                                 $link('gateways.index', 'gateways.*', 'plug', __('Payment Gateways')),
@@ -103,11 +103,11 @@
                                 $link('clients.import.show', 'clients.import.*', 'upload', __('CSV Import')),
                                 $link('exports.index', 'exports.*', 'download', __('Exports')),
                             ],
-                            __('Billing') => [
+                            __('BILLING') => [
                                 $link('billing.show', 'billing.*', 'wallet', __('Current Plan')),
                                 $link('affiliate.index', 'affiliate.*', 'star', __('Affiliate')),
                             ],
-                            __('Help') => [
+                            __('HELP') => [
                                 $link('docs', 'docs', 'book', __('Documentation')),
                                 $link('support.index', 'support.*', 'lifebuoy', __('Support')),
                             ],
@@ -165,6 +165,26 @@
                     <span class="navbar-toggler-icon"></span>
                 </button>
                 <div class="navbar-nav flex-row order-md-last ms-auto">
+                    <div class="nav-item dropdown me-2 d-flex">
+                        <a href="#" class="btn btn-primary d-flex align-items-center gap-1" data-bs-toggle="dropdown"
+                            aria-label="{{ __('Quick create') }}" aria-expanded="false">
+                            <x-ti name="plus" /> <span class="d-none d-sm-inline">{{ __('New') }}</span>
+                        </a>
+                        <div class="dropdown-menu dropdown-menu-end">
+                            <a class="dropdown-item" href="{{ route('invoices.create') }}">{{ __('New Invoice') }}</a>
+                            <a class="dropdown-item" href="{{ route('quotes.create') }}">{{ __('New Quotation') }}</a>
+                            <a class="dropdown-item" href="{{ route('clients.create') }}">{{ __('New Customer') }}</a>
+                        </div>
+                    </div>
+                    @php $unreadCount = \App\Models\AppNotification::unread()->count(); @endphp
+                    <div class="nav-item me-2">
+                        <a href="{{ route('notifications.index') }}" class="btn btn-icon position-relative" aria-label="{{ __('Notifications') }}">
+                            <x-ti name="bell" />
+                            @if($unreadCount > 0)
+                                <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-red">{{ $unreadCount > 9 ? '9+' : $unreadCount }}</span>
+                            @endif
+                        </a>
+                    </div>
                     @if($ws)
                         <div class="nav-item dropdown me-2 d-flex">
                             <a href="#" class="nav-link d-flex lh-1 p-0 px-2" data-bs-toggle="dropdown"

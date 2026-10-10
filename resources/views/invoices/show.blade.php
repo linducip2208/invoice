@@ -13,6 +13,10 @@
         <a href="{{ route('invoices.pdf', $invoice) }}" class="btn">
             <x-ti name="download" /> {{ __('PDF') }}
         </a>
+        <form method="POST" action="{{ route('invoices.rotate-link', $invoice) }}" class="d-inline" onsubmit="return confirm({{ Js::from(__('Rotate the public link? The old link stops working.')) }});">
+            @csrf
+            <button class="btn" title="{{ __('Rotate public link') }}"><x-ti name="refresh" /></button>
+        </form>
         <form method="POST" action="{{ route('invoices.duplicate', $invoice) }}" class="d-inline">
             @csrf
             <button class="btn"><x-ti name="copy" /> {{ __('Duplicate') }}</button>
@@ -320,7 +324,7 @@
     </div>
 
     <!-- Public Link -->
-    <div class="card">
+    <div class="card mb-3">
         <div class="card-body">
             <h3 class="card-title mb-3">{{ __('Public Link') }}</h3>
             <div class="input-group">
@@ -329,6 +333,27 @@
                     {{ __('Copy') }}
                 </button>
             </div>
+        </div>
+    </div>
+
+    <!-- Activity timeline -->
+    <div class="card">
+        <div class="card-header">
+            <h3 class="card-title"><x-ti name="history" /> {{ __('Activity') }}</h3>
+        </div>
+        <div class="card-body">
+            @if($activity->isNotEmpty())
+                <ul class="steps steps-vertical">
+                    @foreach($activity as $event)
+                        <li class="step-item">
+                            <div class="h4 m-0">{{ $event->description }}</div>
+                            <div class="text-muted">{{ $event->created_at?->format('d M Y, H:i') }}@if($event->user)· {{ $event->user->name }}@endif</div>
+                        </li>
+                    @endforeach
+                </ul>
+            @else
+                <p class="text-muted mb-0">{{ __('No activity yet.') }}</p>
+            @endif
         </div>
     </div>
 
