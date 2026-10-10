@@ -32,8 +32,10 @@ storage/app/.license.lock
 # Laravel runtime cache/views/sessions (regenerable, may contain
 # throttle counters and other host-specific state)
 storage/framework/cache/data/
-storage/framework/sessions/
-storage/framework/views/
+storage/framework/sessions/*
+!storage/framework/sessions/.gitignore
+storage/framework/views/*
+!storage/framework/views/.gitignore
 storage/logs/*.log
 
 # Playwright E2E artifacts (traces, screenshots on failure, local report)
