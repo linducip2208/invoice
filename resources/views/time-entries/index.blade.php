@@ -1,50 +1,96 @@
-<x-app-layout>
-    <x-slot name="header">
-        <h2 class="heading-unicorn flex items-center gap-2">⏱️ {{ __('Time Tracking') }}</h2>
-    </x-slot>
-    <div class="max-w-6xl mx-auto space-y-6">
-        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            <div class="card-unicorn"><p class="text-xs text-purple-400 uppercase font-bold">{{ __('Total Hours') }}</p><p class="text-2xl font-display font-bold">{{ number_format($totalHours, 2) }}h</p></div>
-            <div class="card-unicorn"><p class="text-xs text-purple-400 uppercase font-bold">{{ __('Billable Amount') }}</p><p class="text-2xl font-display font-bold">{{ number_format($totalAmount, 2) }}</p></div>
-        </div>
+<x-tabler.layout :title="__('Time Tracking')" :pretitle="__('Workspace')">
+    <div class="row row-decks row-cards mb-3">
+        <x-tabler.stat :label="__('Total Hours')" :value="number_format($totalHours, 2) . 'h'" icon="clock" />
+        <x-tabler.stat :label="__('Billable Amount')" :value="number_format($totalAmount, 2)" icon="coins" />
+    </div>
 
-        <div class="card-unicorn">
-            <h3 class="font-display font-bold text-lg mb-4">+ {{ __('Tambah Time Entry') }}</h3>
-            <form method="POST" action="{{ route('time-entries.store') }}" class="grid grid-cols-1 md:grid-cols-6 gap-3">
+    <div class="card mb-3">
+        <div class="card-header">
+            <h3 class="card-title"><x-ti name="plus" /> {{ __('Tambah Time Entry') }}</h3>
+        </div>
+        <div class="card-body">
+            <form method="POST" action="{{ route('time-entries.store') }}">
                 @csrf
-                <input type="date" name="entry_date" value="{{ now()->toDateString() }}" required class="input-unicorn rounded-xl px-3 py-2 text-sm">
-                <select name="client_id" class="input-unicorn rounded-xl px-3 py-2 text-sm">
-                    <option value="">— Klien (opsional) —</option>
-                    @foreach($clients as $c)<option value="{{ $c->id }}">{{ $c->name }}</option>@endforeach
-                </select>
-                <input type="text" name="description" required placeholder="Apa yang dikerjakan" class="input-unicorn rounded-xl px-3 py-2 text-sm md:col-span-2">
-                <input type="number" step="0.25" min="0.01" name="hours" required placeholder="Jam (mis: 2.5)" class="input-unicorn rounded-xl px-3 py-2 text-sm">
-                <input type="number" step="0.01" min="0" name="hourly_rate" required placeholder="Rate / jam" class="input-unicorn rounded-xl px-3 py-2 text-sm">
-                <label class="flex items-center gap-2 text-sm md:col-span-5"><input type="checkbox" name="billable" value="1" checked> {{ __('Billable (bisa di-invoice)') }}</label>
-                <button class="btn-unicorn">{{ __('Catat') }}</button>
+                <div class="row g-2">
+                    <div class="col-md-2">
+                        <x-tabler.field name="entry_date" type="date" :value="now()->toDateString()" attrs="required" />
+                    </div>
+                    <div class="col-md-2">
+                        <x-tabler.field name="client_id">
+                            <select id="client_id" name="client_id" class="form-select">
+                                <option value="">— {{ __('Klien (opsional)') }} —</option>
+                                @foreach($clients as $c)
+                                    <option value="{{ $c->id }}">{{ $c->name }}</option>
+                                @endforeach
+                            </select>
+                        </x-tabler.field>
+                    </div>
+                    <div class="col-md-3">
+                        <x-tabler.field name="description" type="text" attrs='required placeholder="Apa yang dikerjakan"' />
+                    </div>
+                    <div class="col-md-2">
+                        <x-tabler.field name="hours" type="number" attrs='step="0.25" min="0.01" required placeholder="Jam (mis: 2.5)"' />
+                    </div>
+                    <div class="col-md-3">
+                        <x-tabler.field name="hourly_rate" type="number" attrs='step="0.01" min="0" required placeholder="Rate / jam"' />
+                    </div>
+                </div>
+                <div class="row g-2 align-items-center">
+                    <div class="col-md-8">
+                        <label class="form-check">
+                            <input type="checkbox" name="billable" value="1" checked class="form-check-input">
+                            <span class="form-check-label">{{ __('Billable (bisa di-invoice)') }}</span>
+                        </label>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="btn-list justify-content-end">
+                            <button class="btn btn-primary">{{ __('Catat') }}</button>
+                        </div>
+                    </div>
+                </div>
             </form>
         </div>
+    </div>
 
-        <div class="card-unicorn">
-            <table class="table-unicorn">
-                <thead><tr><th>Tanggal</th><th>Klien</th><th>Deskripsi</th><th class="text-right">Jam</th><th class="text-right">Rate</th><th class="text-right">Total</th><th></th></tr></thead>
+    <div class="card">
+        <div class="table-responsive">
+            <table class="table table-vcenter card-table">
+                <thead>
+                    <tr>
+                        <th>{{ __('Tanggal') }}</th>
+                        <th>{{ __('Klien') }}</th>
+                        <th>{{ __('Deskripsi') }}</th>
+                        <th class="text-end">{{ __('Jam') }}</th>
+                        <th class="text-end">{{ __('Rate') }}</th>
+                        <th class="text-end">{{ __('Total') }}</th>
+                        <th class="text-end">{{ __('Actions') }}</th>
+                    </tr>
+                </thead>
                 <tbody>
                     @forelse($entries as $e)
-                    <tr>
-                        <td>{{ $e->entry_date?->format('d M Y') }}</td>
-                        <td>{{ $e->client?->name ?? '—' }}</td>
-                        <td>{{ $e->description }}</td>
-                        <td class="text-right">{{ number_format($e->hours, 2) }}</td>
-                        <td class="text-right">{{ number_format($e->hourly_rate, 2) }}</td>
-                        <td class="text-right font-bold">{{ number_format($e->amount, 2) }}</td>
-                        <td>
-                            <form method="POST" action="{{ route('time-entries.destroy', $e) }}" onsubmit="return confirm('Hapus?');">@csrf @method('DELETE')<button class="text-rose-500 hover:text-rose-700 text-sm">×</button></form>
-                        </td>
-                    </tr>
-                    @empty<tr><td colspan="7" class="text-center text-purple-400 py-8">Belum ada entry.</td></tr>@endforelse
+                        <tr>
+                            <td class="text-muted">{{ $e->entry_date?->format('d M Y') }}</td>
+                            <td class="text-muted">{{ $e->client?->name ?? '—' }}</td>
+                            <td>{{ $e->description }}</td>
+                            <td class="text-end">{{ number_format($e->hours, 2) }}</td>
+                            <td class="text-end">{{ number_format($e->hourly_rate, 2) }}</td>
+                            <td class="text-end fw-bold">{{ number_format($e->amount, 2) }}</td>
+                            <td class="text-end">
+                                <x-tabler.delete-button :action="route('time-entries.destroy', $e)" :confirm="__('Hapus?')" />
+                            </td>
+                        </tr>
+                    @empty
+                        <tr>
+                            <td colspan="7">
+                                <x-tabler.empty icon="clock" :title="__('Belum ada entry.')" />
+                            </td>
+                        </tr>
+                    @endforelse
                 </tbody>
             </table>
-            <div class="mt-4">{{ $entries->links() }}</div>
         </div>
+        @if($entries->hasPages())
+            <div class="card-footer d-flex justify-content-center">{{ $entries->links() }}</div>
+        @endif
     </div>
-</x-app-layout>
+</x-tabler.layout>

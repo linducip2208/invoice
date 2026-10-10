@@ -1,78 +1,85 @@
-<x-app-layout>
-    <x-slot name="header">
-        <h2 class="heading-unicorn flex items-center gap-2">{{ __('Project Baru') }} <span class="text-2xl">📁</span></h2>
+<x-tabler.layout :title="__('Project Baru')">
+    <x-slot name="actions">
+        <a href="{{ route('projects.index') }}" class="btn">
+            <x-ti name="arrow-left" /> {{ __('Semua Project') }}
+        </a>
     </x-slot>
 
-    <div class="max-w-3xl mx-auto">
-        <form method="POST" action="{{ route('projects.store') }}" class="card-unicorn !p-8 space-y-5">
-            @csrf
+    <div class="card">
+        <div class="card-header">
+            <h3 class="card-title">{{ __('Project Baru') }}</h3>
+        </div>
+        <div class="card-body">
+            <form method="POST" action="{{ route('projects.store') }}">
+                @csrf
 
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div>
-                    <x-input-label :value="__('Nama Project *')" />
-                    <x-text-input name="name" :value="old('name')" required class="mt-1 w-full" />
-                    @error('name') <p class="text-xs text-rose-500 mt-1">{{ $message }}</p> @enderror
+                <div class="row g-3">
+                    <div class="col-md-6">
+                        <x-tabler.field :label="__('Nama Project *')" name="name" type="text" :value="old('name')"
+                            attrs="required" />
+                    </div>
+                    <div class="col-md-6">
+                        <x-tabler.field :label="__('Klien *')" name="client_id">
+                            <select name="client_id" id="client_id" required class="form-select @error('client_id') is-invalid @enderror">
+                                <option value="">{{ __('Pilih klien…') }}</option>
+                                @foreach($clients as $c)
+                                    <option value="{{ $c->id }}" {{ old('client_id') == $c->id ? 'selected' : '' }}>{{ $c->name }}</option>
+                                @endforeach
+                            </select>
+                        </x-tabler.field>
+                    </div>
                 </div>
-                <div>
-                    <x-input-label :value="__('Klien *')" />
-                    <select name="client_id" required class="input-unicorn rounded-xl px-4 py-2 mt-1 block w-full">
-                        <option value="">{{ __('Pilih klien…') }}</option>
-                        @foreach($clients as $c)
-                            <option value="{{ $c->id }}" {{ old('client_id') == $c->id ? 'selected' : '' }}>{{ $c->name }}</option>
-                        @endforeach
-                    </select>
-                    @error('client_id') <p class="text-xs text-rose-500 mt-1">{{ $message }}</p> @enderror
-                </div>
-            </div>
 
-            <div>
-                <x-input-label :value="__('Deskripsi')" />
-                <textarea name="description" rows="3" class="input-unicorn rounded-xl px-4 py-2 mt-1 block w-full">{{ old('description') }}</textarea>
-            </div>
+                <x-tabler.field :label="__('Deskripsi')" name="description">
+                    <textarea name="description" id="description" rows="3"
+                        class="form-control @error('description') is-invalid @enderror">{{ old('description') }}</textarea>
+                </x-tabler.field>
 
-            <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
-                <div>
-                    <x-input-label :value="__('Status *')" />
-                    <select name="status" class="input-unicorn rounded-xl px-4 py-2 mt-1 block w-full">
-                        <option value="active">Active</option>
-                        <option value="on_hold">On Hold</option>
-                        <option value="completed">Completed</option>
-                        <option value="cancelled">Cancelled</option>
-                    </select>
+                <div class="row g-3">
+                    <div class="col-md-3 col-6">
+                        <x-tabler.field :label="__('Status *')" name="status">
+                            <select name="status" id="status" class="form-select">
+                                <option value="active" @selected(old('status') === 'active')>Active</option>
+                                <option value="on_hold" @selected(old('status') === 'on_hold')>On Hold</option>
+                                <option value="completed" @selected(old('status') === 'completed')>Completed</option>
+                                <option value="cancelled" @selected(old('status') === 'cancelled')>Cancelled</option>
+                            </select>
+                        </x-tabler.field>
+                    </div>
+                    <div class="col-md-3 col-6">
+                        <x-tabler.field :label="__('Budget (Rp)')" name="budget_amount" type="number" :value="old('budget_amount')"
+                            attrs='step="0.01" min="0"' />
+                    </div>
+                    <div class="col-md-3 col-6">
+                        <x-tabler.field :label="__('Budget (Jam)')" name="budget_hours" type="number" :value="old('budget_hours')"
+                            attrs='step="0.01" min="0"' />
+                    </div>
+                    <div class="col-md-3 col-6">
+                        <x-tabler.field :label="__('Tarif/Jam')" name="hourly_rate" type="number" :value="old('hourly_rate')"
+                            attrs='step="0.01" min="0"' />
+                    </div>
                 </div>
-                <div>
-                    <x-input-label :value="__('Budget (Rp)')" />
-                    <x-text-input name="budget_amount" type="number" step="0.01" min="0" :value="old('budget_amount')" class="mt-1 w-full" />
-                </div>
-                <div>
-                    <x-input-label :value="__('Budget (Jam)')" />
-                    <x-text-input name="budget_hours" type="number" step="0.01" min="0" :value="old('budget_hours')" class="mt-1 w-full" />
-                </div>
-                <div>
-                    <x-input-label :value="__('Tarif/Jam')" />
-                    <x-text-input name="hourly_rate" type="number" step="0.01" min="0" :value="old('hourly_rate')" class="mt-1 w-full" />
-                </div>
-            </div>
 
-            <div class="grid grid-cols-2 md:grid-cols-3 gap-4">
-                <div>
-                    <x-input-label :value="__('Tgl Mulai')" />
-                    <x-text-input name="start_date" type="date" :value="old('start_date')" class="mt-1 w-full" />
+                <div class="row g-3">
+                    <div class="col-md-4 col-6">
+                        <x-tabler.field :label="__('Tgl Mulai')" name="start_date" type="date" :value="old('start_date')" />
+                    </div>
+                    <div class="col-md-4 col-6">
+                        <x-tabler.field :label="__('Tgl Selesai')" name="end_date" type="date" :value="old('end_date')" />
+                    </div>
+                    <div class="col-md-4">
+                        <x-tabler.field :label="__('Warna Tag')" name="color">
+                            <input type="color" name="color" id="color" value="{{ old('color', '#A78BFA') }}"
+                                class="form-control form-control-color w-100">
+                        </x-tabler.field>
+                    </div>
                 </div>
-                <div>
-                    <x-input-label :value="__('Tgl Selesai')" />
-                    <x-text-input name="end_date" type="date" :value="old('end_date')" class="mt-1 w-full" />
-                </div>
-                <div>
-                    <x-input-label :value="__('Warna Tag')" />
-                    <input type="color" name="color" value="{{ old('color', '#A78BFA') }}" class="h-10 w-full rounded-xl border-2 border-purple-200 cursor-pointer mt-1">
-                </div>
-            </div>
 
-            <div class="flex items-center justify-end gap-3 pt-2">
-                <a href="{{ route('projects.index') }}" class="btn-unicorn-secondary">{{ __('Batal') }}</a>
-                <button type="submit" class="btn-unicorn px-8">✦ {{ __('Buat Project') }}</button>
-            </div>
-        </form>
+                <div class="d-flex justify-content-end gap-2 mt-3">
+                    <a href="{{ route('projects.index') }}" class="btn">{{ __('Batal') }}</a>
+                    <button type="submit" class="btn btn-primary">{{ __('Buat Project') }}</button>
+                </div>
+            </form>
+        </div>
     </div>
-</x-app-layout>
+</x-tabler.layout>

@@ -1,48 +1,51 @@
-<x-app-layout>
-    <x-slot name="header">
-        <h2 class="heading-unicorn flex items-center gap-2">{{ __('Quick Invoice') }} <span class="text-2xl">⚡</span></h2>
-    </x-slot>
-
-    <div class="max-w-lg mx-auto">
-        <form method="POST" action="{{ route('mobile.quick-invoice.store') }}" class="card-unicorn !p-6 space-y-5">
-            @csrf
-            <p class="text-sm text-purple-500">3 field. 1 klik kirim. Bahkan dari HP.</p>
-
-            <div>
-                <x-input-label :value="__('Klien *')" />
-                <select name="client_id" required class="input-unicorn rounded-xl px-4 py-3 mt-1 block w-full text-base">
-                    <option value="">— Pilih klien —</option>
-                    @foreach($clients as $c)
-                        <option value="{{ $c->id }}">{{ $c->name }}</option>
-                    @endforeach
-                </select>
-            </div>
-
-            <div>
-                <x-input-label :value="__('Apa yang ditagih *')" />
-                <textarea name="description" rows="2" required maxlength="500"
-                          class="input-unicorn rounded-xl px-4 py-3 mt-1 w-full text-base"
-                          placeholder="Mis. Jasa design landing page"></textarea>
-            </div>
-
-            <div class="grid grid-cols-2 gap-4">
-                <div>
-                    <x-input-label :value="__('Total *')" />
-                    <x-text-input name="amount" type="number" step="0.01" min="0.01" required class="mt-1 w-full text-lg font-bold" placeholder="500000" />
+<x-tabler.layout :title="__('Quick Invoice')" :pretitle="__('Mobile')">
+    <div class="row justify-content-center">
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-header">
+                    <h3 class="card-title">{{ __('Quick Invoice') }}</h3>
+                    <div class="card-subtitle">{{ __('3 field. 1 klik kirim. Bahkan dari HP.') }}</div>
                 </div>
-                <div>
-                    <x-input-label :value="__('Jatuh tempo')" />
-                    <select name="due_in_days" class="input-unicorn rounded-xl px-4 py-3 mt-1 block w-full text-base">
-                        <option value="7">+7 hari</option>
-                        <option value="14" selected>+14 hari</option>
-                        <option value="30">+30 hari</option>
-                        <option value="60">+60 hari</option>
-                    </select>
+                <div class="card-body">
+                    <form method="POST" action="{{ route('mobile.quick-invoice.store') }}">
+                        @csrf
+                        <x-tabler.field :label="__('Klien *')" name="client_id" :required="true">
+                            <select id="client_id" name="client_id" required class="form-select form-select-lg">
+                                <option value="">— {{ __('Pilih klien') }} —</option>
+                                @foreach($clients as $c)
+                                    <option value="{{ $c->id }}">{{ $c->name }}</option>
+                                @endforeach
+                            </select>
+                        </x-tabler.field>
+
+                        <x-tabler.field :label="__('Apa yang ditagih *')" name="description" :required="true">
+                            <textarea id="description" name="description" rows="2" required maxlength="500"
+                                placeholder="Mis. Jasa design landing page" class="form-control form-control-lg"></textarea>
+                        </x-tabler.field>
+
+                        <div class="row g-2">
+                            <div class="col-6">
+                                <x-tabler.field :label="__('Total *')" name="amount" :required="true">
+                                    <input type="number" id="amount" name="amount" step="0.01" min="0.01" required placeholder="500000" class="form-control form-control-lg fw-bold">
+                                </x-tabler.field>
+                            </div>
+                            <div class="col-6">
+                                <x-tabler.field :label="__('Jatuh tempo')" name="due_in_days">
+                                    <select id="due_in_days" name="due_in_days" class="form-select form-select-lg">
+                                        <option value="7">+7 {{ __('hari') }}</option>
+                                        <option value="14" selected>+14 {{ __('hari') }}</option>
+                                        <option value="30">+30 {{ __('hari') }}</option>
+                                        <option value="60">+60 {{ __('hari') }}</option>
+                                    </select>
+                                </x-tabler.field>
+                            </div>
+                        </div>
+
+                        <button type="submit" class="btn btn-primary w-100 btn-lg"><x-ti name="bolt" /> {{ __('Buat Invoice') }}</button>
+                        <p class="form-hint text-center mt-2 mb-0">{{ __('Detail lainnya bisa di-edit setelah ini di halaman invoice.') }}</p>
+                    </form>
                 </div>
             </div>
-
-            <button type="submit" class="btn-unicorn w-full py-4 text-lg">⚡ {{ __('Buat Invoice') }}</button>
-            <p class="text-xs text-center text-purple-400">Detail lainnya bisa di-edit setelah ini di halaman invoice.</p>
-        </form>
+        </div>
     </div>
-</x-app-layout>
+</x-tabler.layout>

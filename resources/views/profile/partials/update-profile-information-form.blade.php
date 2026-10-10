@@ -1,48 +1,42 @@
 <section>
-    <header>
-        <h2 class="font-display text-lg font-bold text-purple-900 flex items-center gap-2">
-            <span class="text-pink-400">✦</span> {{ __('Profile Information') }}
-        </h2>
-        <p class="mt-1 text-sm text-purple-500">{{ __("Update your account's name and email address.") }}</p>
-    </header>
+    <p class="text-muted mb-3">{{ __("Update your account's name and email address.") }}</p>
 
     <form id="send-verification" method="post" action="{{ route('verification.send') }}">
         @csrf
     </form>
 
-    <form method="post" action="{{ route('profile.update') }}" class="mt-6 space-y-5">
+    <form method="post" action="{{ route('profile.update') }}">
         @csrf @method('patch')
 
-        <div>
-            <x-input-label for="name" :value="__('Name')" />
-            <x-text-input id="name" name="name" type="text" class="mt-1 block w-full" :value="old('name', $user->name)" required autofocus autocomplete="name" />
-            <x-input-error class="mt-2" :messages="$errors->get('name')" />
-        </div>
+        <x-tabler.field :label="__('Name')" name="name">
+            <input type="text" id="name" name="name" value="{{ old('name', $user->name) }}" required autofocus autocomplete="name"
+                class="form-control @error('name') is-invalid @enderror">
+            @error('name')<div class="invalid-feedback">{{ $message }}</div>@enderror
+        </x-tabler.field>
 
-        <div>
-            <x-input-label for="email" :value="__('Email')" />
-            <x-text-input id="email" name="email" type="email" class="mt-1 block w-full" :value="old('email', $user->email)" required autocomplete="username" />
-            <x-input-error class="mt-2" :messages="$errors->get('email')" />
+        <x-tabler.field :label="__('Email')" name="email">
+            <input type="email" id="email" name="email" value="{{ old('email', $user->email) }}" required autocomplete="username"
+                class="form-control @error('email') is-invalid @enderror">
+            @error('email')<div class="invalid-feedback">{{ $message }}</div>@enderror
+        </x-tabler.field>
 
-            @if ($user instanceof \Illuminate\Contracts\Auth\MustVerifyEmail && ! $user->hasVerifiedEmail())
-                <div>
-                    <p class="text-sm mt-2 text-amber-700">
-                        {{ __('Your email address is unverified.') }}
-                        <button form="send-verification" class="font-semibold text-pink-500 hover:text-pink-700 underline decoration-pink-300 underline-offset-2">
-                            {{ __('Resend verification email →') }}
-                        </button>
-                    </p>
-                    @if (session('status') === 'verification-link-sent')
-                        <p class="mt-2 font-semibold text-sm text-green-600">✦ {{ __('A new verification link has been sent.') }}</p>
-                    @endif
+        @if ($user instanceof \Illuminate\Contracts\Auth\MustVerifyEmail && ! $user->hasVerifiedEmail())
+            <div class="alert alert-warning">
+                <div>{{ __('Your email address is unverified.') }}
+                    <button form="send-verification" class="btn btn-sm ms-2">{{ __('Resend verification email →') }}</button>
                 </div>
-            @endif
-        </div>
+                @if (session('status') === 'verification-link-sent')
+                    <div class="mt-2 text-success">{{ __('A new verification link has been sent.') }}</div>
+                @endif
+            </div>
+        @endif
 
-        <div class="flex items-center gap-4">
-            <x-primary-button>✦ {{ __('Save') }}</x-primary-button>
+        <div class="d-flex align-items-center gap-3">
+            <button type="submit" class="btn btn-primary">
+                <x-ti name="check" /> {{ __('Save') }}
+            </button>
             @if (session('status') === 'profile-updated')
-                <p x-data="{ show: true }" x-show="show" x-transition x-init="setTimeout(() => show = false, 2000)" class="text-sm font-semibold text-green-600">✦ {{ __('Saved!') }}</p>
+                <p x-data="{ show: true }" x-show="show" x-transition x-init="setTimeout(() => show = false, 2000)" class="text-success mb-0">{{ __('Saved!') }}</p>
             @endif
         </div>
     </form>

@@ -1,16 +1,29 @@
-<x-app-layout>
-    <x-slot name="header"><h2 class="heading-unicorn">💬 {{ __('Ticket Baru') }}</h2></x-slot>
-    <div class="max-w-2xl mx-auto card-unicorn">
-        <form method="POST" action="{{ route('support.store') }}" class="space-y-4">
-            @csrf
-            <div><label class="text-sm font-bold">Subject *</label><input type="text" name="subject" required maxlength="255" class="input-unicorn rounded-xl px-3 py-2 mt-1 w-full"></div>
-            <div><label class="text-sm font-bold">Priority *</label>
-                <select name="priority" class="input-unicorn rounded-xl px-3 py-2 mt-1 w-full">
-                    <option>low</option><option selected>normal</option><option>high</option><option>urgent</option>
-                </select>
+<x-tabler.layout :title="__('Ticket Baru')" :pretitle="__('Support Tickets')">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card">
+                <div class="card-header"><h3 class="card-title">{{ __('Ticket Baru') }}</h3></div>
+                <div class="card-body">
+                    <form method="POST" action="{{ route('support.store') }}">
+                        @csrf
+                        <x-tabler.field :label="__('Subject *')" name="subject" :required="true">
+                            <input type="text" id="subject" name="subject" required maxlength="255" class="form-control">
+                        </x-tabler.field>
+                        <x-tabler.field :label="__('Priority *')" name="priority" :required="true">
+                            <select id="priority" name="priority" class="form-select">
+                                <option>low</option><option selected>normal</option><option>high</option><option>urgent</option>
+                            </select>
+                        </x-tabler.field>
+                        <x-tabler.field :label="__('Pesan *')" name="message" :required="true">
+                            <textarea id="message" name="message" rows="6" required placeholder="Jelaskan issue / pertanyaan kamu..." class="form-control"></textarea>
+                        </x-tabler.field>
+                        <div class="d-flex justify-content-end gap-2">
+                            <a href="{{ route('support.index') }}" class="btn">{{ __('Cancel') }}</a>
+                            <button class="btn btn-primary"><x-ti name="send" /> {{ __('Submit Ticket') }}</button>
+                        </div>
+                    </form>
+                </div>
             </div>
-            <div><label class="text-sm font-bold">Pesan *</label><textarea name="message" rows="6" required class="input-unicorn rounded-xl px-3 py-2 mt-1 w-full" placeholder="Jelaskan issue / pertanyaan kamu..."></textarea></div>
-            <div class="flex justify-end gap-3"><a href="{{ route('support.index') }}" class="btn-unicorn-secondary">Cancel</a><button class="btn-unicorn">Submit Ticket</button></div>
-        </form>
+        </div>
     </div>
-</x-app-layout>
+</x-tabler.layout>

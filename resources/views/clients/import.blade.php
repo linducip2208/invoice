@@ -1,19 +1,31 @@
-<x-app-layout>
-    <x-slot name="header"><h2 class="heading-unicorn">📥 {{ __('Import Clients dari CSV') }}</h2></x-slot>
-    <div class="max-w-2xl mx-auto card-unicorn">
-        <p class="text-sm text-purple-600 mb-4">Upload file CSV. Header wajib di baris pertama: <code class="font-mono">name, company_name, email, phone, address, city, state, country, postal_code, tax_id</code> (cuma <code>name</code> yang required).</p>
+<x-tabler.layout :title="__('Import Clients dari CSV')">
+    <x-slot name="actions">
+        <a href="{{ route('clients.index') }}" class="btn">
+            <x-ti name="arrow-left" /> {{ __('Back to Clients') }}
+        </a>
+    </x-slot>
 
-        <form method="POST" action="{{ route('clients.import') }}" enctype="multipart/form-data" class="space-y-4">
-            @csrf
-            <input type="file" name="file" accept=".csv,text/csv" required class="block w-full text-sm">
-            <button class="btn-unicorn">Upload & Import</button>
-        </form>
+    <div class="card">
+        <div class="card-header">
+            <h3 class="card-title">{{ __('Import Clients dari CSV') }}</h3>
+        </div>
+        <div class="card-body">
+            <p class="text-muted mb-3">Upload file CSV. Header wajib di baris pertama: <code>name, company_name, email, phone, address, city, state, country, postal_code, tax_id</code> (cuma <code>name</code> yang required).</p>
 
-        <div class="mt-6 p-3 bg-purple-50 rounded-lg text-xs">
-            <p class="font-bold text-purple-700 mb-2">Contoh CSV:</p>
-<pre class="font-mono text-purple-700">name,company_name,email,phone,city
+            <form method="POST" action="{{ route('clients.import') }}" enctype="multipart/form-data">
+                @csrf
+                <x-tabler.field :label="__('CSV File')" name="file" type="file" attrs='accept=".csv,text/csv" required' />
+                <button type="submit" class="btn btn-primary">
+                    <x-ti name="upload" /> {{ __('Upload & Import') }}
+                </button>
+            </form>
+
+            <div class="alert alert-info mt-3 mb-0">
+                <p class="fw-semibold mb-2">Contoh CSV:</p>
+<pre class="mb-0">name,company_name,email,phone,city
 John Doe,Acme Inc,john@acme.com,+62-812-1234,Jakarta
 Jane Smith,Globex,jane@globex.com,+62-813-5678,Surabaya</pre>
+            </div>
         </div>
     </div>
-</x-app-layout>
+</x-tabler.layout>

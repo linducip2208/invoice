@@ -1,127 +1,114 @@
-<x-app-layout>
-    <x-slot name="header">
-        <h2 class="heading-unicorn flex items-center gap-2">{{ __('Discount Coupons') }} <span class="text-2xl">🎟️</span></h2>
-    </x-slot>
-
-    <div class="max-w-5xl mx-auto space-y-6">
-        @if(session('success'))
-            <div class="rounded-2xl bg-emerald-50 border-2 border-emerald-200 p-4 text-emerald-800">✓ {{ session('success') }}</div>
-        @endif
-
-        <details class="card-unicorn !p-6">
-            <summary class="cursor-pointer font-display font-bold text-purple-900 flex items-center gap-2">
-                <span class="text-pink-400">+</span> {{ __('Buat Coupon Baru') }}
-            </summary>
-            <form method="POST" action="{{ route('coupons.store') }}" class="mt-5 space-y-4">
+<x-tabler.layout :title="__('Discount Coupons')" :pretitle="__('Workspace')">
+    <div class="card mb-3">
+        <div class="card-header">
+            <h3 class="card-title"><x-ti name="plus" /> {{ __('Buat Coupon Baru') }}</h3>
+        </div>
+        <div class="card-body">
+            <form method="POST" action="{{ route('coupons.store') }}">
                 @csrf
-                <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-                    <div>
-                        <x-input-label :value="__('Kode (kosong = auto)')" />
-                        <x-text-input name="code" class="mt-1 w-full font-mono uppercase" placeholder="HEMAT10" />
+                <div class="row g-2">
+                    <div class="col-md-4">
+                        <x-tabler.field :label="__('Kode (kosong = auto)')" name="code" type="text" :value="old('code')" attrs='placeholder="HEMAT10" class="font-monospace text-uppercase"' />
                     </div>
-                    <div>
-                        <x-input-label :value="__('Berlaku untuk')" />
-                        <select name="applies_to" required class="input-unicorn rounded-xl px-4 py-2 mt-1 block w-full">
-                            <option value="invoice">Invoice</option>
-                            <option value="subscription">Subscription</option>
-                            <option value="both">Keduanya</option>
-                        </select>
+                    <div class="col-md-4">
+                        <x-tabler.field :label="__('Berlaku untuk')" name="applies_to">
+                            <select id="applies_to" name="applies_to" required class="form-select">
+                                <option value="invoice">{{ __('Invoice') }}</option>
+                                <option value="subscription">{{ __('Subscription') }}</option>
+                                <option value="both">{{ __('Keduanya') }}</option>
+                            </select>
+                        </x-tabler.field>
                     </div>
-                    <div>
-                        <x-input-label :value="__('Tipe Diskon')" />
-                        <select name="discount_type" required class="input-unicorn rounded-xl px-4 py-2 mt-1 block w-full">
-                            <option value="percent">% Persen</option>
-                            <option value="fixed">Rp Tetap</option>
-                        </select>
-                    </div>
-                </div>
-
-                <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-                    <div>
-                        <x-input-label :value="__('Nilai Diskon *')" />
-                        <x-text-input name="discount_value" type="number" step="0.01" min="0.01" required class="mt-1 w-full" placeholder="10" />
-                    </div>
-                    <div>
-                        <x-input-label :value="__('Min. Total Invoice')" />
-                        <x-text-input name="min_amount" type="number" step="0.01" min="0" class="mt-1 w-full" placeholder="100000" />
-                    </div>
-                    <div>
-                        <x-input-label :value="__('Max Pemakaian')" />
-                        <x-text-input name="max_uses" type="number" min="1" class="mt-1 w-full" placeholder="100" />
+                    <div class="col-md-4">
+                        <x-tabler.field :label="__('Tipe Diskon')" name="discount_type">
+                            <select id="discount_type" name="discount_type" required class="form-select">
+                                <option value="percent">{{ __('% Persen') }}</option>
+                                <option value="fixed">{{ __('Rp Tetap') }}</option>
+                            </select>
+                        </x-tabler.field>
                     </div>
                 </div>
-
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div>
-                        <x-input-label :value="__('Berlaku sampai')" />
-                        <x-text-input name="expires_at" type="datetime-local" class="mt-1 w-full" />
+                <div class="row g-2">
+                    <div class="col-md-4">
+                        <x-tabler.field :label="__('Nilai Diskon *')" name="discount_value" type="number" :value="old('discount_value')" attrs='step="0.01" min="0.01" required placeholder="10"' />
                     </div>
-                    <div>
-                        <x-input-label :value="__('Deskripsi')" />
-                        <x-text-input name="description" class="mt-1 w-full" placeholder="Promo Lebaran 2026" />
+                    <div class="col-md-4">
+                        <x-tabler.field :label="__('Min. Total Invoice')" name="min_amount" type="number" :value="old('min_amount')" attrs='step="0.01" min="0" placeholder="100000"' />
+                    </div>
+                    <div class="col-md-4">
+                        <x-tabler.field :label="__('Max Pemakaian')" name="max_uses" type="number" :value="old('max_uses')" attrs='min="1" placeholder="100"' />
                     </div>
                 </div>
-
-                <label class="flex items-center gap-3 cursor-pointer">
-                    <input type="checkbox" name="allow_stack" value="1" class="rounded border-purple-300 text-pink-500 focus:ring-pink-300">
-                    <span class="text-sm text-purple-700">Boleh dikombinasi dengan diskon lain</span>
-                </label>
-
-                <button type="submit" class="btn-unicorn">+ {{ __('Buat Coupon') }}</button>
+                <div class="row g-2">
+                    <div class="col-md-6">
+                        <x-tabler.field :label="__('Berlaku sampai')" name="expires_at">
+                            <input type="datetime-local" id="expires_at" name="expires_at" value="{{ old('expires_at') }}" class="form-control @error('expires_at') is-invalid @enderror">
+                        </x-tabler.field>
+                    </div>
+                    <div class="col-md-6">
+                        <x-tabler.field :label="__('Deskripsi')" name="description" type="text" :value="old('description')" attrs='placeholder="Promo Lebaran 2026"' />
+                    </div>
+                </div>
+                <div class="mb-3">
+                    <label class="form-check">
+                        <input type="checkbox" name="allow_stack" value="1" class="form-check-input">
+                        <span class="form-check-label">{{ __('Boleh dikombinasi dengan diskon lain') }}</span>
+                    </label>
+                </div>
+                <button type="submit" class="btn btn-primary"><x-ti name="plus" /> {{ __('Buat Coupon') }}</button>
             </form>
-        </details>
+        </div>
+    </div>
 
+    <div class="card">
         @if($coupons->isEmpty())
-            <div class="card-unicorn !p-12 text-center">
-                <p class="text-5xl mb-3">🎟️</p>
-                <p class="font-display font-bold text-lg text-purple-700">{{ __('Belum ada coupon') }}</p>
+            <div class="card-body">
+                <x-tabler.empty icon="percentage" :title="__('Belum ada coupon')" />
             </div>
         @else
-            <div class="card-unicorn !p-0 overflow-hidden">
-                <div class="overflow-x-auto">
-                    <table class="min-w-full">
-                        <thead class="bg-gradient-to-r from-pink-50 via-purple-50 to-sky-50">
+            <div class="table-responsive">
+                <table class="table table-vcenter card-table">
+                    <thead>
+                        <tr>
+                            <th>{{ __('Kode') }}</th>
+                            <th>{{ __('Diskon') }}</th>
+                            <th>{{ __('Berlaku') }}</th>
+                            <th>{{ __('Pemakaian') }}</th>
+                            <th>{{ __('Expires') }}</th>
+                            <th class="text-end">{{ __('Actions') }}</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach($coupons as $c)
                             <tr>
-                                <th class="px-4 py-3 text-left text-[11px] font-bold text-purple-700 uppercase">Kode</th>
-                                <th class="px-4 py-3 text-left text-[11px] font-bold text-purple-700 uppercase">Diskon</th>
-                                <th class="px-4 py-3 text-left text-[11px] font-bold text-purple-700 uppercase">Berlaku</th>
-                                <th class="px-4 py-3 text-left text-[11px] font-bold text-purple-700 uppercase">Pemakaian</th>
-                                <th class="px-4 py-3 text-left text-[11px] font-bold text-purple-700 uppercase">Expires</th>
-                                <th class="px-4 py-3"></th>
+                                <td>
+                                    <code>{{ $c->code }}</code>
+                                    @if($c->description)
+                                        <div class="text-muted small">{{ $c->description }}</div>
+                                    @endif
+                                </td>
+                                <td class="fw-bold">
+                                    @if($c->discount_type === 'percent')
+                                        {{ number_format($c->discount_value, 0) }}%
+                                    @else
+                                        {{ number_format($c->discount_value, 0) }} {{ $c->currency ?? 'IDR' }}
+                                    @endif
+                                </td>
+                                <td class="text-muted">{{ ucfirst($c->applies_to) }}</td>
+                                <td>{{ $c->uses_count }}@if($c->max_uses) / {{ $c->max_uses }}@endif</td>
+                                <td class="text-muted small">{{ $c->expires_at?->format('d M Y') ?? '— ' . __('No expiry') }}</td>
+                                <td class="text-end text-nowrap">
+                                    <form method="POST" action="{{ route('coupons.toggle', $c) }}" class="d-inline">
+                                        @csrf
+                                        <button type="submit" class="btn btn-sm {{ $c->is_active ? 'btn-outline-success' : '' }}">{{ $c->is_active ? __('Active') : __('Inactive') }}</button>
+                                    </form>
+                                    <x-tabler.delete-button :action="route('coupons.destroy', $c)" :confirm="__('Hapus?')" :label="__('Hapus')" />
+                                </td>
                             </tr>
-                        </thead>
-                        <tbody>
-                            @foreach($coupons as $c)
-                                <tr class="border-t border-purple-100 hover:bg-purple-50/40">
-                                    <td class="px-4 py-3">
-                                        <code class="font-mono text-pink-600 font-bold bg-pink-50 px-2 py-0.5 rounded">{{ $c->code }}</code>
-                                        @if($c->description)<p class="text-xs text-purple-500 mt-1">{{ $c->description }}</p>@endif
-                                    </td>
-                                    <td class="px-4 py-3 font-bold text-purple-900">
-                                        @if($c->discount_type === 'percent') {{ number_format($c->discount_value, 0) }}%
-                                        @else {{ number_format($c->discount_value, 0) }} {{ $c->currency ?? 'IDR' }} @endif
-                                    </td>
-                                    <td class="px-4 py-3 text-sm text-purple-600">{{ ucfirst($c->applies_to) }}</td>
-                                    <td class="px-4 py-3 text-sm">
-                                        {{ $c->uses_count }}@if($c->max_uses) / {{ $c->max_uses }}@endif
-                                    </td>
-                                    <td class="px-4 py-3 text-xs text-purple-500">{{ $c->expires_at?->format('d M Y') ?? '— No expiry' }}</td>
-                                    <td class="px-4 py-3 text-right space-x-2">
-                                        <form method="POST" action="{{ route('coupons.toggle', $c) }}" class="inline">@csrf
-                                            <button type="submit" class="text-xs font-semibold {{ $c->is_active ? 'text-emerald-600' : 'text-gray-400' }} hover:underline">
-                                                {{ $c->is_active ? '● Active' : '○ Inactive' }}
-                                            </button>
-                                        </form>
-                                        <form method="POST" action="{{ route('coupons.destroy', $c) }}" class="inline" onsubmit="return confirm('Hapus?')">@csrf @method('DELETE')
-                                            <button type="submit" class="text-xs text-rose-500 hover:underline">Hapus</button>
-                                        </form>
-                                    </td>
-                                </tr>
-                            @endforeach
-                        </tbody>
-                    </table>
-                </div>
+                        @endforeach
+                    </tbody>
+                </table>
             </div>
         @endif
     </div>
-</x-app-layout>
+</x-tabler.layout>

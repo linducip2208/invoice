@@ -173,7 +173,7 @@ class InvoiceTest extends TestCase
             ->get(route('invoices.index', ['status' => 'paid']));
 
         $response->assertStatus(200);
-        $response->assertSee('Paid');
+        $response->assertSee(__('Paid'));
     }
 
     #[Test]

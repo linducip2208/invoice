@@ -1,70 +1,71 @@
-<x-app-layout>
-    <x-slot name="header">
-        <div class="flex items-center justify-between flex-wrap gap-3">
-            <div>
-                <h2 class="heading-unicorn flex items-center gap-2">{{ __('Customize Dashboard') }} <span class="text-2xl">🎨</span></h2>
-                <p class="text-sm text-purple-500 mt-1">✦ Atur widget yang muncul di dashboard kamu</p>
-            </div>
-            <a href="{{ route('dashboard') }}" class="btn-unicorn-secondary text-sm">← {{ __('Dashboard') }}</a>
-        </div>
+<x-tabler.layout :title="__('Customize Dashboard')" :pretitle="__('Dashboard')" :subtitle="__('Atur widget yang muncul di dashboard kamu')">
+    <x-slot name="actions">
+        <a href="{{ route('dashboard') }}" class="btn">
+            <x-ti name="layout-dashboard" /> {{ __('Dashboard') }}
+        </a>
     </x-slot>
 
-    <div class="max-w-5xl mx-auto space-y-6">
-        @if(session('success'))<div class="rounded-2xl bg-emerald-50 border-2 border-emerald-200 p-4 text-emerald-800">✓ {{ session('success') }}</div>@endif
-
-        <div class="card-unicorn !p-6">
-            <h3 class="font-display font-bold text-lg text-purple-900 mb-4">+ Tambah Widget</h3>
-            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+    <div class="card mb-3">
+        <div class="card-header"><h3 class="card-title">{{ __('Tambah Widget') }}</h3></div>
+        <div class="card-body">
+            <div class="row g-2">
                 @foreach($registry as $key => $info)
-                    <form method="POST" action="{{ route('dashboard.widgets.store') }}" class="flex items-center gap-3 p-3 rounded-xl border border-purple-200 hover:border-pink-300 hover:bg-pink-50/40">
-                        @csrf
-                        <input type="hidden" name="widget_type" value="{{ $key }}">
-                        <input type="hidden" name="size" value="{{ $info['sizes'][0] }}">
-                        <div class="flex-1 min-w-0">
-                            <p class="font-semibold text-purple-900 text-sm">{{ $info['name'] }}</p>
-                            <p class="text-xs text-purple-500 truncate">{{ $info['desc'] }}</p>
-                        </div>
-                        <button type="submit" class="text-pink-600 font-bold text-xl hover:text-pink-700 shrink-0">+</button>
-                    </form>
+                    <div class="col-md-6 col-lg-4">
+                        <form method="POST" action="{{ route('dashboard.widgets.store') }}" class="d-flex align-items-center gap-2 border rounded p-2 h-100">
+                            @csrf
+                            <input type="hidden" name="widget_type" value="{{ $key }}">
+                            <input type="hidden" name="size" value="{{ $info['sizes'][0] }}">
+                            <div class="flex-fill">
+                                <div class="fw-semibold small">{{ $info['name'] }}</div>
+                                <div class="text-muted small text-truncate">{{ $info['desc'] }}</div>
+                            </div>
+                            <button type="submit" class="btn btn-sm btn-outline-primary" title="{{ __('Tambah Widget') }}">
+                                <x-ti name="plus" />
+                            </button>
+                        </form>
+                    </div>
                 @endforeach
             </div>
         </div>
-
-        <div class="card-unicorn !p-0 overflow-hidden">
-            <div class="p-6 border-b border-purple-100">
-                <h3 class="font-display font-bold text-lg text-purple-900">Widget Aktif ({{ $widgets->count() }})</h3>
-                <p class="text-xs text-purple-500 mt-1">Drag handle untuk reorder · ubah size lewat dropdown</p>
-            </div>
-            @if($widgets->isEmpty())
-                <p class="p-8 text-center text-purple-400">Belum ada widget aktif.</p>
-            @else
-                <div class="divide-y divide-purple-100" x-data="widgetReorder()">
-                    @foreach($widgets as $w)
-                        <div class="p-4 flex items-center gap-3" data-id="{{ $w->id }}">
-                            <span class="text-purple-300 cursor-move drag-handle" title="Drag untuk reorder">⋮⋮</span>
-                            <div class="flex-1">
-                                <p class="font-semibold text-purple-900">{{ $registry[$w->widget_type]['name'] ?? $w->widget_type }}</p>
-                                <p class="text-xs text-purple-500">{{ $registry[$w->widget_type]['desc'] ?? '' }}</p>
-                            </div>
-                            <form method="POST" action="{{ route('dashboard.widgets.update', $w) }}" class="flex items-center gap-2">
-                                @csrf @method('PUT')
-                                <select name="size" onchange="this.form.submit()" class="text-xs input-unicorn rounded-lg px-2 py-1">
-                                    @foreach($registry[$w->widget_type]['sizes'] ?? ['md'] as $size)
-                                        <option value="{{ $size }}" {{ $w->size === $size ? 'selected' : '' }}>{{ strtoupper($size) }}</option>
-                                    @endforeach
-                                </select>
-                            </form>
-                            <form method="POST" action="{{ route('dashboard.widgets.destroy', $w) }}" onsubmit="return confirm('Hapus widget?')">
-                                @csrf @method('DELETE')
-                                <button class="text-rose-500 text-sm font-semibold">✗</button>
-                            </form>
-                        </div>
-                    @endforeach
-                </div>
-            @endif
-        </div>
     </div>
 
+    <div class="card">
+        <div class="card-header">
+            <h3 class="card-title">{{ __('Widget Aktif') }} ({{ $widgets->count() }})</h3>
+            <div class="card-subtitle">{{ __('Drag handle untuk reorder · ubah size lewat dropdown') }}</div>
+        </div>
+        @if($widgets->isEmpty())
+            <div class="card-body">
+                <x-tabler.empty icon="layout-dashboard" :title="__('Belum ada widget aktif.')" />
+            </div>
+        @else
+            <div class="list-group list-group-flush" x-data="widgetReorder()">
+                @foreach($widgets as $w)
+                    <div class="list-group-item d-flex align-items-center gap-2" data-id="{{ $w->id }}">
+                        <span class="text-muted cursor-move drag-handle" title="{{ __('Drag untuk reorder') }}"><x-ti name="grip-vertical" /></span>
+                        <div class="flex-fill">
+                            <div class="fw-semibold">{{ $registry[$w->widget_type]['name'] ?? $w->widget_type }}</div>
+                            <div class="text-muted small">{{ $registry[$w->widget_type]['desc'] ?? '' }}</div>
+                        </div>
+                        <form method="POST" action="{{ route('dashboard.widgets.update', $w) }}" class="d-flex align-items-center gap-2">
+                            @csrf @method('PUT')
+                            <select name="size" onchange="this.form.submit()" class="form-select form-select-sm">
+                                @foreach($registry[$w->widget_type]['sizes'] ?? ['md'] as $size)
+                                    <option value="{{ $size }}" {{ $w->size === $size ? 'selected' : '' }}>{{ strtoupper($size) }}</option>
+                                @endforeach
+                            </select>
+                        </form>
+                        <form method="POST" action="{{ route('dashboard.widgets.destroy', $w) }}" onsubmit="return confirm('Hapus widget?')">
+                            @csrf @method('DELETE')
+                            <button class="btn btn-sm btn-outline-danger"><x-ti name="trash" /></button>
+                        </form>
+                    </div>
+                @endforeach
+            </div>
+        @endif
+    </div>
+
+    @push('scripts')
     <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.6/Sortable.min.js" defer></script>
     <script>
         function widgetReorder() {
@@ -93,4 +94,5 @@
             };
         }
     </script>
-</x-app-layout>
+    @endpush
+</x-tabler.layout>

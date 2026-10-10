@@ -1,12 +1,16 @@
-<x-guest-layout>
-    <div class="text-center py-10">
-        <span class="text-7xl block animate-unicorn-float">🔍</span>
-        <h1 class="mt-6 font-display text-4xl font-bold text-purple-900">404</h1>
-        <p class="mt-2 text-lg font-semibold text-purple-700">{{ __('Page not found') }}</p>
-        <p class="mt-2 text-sm text-purple-500 max-w-sm mx-auto">{{ __('The sparkly page you are looking for has moved or never existed.') }}</p>
-        <div class="mt-6 flex items-center justify-center gap-3">
-            <a href="/" class="btn-unicorn-secondary">🏠 {{ __('Home') }}</a>
-            <a href="{{ route('dashboard') }}" class="btn-unicorn">✦ {{ __('Dashboard') }}</a>
+@section('title', '404')
+<x-tabler.guest>
+    <div class="card card-md">
+        <div class="card-body text-center py-5">
+            <div class="empty">
+                <div class="empty-icon"><x-ti name="search" class="icon icon-lg" /></div>
+                <p class="empty-title h1">404</p>
+                <p class="empty-subtitle text-muted">{{ __('The page you are looking for does not exist.') }}</p>
+                <div class="empty-action">
+                    <a href="/" class="btn">{{ __('Home') }}</a>
+                    <a href="{{ route('dashboard') }}" class="btn btn-primary">{{ __('Dashboard') }}</a>
+                </div>
+            </div>
         </div>
     </div>
-</x-guest-layout>
+</x-tabler.guest>

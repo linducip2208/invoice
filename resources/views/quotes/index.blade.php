@@ -1,32 +1,55 @@
-<x-app-layout>
-    <x-slot name="header">
-        <div class="flex flex-wrap items-center justify-between gap-3">
-            <h2 class="heading-unicorn flex items-center gap-2">📋 {{ __('Quotes / Estimates') }}</h2>
-            <a href="{{ route('quotes.create') }}" class="btn-unicorn">+ {{ __('Quote Baru') }}</a>
-        </div>
+<x-tabler.layout :title="__('Quotes / Estimates')" :pretitle="__('Sales')">
+    <x-slot name="actions">
+        <a href="{{ route('quotes.create') }}" class="btn btn-primary">
+            <x-ti name="plus" /> {{ __('Quote Baru') }}
+        </a>
     </x-slot>
-    <div class="max-w-6xl mx-auto card-unicorn">
-        <table class="table-unicorn">
-            <thead><tr><th>No</th><th>Klien</th><th>Issue</th><th>Expiry</th><th class="text-right">Total</th><th>Status</th><th></th></tr></thead>
-            <tbody>
-                @forelse($quotes as $q)
-                <tr>
-                    <td class="font-bold"><a href="{{ route('quotes.show', $q) }}" class="text-purple-700 hover:text-pink-500">{{ $q->quote_no }}</a></td>
-                    <td>{{ $q->client?->name }}</td>
-                    <td>{{ $q->issue_date?->format('d M Y') }}</td>
-                    <td>{{ $q->expiry_date?->format('d M Y') ?? '—' }}</td>
-                    <td class="text-right font-bold">{{ $q->currency }} {{ number_format($q->total, 2) }}</td>
-                    <td><span class="badge-{{ $q->status_color }}">{{ ucfirst($q->status) }}</span></td>
-                    <td>
-                        @if($q->status !== 'converted')
-                        <form method="POST" action="{{ route('quotes.convert', $q) }}" class="inline">@csrf<button class="text-emerald-600 text-sm font-semibold">→ Invoice</button></form>
-                        @endif
-                        <form method="POST" action="{{ route('quotes.destroy', $q) }}" class="inline" onsubmit="return confirm('Hapus?');">@csrf @method('DELETE')<button class="text-rose-500 text-sm ml-2">×</button></form>
-                    </td>
-                </tr>
-                @empty<tr><td colspan="7" class="text-center text-purple-400 py-8">Belum ada quote. <a href="{{ route('quotes.create') }}" class="text-pink-600 font-semibold">Bikin yang pertama →</a></td></tr>@endforelse
-            </tbody>
-        </table>
-        <div class="mt-4">{{ $quotes->links() }}</div>
+
+    <div class="card">
+        <div class="table-responsive">
+            <table class="table table-vcenter card-table">
+                <thead>
+                    <tr>
+                        <th>{{ __('No') }}</th>
+                        <th>{{ __('Klien') }}</th>
+                        <th>{{ __('Issue') }}</th>
+                        <th>{{ __('Expiry') }}</th>
+                        <th class="text-end">{{ __('Total') }}</th>
+                        <th class="text-center">{{ __('Status') }}</th>
+                        <th class="text-end">{{ __('Actions') }}</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @forelse($quotes as $q)
+                        <tr>
+                            <td class="fw-bold"><a href="{{ route('quotes.show', $q) }}">{{ $q->quote_no }}</a></td>
+                            <td class="text-muted">{{ $q->client?->name }}</td>
+                            <td class="text-muted">{{ $q->issue_date?->format('d M Y') }}</td>
+                            <td class="text-muted">{{ $q->expiry_date?->format('d M Y') ?? '—' }}</td>
+                            <td class="text-end fw-bold">{{ $q->currency }} {{ number_format($q->total, 2) }}</td>
+                            <td class="text-center"><x-tabler.status-badge :status="$q->status" /></td>
+                            <td class="text-end text-nowrap">
+                                <a href="{{ route('quotes.show', $q) }}" class="btn btn-sm">{{ __('View') }}</a>
+                                @if($q->status !== 'converted')
+                                    <form method="POST" action="{{ route('quotes.convert', $q) }}" class="d-inline">@csrf<button class="btn btn-sm btn-outline-success">{{ __('Invoice') }}</button></form>
+                                @endif
+                                <x-tabler.delete-button :action="route('quotes.destroy', $q)"
+                                    :confirm="__('Hapus?')" :title="__('Delete')" />
+                            </td>
+                        </tr>
+                    @empty
+                        <tr>
+                            <td colspan="7">
+                                <x-tabler.empty icon="file-text" :title="__('Belum ada quote.')"
+                                    :actionUrl="route('quotes.create')" :actionLabel="__('Bikin yang pertama')" />
+                            </td>
+                        </tr>
+                    @endforelse
+                </tbody>
+            </table>
+        </div>
+        @if($quotes->hasPages())
+            <div class="card-footer d-flex justify-content-center">{{ $quotes->links() }}</div>
+        @endif
     </div>
-</x-app-layout>
+</x-tabler.layout>

@@ -1,265 +1,263 @@
-<x-app-layout>
-    <x-slot name="header">
-        <div class="flex flex-wrap items-center justify-between gap-3">
-            <div>
-                <h2 class="heading-unicorn flex items-center gap-2">{{ __('Create Invoice') }} <span class="text-2xl">✨</span></h2>
-                <p class="text-sm text-purple-500 mt-1">✦ {{ __('Conjure a sparkly new invoice') }}</p>
-            </div>
-            <a href="{{ route('invoices.index') }}" class="text-sm font-semibold text-purple-500 hover:text-pink-500">← {{ __('Back') }}</a>
-        </div>
+<x-tabler.layout :title="__('Create Invoice')" :pretitle="__('Sales')">
+    <x-slot name="actions">
+        <a href="{{ route('invoices.index') }}" class="btn">
+            <x-ti name="arrow-left" /> {{ __('Back') }}
+        </a>
     </x-slot>
 
-    <div class="max-w-5xl mx-auto">
-        <!-- Helper banner: drag-drop builder location -->
-        <div class="glass-card p-4 mb-4 flex items-center justify-between gap-3 flex-wrap">
-            <div class="flex items-start gap-3 flex-1">
-                <span class="text-2xl">💡</span>
-                <div class="text-sm">
-                    <p class="font-bold text-purple-900">Drag & drop di halaman ini:</p>
-                    <ul class="text-purple-600 mt-1 space-y-0.5 text-xs">
-                        <li>⋮⋮ <strong>Drag handle</strong> di kolom kiri tabel Items → reorder baris</li>
-                        <li>📜 <strong>Custom Print Layout</strong> picker → ada di section "Template & Colors" di bawah</li>
-                        <li>🎨 <strong>Design layout baru</strong> → @if(workspace()?->planFeature('drag_drop_builder'))<a href="{{ route('invoice-layouts.index') }}" class="text-pink-600 font-bold hover:underline">/invoice-layouts</a>@else<span class="text-amber-600 font-bold">Upgrade ke Business untuk drag-drop builder</span>@endif</li>
-                    </ul>
+    <!-- Helper banner: drag-drop builder location -->
+    <div class="card mb-3">
+        <div class="card-body">
+            <div class="row align-items-center g-3">
+                <div class="col d-flex gap-3">
+                    <x-ti name="sparkles" class="icon icon-lg" />
+                    <div class="small">
+                        <p class="fw-bold mb-1">Drag & drop di halaman ini:</p>
+                        <ul class="text-muted mt-1 mb-0 small">
+                            <li><strong>Drag handle</strong> di kolom kiri tabel Items → reorder baris</li>
+                            <li><strong>Custom Print Layout</strong> picker → ada di section "Template & Colors" di bawah</li>
+                            <li><strong>Design layout baru</strong> → @if(workspace()?->planFeature('drag_drop_builder'))<a href="{{ route('invoice-layouts.index') }}" class="fw-bold">/invoice-layouts</a>@else<span class="text-warning fw-bold">Upgrade ke Business untuk drag-drop builder</span>@endif</li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="col-auto">
+                    @if(workspace()?->planFeature('drag_drop_builder'))
+                        <a href="{{ route('invoice-layouts.create') }}" class="btn btn-sm">+ Bikin Layout</a>
+                    @else
+                        <a href="{{ route('billing.show') }}" class="btn btn-sm btn-primary"><x-ti name="sparkles" /> Upgrade</a>
+                    @endif
                 </div>
             </div>
-            @if(workspace()?->planFeature('drag_drop_builder'))
-                <a href="{{ route('invoice-layouts.create') }}" class="btn-ghost text-xs">+ Bikin Layout</a>
-            @else
-                <a href="{{ route('billing.show') }}" class="btn-glow text-xs">⚡ Upgrade</a>
-            @endif
+        </div>
+    </div>
+
+    <form method="POST" action="{{ route('invoices.store') }}" data-prevent-double-submit x-data="invoiceForm({{ Js::from([]) }}, {{ Js::from($products->keyBy('id')->toArray()) }})">
+        @csrf
+
+        <!-- Client & Dates -->
+        <div class="card mb-3">
+            <div class="card-body">
+                <h3 class="card-title mb-3">{{ __('Client & Dates') }}</h3>
+                <div class="row g-3">
+                    <div class="col-md-6">
+                        <x-tabler.field :label="__('Client *')" name="client_id">
+                            <select id="client_id" name="client_id" required class="form-select @error('client_id') is-invalid @enderror">
+                                <option value="">{{ __('Select client…') }}</option>
+                                @foreach ($clients as $client)
+                                    <option value="{{ $client->id }}" {{ old('client_id', request('client_id')) == $client->id ? 'selected' : '' }}>
+                                        {{ $client->name }}{{ $client->company_name ? ' (' . $client->company_name . ')' : '' }}
+                                    </option>
+                                @endforeach
+                            </select>
+                        </x-tabler.field>
+                    </div>
+                    <div class="col-md-6">
+                        <x-tabler.field :label="__('Currency *')" name="currency">
+                            <select id="currency" name="currency" x-model="currency" class="form-select">
+                                <option value="IDR">IDR — Indonesian Rupiah</option>
+                                <option value="USD">USD — US Dollar</option>
+                                <option value="EUR">EUR — Euro</option>
+                                <option value="GBP">GBP — British Pound</option>
+                                <option value="SGD">SGD — Singapore Dollar</option>
+                                <option value="AUD">AUD — Australian Dollar</option>
+                                <option value="JPY">JPY — Japanese Yen</option>
+                            </select>
+                        </x-tabler.field>
+                    </div>
+                    <div class="col-md-6">
+                        <x-tabler.field :label="__('Issue Date *')" name="issue_date" type="date" :value="old('issue_date', now()->format('Y-m-d'))" attrs="required" />
+                    </div>
+                    <div class="col-md-6">
+                        <x-tabler.field :label="__('Due Date *')" name="due_date" type="date" :value="old('due_date', now()->addDays(30)->format('Y-m-d'))" attrs="required" />
+                    </div>
+                </div>
+            </div>
         </div>
 
-        <form method="POST" action="{{ route('invoices.store') }}" x-data="invoiceForm({{ Js::from([]) }}, {{ Js::from($products->keyBy('id')->toArray()) }})" class="space-y-6">
-            @csrf
-
-            <!-- Client & Dates -->
-            <div class="card-unicorn">
-                <div class="rainbow-bar -mx-6 -mt-6 mb-6 rounded-t-2xl"></div>
-                <h3 class="font-display font-bold text-lg text-purple-900 mb-4 flex items-center gap-2">
-                    <span class="text-pink-400">✦</span> {{ __('Client & Dates') }}
-                </h3>
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
-                    <div>
-                        <x-input-label :value="__('Client *')" />
-                        <select name="client_id" required class="mt-1 block w-full input-unicorn rounded-xl px-4 py-2">
-                            <option value="">{{ __('Select client…') }}</option>
-                            @foreach ($clients as $client)
-                                <option value="{{ $client->id }}" {{ old('client_id', request('client_id')) == $client->id ? 'selected' : '' }}>
-                                    {{ $client->name }}{{ $client->company_name ? ' (' . $client->company_name . ')' : '' }}
-                                </option>
-                            @endforeach
-                        </select>
-                        @error('client_id') <p class="mt-1 text-sm text-rose-500">{{ $message }}</p> @enderror
-                    </div>
-                    <div>
-                        <x-input-label :value="__('Currency *')" />
-                        <select name="currency" x-model="currency" class="mt-1 block w-full input-unicorn rounded-xl px-4 py-2">
-                            <option value="IDR">IDR — Indonesian Rupiah</option>
-                            <option value="USD">USD — US Dollar</option>
-                            <option value="EUR">EUR — Euro</option>
-                            <option value="GBP">GBP — British Pound</option>
-                            <option value="SGD">SGD — Singapore Dollar</option>
-                            <option value="AUD">AUD — Australian Dollar</option>
-                            <option value="JPY">JPY — Japanese Yen</option>
-                        </select>
-                    </div>
-                    <div>
-                        <x-input-label :value="__('Issue Date *')" />
-                        <x-text-input name="issue_date" type="date" :value="old('issue_date', now()->format('Y-m-d'))" required class="mt-1 block w-full" />
-                    </div>
-                    <div>
-                        <x-input-label :value="__('Due Date *')" />
-                        <x-text-input name="due_date" type="date" :value="old('due_date', now()->addDays(30)->format('Y-m-d'))" required class="mt-1 block w-full" />
-                    </div>
-                </div>
-            </div>
-
-            <!-- Template & Colors -->
-            <div class="card-unicorn">
-                <h3 class="font-display font-bold text-lg text-purple-900 mb-4 flex items-center gap-2">
-                    <span class="text-purple-400">✦</span> {{ __('Template & Colors') }}
-                </h3>
-                <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-3 mb-5">
-                    @php $templates = ['classic', 'modern', 'minimal', 'bold', 'elegant']; $tplGradients = ['classic'=>'from-purple-100 to-blue-100','modern'=>'from-pink-100 to-purple-100','minimal'=>'from-gray-100 to-purple-50','bold'=>'from-pink-200 to-yellow-100','elegant'=>'from-purple-200 to-pink-100']; @endphp
+        <!-- Template & Colors -->
+        <div class="card mb-3">
+            <div class="card-body">
+                <h3 class="card-title mb-3">{{ __('Template & Colors') }}</h3>
+                <div class="row g-2 mb-3">
+                    @php $templates = ['classic', 'modern', 'minimal', 'bold', 'elegant']; @endphp
                     @foreach ($templates as $tpl)
-                        <label class="relative rounded-xl p-3 cursor-pointer border-2 border-purple-100 hover:border-pink-300 has-[:checked]:border-pink-400 has-[:checked]:shadow-unicorn-pink transition">
-                            <input type="radio" name="template" value="{{ $tpl }}" {{ old('template', 'classic') === $tpl ? 'checked' : '' }} class="sr-only">
-                            <div class="text-center">
-                                <div class="w-full h-16 rounded-lg bg-gradient-to-br {{ $tplGradients[$tpl] }} mb-2 flex items-center justify-center text-xs uppercase font-bold text-purple-700">{{ $tpl }}</div>
-                                <span class="text-sm font-semibold text-purple-700 capitalize">{{ $tpl }}</span>
-                            </div>
-                        </label>
+                        <div class="col-6 col-sm-4 col-lg-2">
+                            <label class="form-selectgroup-item w-100">
+                                <input type="radio" name="template" value="{{ $tpl }}" {{ old('template', 'classic') === $tpl ? 'checked' : '' }} class="form-selectgroup-input">
+                                <span class="form-selectgroup-label text-center text-capitalize">{{ $tpl }}</span>
+                            </label>
+                        </div>
                     @endforeach
                 </div>
-                @error('template') <p class="text-sm text-rose-500 mb-3">{{ $message }}</p> @enderror
+                @error('template') <p class="text-danger small mb-3">{{ $message }}</p> @enderror
 
-                <div class="grid grid-cols-1 sm:grid-cols-2 gap-5">
-                    <div>
-                        <x-input-label :value="__('Primary Color')" />
-                        <div class="mt-1 flex items-center gap-2">
-                            <input type="color" name="primary_color" id="primary_color" value="{{ old('primary_color', '#A78BFA') }}" class="h-10 w-16 rounded-xl border-2 border-purple-200 cursor-pointer">
-                            <input type="text" value="{{ old('primary_color', '#A78BFA') }}" id="primary_color_text" class="input-unicorn rounded-xl px-3 py-2 text-sm w-32" oninput="document.getElementById('primary_color').value = this.value">
-                        </div>
+                <div class="row g-3">
+                    <div class="col-sm-6">
+                        <x-tabler.field :label="__('Primary Color')" name="primary_color">
+                            <div class="d-flex align-items-center gap-2">
+                                <input type="color" name="primary_color" id="primary_color" value="{{ old('primary_color', '#A78BFA') }}" class="form-control form-control-color" style="width: 4rem;">
+                                <input type="text" value="{{ old('primary_color', '#A78BFA') }}" id="primary_color_text" class="form-control form-control-sm" style="max-width: 8rem;" oninput="document.getElementById('primary_color').value = this.value">
+                            </div>
+                        </x-tabler.field>
                     </div>
-                    <div>
-                        <x-input-label :value="__('Accent Color')" />
-                        <div class="mt-1 flex items-center gap-2">
-                            <input type="color" name="accent_color" id="accent_color" value="{{ old('accent_color', '#FF7AC6') }}" class="h-10 w-16 rounded-xl border-2 border-purple-200 cursor-pointer">
-                            <input type="text" value="{{ old('accent_color', '#FF7AC6') }}" id="accent_color_text" class="input-unicorn rounded-xl px-3 py-2 text-sm w-32" oninput="document.getElementById('accent_color').value = this.value">
-                        </div>
+                    <div class="col-sm-6">
+                        <x-tabler.field :label="__('Accent Color')" name="accent_color">
+                            <div class="d-flex align-items-center gap-2">
+                                <input type="color" name="accent_color" id="accent_color" value="{{ old('accent_color', '#FF7AC6') }}" class="form-control form-control-color" style="width: 4rem;">
+                                <input type="text" value="{{ old('accent_color', '#FF7AC6') }}" id="accent_color_text" class="form-control form-control-sm" style="max-width: 8rem;" oninput="document.getElementById('accent_color').value = this.value">
+                            </div>
+                        </x-tabler.field>
                     </div>
                 </div>
 
                 <!-- Custom Layout Picker (drag-drop builder output) -->
                 @if(isset($layouts) && $layouts->isNotEmpty())
-                    <div class="mt-5 pt-5 border-t border-purple-100">
-                        <x-input-label :value="__('Custom Print Layout (drag-drop builder)')" />
-                        <select name="invoice_layout_id" class="input-premium mt-1 w-full">
-                            <option value="">— {{ __('Pakai template di atas (default)') }} —</option>
-                            @foreach($layouts as $l)
-                                <option value="{{ $l->id }}" {{ old('invoice_layout_id') == $l->id ? 'selected' : '' }}>
-                                    🎨 {{ $l->name }}{{ $l->is_default ? ' (default)' : '' }}
-                                </option>
-                            @endforeach
-                        </select>
-                        <p class="text-xs text-purple-400 mt-1">
+                    <div class="mt-3 pt-3 border-top">
+                        <x-tabler.field :label="__('Custom Print Layout (drag-drop builder)')" name="invoice_layout_id">
+                            <select id="invoice_layout_id" name="invoice_layout_id" class="form-select">
+                                <option value="">— {{ __('Pakai template di atas (default)') }} —</option>
+                                @foreach($layouts as $l)
+                                    <option value="{{ $l->id }}" {{ old('invoice_layout_id') == $l->id ? 'selected' : '' }}>
+                                        {{ $l->name }}{{ $l->is_default ? ' (default)' : '' }}
+                                    </option>
+                                @endforeach
+                            </select>
+                        </x-tabler.field>
+                        <p class="small text-muted mt-1">
                             {{ __('Pilih layout custom yang sudah kamu design. Override template di atas.') }}
                             @if(workspace()?->planFeature('drag_drop_builder'))
-                                <a href="{{ route('invoice-layouts.create') }}" class="text-pink-600 font-semibold hover:underline">+ {{ __('Bikin layout baru') }} →</a>
+                                <a href="{{ route('invoice-layouts.create') }}" class="fw-semibold">+ {{ __('Bikin layout baru') }}</a>
                             @endif
                         </p>
                     </div>
                 @elseif(workspace()?->planFeature('drag_drop_builder'))
-                    <div class="mt-5 pt-5 border-t border-purple-100 flex items-center justify-between gap-3 p-3 rounded-xl bg-gradient-to-r from-pink-50 to-purple-50">
-                        <p class="text-sm text-purple-700">🎨 {{ __('Custom drag-drop layout untuk hasil print/PDF unik.') }}</p>
-                        <a href="{{ route('invoice-layouts.create') }}" class="btn-ghost text-xs">+ {{ __('Design Layout') }}</a>
+                    <div class="mt-3 pt-3 border-top d-flex align-items-center justify-content-between gap-3 p-3 rounded bg-light">
+                        <p class="mb-0">{{ __('Custom drag-drop layout untuk hasil print/PDF unik.') }}</p>
+                        <a href="{{ route('invoice-layouts.create') }}" class="btn btn-sm">+ {{ __('Design Layout') }}</a>
                     </div>
                 @endif
             </div>
+        </div>
 
-            <!-- Items -->
-            <div class="card-unicorn">
-                <div class="flex items-center justify-between mb-4">
-                    <h3 class="font-display font-bold text-lg text-purple-900 flex items-center gap-2">
-                        <span class="text-sky-400">✦</span> {{ __('Items') }}
-                    </h3>
-                    <button type="button" @click="addItem()" class="btn-unicorn">
-                        + {{ __('Add Row') }}
+        <!-- Items -->
+        <div class="card mb-3">
+            <div class="card-header">
+                <h3 class="card-title">{{ __('Items') }}</h3>
+                <div class="card-actions">
+                    <button type="button" @click="addItem()" class="btn btn-sm btn-primary">
+                        <x-ti name="plus" /> {{ __('Add Row') }}
                     </button>
                 </div>
-
-                <div class="overflow-x-auto -mx-2">
-                    <table class="min-w-full">
-                        <thead>
-                            <tr class="bg-gradient-to-r from-pink-50 via-purple-50 to-sky-50 rounded-xl">
-                                <th class="px-2 py-2 text-left text-[11px] font-bold text-purple-700 uppercase tracking-wider w-6">⋮⋮</th>
-                                <th class="px-2 py-2 text-left text-[11px] font-bold text-purple-700 uppercase tracking-wider w-6">#</th>
-                                <th class="px-2 py-2 text-left text-[11px] font-bold text-purple-700 uppercase tracking-wider">{{ __('Description *') }}</th>
-                                <th class="px-2 py-2 text-right text-[11px] font-bold text-purple-700 uppercase tracking-wider w-24">{{ __('Qty *') }}</th>
-                                <th class="px-2 py-2 text-right text-[11px] font-bold text-purple-700 uppercase tracking-wider w-32">{{ __('Unit *') }}</th>
-                                <th class="px-2 py-2 text-right text-[11px] font-bold text-purple-700 uppercase tracking-wider w-20">{{ __('Tax %') }}</th>
-                                <th class="px-2 py-2 text-right text-[11px] font-bold text-purple-700 uppercase tracking-wider w-28">{{ __('Total') }}</th>
-                                <th class="px-2 py-2 w-10"></th>
+            </div>
+            <div class="table-responsive">
+                <table class="table table-vcenter card-table">
+                    <thead>
+                        <tr>
+                            <th class="w-1"></th>
+                            <th class="w-1">#</th>
+                            <th>{{ __('Description *') }}</th>
+                            <th class="text-end" style="width: 6rem;">{{ __('Qty *') }}</th>
+                            <th class="text-end" style="width: 8rem;">{{ __('Unit *') }}</th>
+                            <th class="text-end" style="width: 5rem;">{{ __('Tax %') }}</th>
+                            <th class="text-end" style="width: 7rem;">{{ __('Total') }}</th>
+                            <th class="w-1"></th>
+                        </tr>
+                    </thead>
+                    <tbody id="invoiceItemsBody" x-ref="itemsBody">
+                        <template x-for="(item, index) in items" :key="item._uid">
+                            <tr class="invoice-item-row" :data-uid="item._uid">
+                                <td class="text-muted cursor-move drag-handle text-center user-select-none" title="Drag untuk reorder"><x-ti name="dots-vertical" /></td>
+                                <td class="text-muted small" x-text="index + 1"></td>
+                                <td>
+                                    <select class="form-select form-select-sm"
+                                            :name="'items[' + index + '][product_id]'"
+                                            x-model="item.product_id"
+                                            @change="onProductSelect(index, $event.target.value)">
+                                        <option value="">— {{ __('Pick product') }} —</option>
+                                        @foreach ($products as $product)
+                                            <option value="{{ $product->id }}">{{ $product->name }}</option>
+                                        @endforeach
+                                    </select>
+                                    <input type="text" required
+                                           :name="'items[' + index + '][description]'"
+                                           x-model="item.description"
+                                           placeholder="{{ __('Description') }}"
+                                           class="mt-1 form-control form-control-sm">
+                                </td>
+                                <td><input type="number" step="0.01" min="0.01" required :name="'items[' + index + '][quantity]'" x-model.number="item.quantity" class="form-control form-control-sm text-end"></td>
+                                <td><input type="number" step="0.01" min="0" required :name="'items[' + index + '][unit_price]'" x-model.number="item.unit_price" class="form-control form-control-sm text-end"></td>
+                                <td><input type="number" step="0.01" min="0" max="100" :name="'items[' + index + '][tax_rate]'" x-model.number="item.tax_rate" class="form-control form-control-sm text-end"></td>
+                                <td class="text-end fw-bold small" x-text="formatCurrency(lineTotal(index))"></td>
+                                <td class="text-center">
+                                    <button type="button" @click="removeItem(index)" x-show="items.length > 1" class="btn btn-sm btn-link text-danger p-0"><x-ti name="x" /></button>
+                                </td>
                             </tr>
-                        </thead>
-                        <tbody id="invoiceItemsBody" x-ref="itemsBody">
-                            <template x-for="(item, index) in items" :key="item._uid">
-                                <tr class="border-t border-purple-100 invoice-item-row" :data-uid="item._uid">
-                                    <td class="px-2 py-2 text-purple-300 cursor-move drag-handle text-center select-none" title="Drag untuk reorder">⋮⋮</td>
-                                    <td class="px-2 py-2 text-sm text-purple-400" x-text="index + 1"></td>
-                                    <td class="px-2 py-2">
-                                        <select class="w-full input-unicorn rounded-lg px-2 py-1 text-xs"
-                                                :name="'items[' + index + '][product_id]'"
-                                                x-model="item.product_id"
-                                                @change="onProductSelect(index, $event.target.value)">
-                                            <option value="">— {{ __('Pick product') }} —</option>
-                                            @foreach ($products as $product)
-                                                <option value="{{ $product->id }}">{{ $product->name }}</option>
-                                            @endforeach
-                                        </select>
-                                        <input type="text" required
-                                               :name="'items[' + index + '][description]'"
-                                               x-model="item.description"
-                                               placeholder="{{ __('Description') }}"
-                                               class="mt-1 w-full input-unicorn rounded-lg px-2 py-1 text-sm">
-                                    </td>
-                                    <td class="px-2 py-2"><input type="number" step="0.01" min="0.01" required :name="'items[' + index + '][quantity]'" x-model.number="item.quantity" class="w-full input-unicorn rounded-lg px-2 py-1 text-sm text-right"></td>
-                                    <td class="px-2 py-2"><input type="number" step="0.01" min="0" required :name="'items[' + index + '][unit_price]'" x-model.number="item.unit_price" class="w-full input-unicorn rounded-lg px-2 py-1 text-sm text-right"></td>
-                                    <td class="px-2 py-2"><input type="number" step="0.01" min="0" max="100" :name="'items[' + index + '][tax_rate]'" x-model.number="item.tax_rate" class="w-full input-unicorn rounded-lg px-2 py-1 text-sm text-right"></td>
-                                    <td class="px-2 py-2 text-right text-sm font-bold text-purple-900" x-text="formatCurrency(lineTotal(index))"></td>
-                                    <td class="px-2 py-2 text-center">
-                                        <button type="button" @click="removeItem(index)" x-show="items.length > 1" class="text-rose-400 hover:text-rose-600 text-xl leading-none">×</button>
-                                    </td>
-                                </tr>
-                            </template>
-                        </tbody>
-                    </table>
-                </div>
-                @error('items') <p class="mt-1 text-sm text-rose-500">{{ $message }}</p> @enderror
+                        </template>
+                    </tbody>
+                </table>
             </div>
+            @error('items')
+                <div class="card-body pt-0"><p class="mt-1 small text-danger mb-0">{{ $message }}</p></div>
+            @enderror
+        </div>
 
-            <!-- Summary -->
-            <div class="card-unicorn">
-                <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                    <div>
-                        <h3 class="font-display font-bold text-lg text-purple-900 mb-4 flex items-center gap-2">
-                            <span class="text-pink-400">✦</span> {{ __('Tax & Discount') }}
-                        </h3>
-                        <div class="space-y-4">
-                            <div>
-                                <x-input-label :value="__('Tax Rate (%)')" />
-                                <input type="number" step="0.01" min="0" max="100" name="tax_rate" x-model.number="tax_rate" value="{{ old('tax_rate', 0) }}" class="input-unicorn rounded-xl px-4 py-2 mt-1 block w-full">
-                            </div>
-                            <div>
-                                <x-input-label :value="__('Discount Type')" />
-                                <select name="discount_type" x-model="discount_type" class="input-unicorn rounded-xl px-4 py-2 mt-1 block w-full">
-                                    <option value="none">{{ __('None') }}</option>
-                                    <option value="fixed">{{ __('Fixed Amount') }}</option>
-                                    <option value="percent">{{ __('Percentage (%)') }}</option>
-                                </select>
-                            </div>
-                            <div x-show="discount_type !== 'none'">
-                                <x-input-label :value="__('Discount Value')" />
-                                <input type="number" step="0.01" min="0" name="discount_value" x-model.number="discount_value" value="{{ old('discount_value', 0) }}" class="input-unicorn rounded-xl px-4 py-2 mt-1 block w-full">
-                            </div>
+        <!-- Summary -->
+        <div class="card mb-3">
+            <div class="card-body">
+                <div class="row g-4">
+                    <div class="col-lg-6">
+                        <h3 class="card-title mb-3">{{ __('Tax & Discount') }}</h3>
+                        <x-tabler.field :label="__('Tax Rate (%)')" name="tax_rate">
+                            <input type="number" step="0.01" min="0" max="100" id="tax_rate" name="tax_rate" x-model.number="tax_rate" value="{{ old('tax_rate', 0) }}" class="form-control">
+                        </x-tabler.field>
+                        <x-tabler.field :label="__('Discount Type')" name="discount_type">
+                            <select id="discount_type" name="discount_type" x-model="discount_type" class="form-select">
+                                <option value="none">{{ __('None') }}</option>
+                                <option value="fixed">{{ __('Fixed Amount') }}</option>
+                                <option value="percent">{{ __('Percentage (%)') }}</option>
+                            </select>
+                        </x-tabler.field>
+                        <div x-show="discount_type !== 'none'">
+                            <x-tabler.field :label="__('Discount Value')" name="discount_value">
+                                <input type="number" step="0.01" min="0" id="discount_value" name="discount_value" x-model.number="discount_value" value="{{ old('discount_value', 0) }}" class="form-control">
+                            </x-tabler.field>
                         </div>
                     </div>
 
-                    <div>
-                        <h3 class="font-display font-bold text-lg text-purple-900 mb-4 flex items-center gap-2">
-                            <span class="text-purple-400">✦</span> {{ __('Summary') }}
-                        </h3>
-                        <div class="space-y-2 p-5 rounded-2xl" style="background: linear-gradient(135deg, rgba(255,228,241,0.6), rgba(237,233,254,0.6), rgba(224,242,254,0.5));">
-                            <div class="flex justify-between text-sm"><span class="text-purple-500">{{ __('Subtotal') }}</span><span class="text-purple-900 font-semibold" x-text="formatCurrency(subtotal)"></span></div>
-                            <div class="flex justify-between text-sm" x-show="taxAmount > 0"><span class="text-purple-500">{{ __('Tax') }} <span x-text="'(' + tax_rate + '%)'"></span></span><span class="text-purple-900" x-text="formatCurrency(taxAmount)"></span></div>
-                            <div class="flex justify-between text-sm" x-show="discountAmount > 0"><span class="text-purple-500">{{ __('Discount') }}</span><span class="text-rose-600 font-semibold" x-text="'-' + formatCurrency(discountAmount)"></span></div>
-                            <div class="flex justify-between text-base font-display font-bold border-t border-purple-200 pt-2.5">
-                                <span class="text-purple-900">{{ __('Total') }}</span>
-                                <span class="text-rainbow" x-text="formatCurrency(total)"></span>
+                    <div class="col-lg-6">
+                        <h3 class="card-title mb-3">{{ __('Summary') }}</h3>
+                        <div class="rounded bg-light p-3">
+                            <div class="d-flex justify-content-between small mb-1"><span class="text-muted">{{ __('Subtotal') }}</span><span class="fw-semibold" x-text="formatCurrency(subtotal)"></span></div>
+                            <div class="d-flex justify-content-between small mb-1" x-show="taxAmount > 0"><span class="text-muted">{{ __('Tax') }} <span x-text="'(' + tax_rate + '%)'"></span></span><span x-text="formatCurrency(taxAmount)"></span></div>
+                            <div class="d-flex justify-content-between small mb-1" x-show="discountAmount > 0"><span class="text-muted">{{ __('Discount') }}</span><span class="text-danger fw-semibold" x-text="'-' + formatCurrency(discountAmount)"></span></div>
+                            <div class="d-flex justify-content-between h4 border-top pt-2 mt-2 mb-0">
+                                <span>{{ __('Total') }}</span>
+                                <span x-text="formatCurrency(total)"></span>
                             </div>
                         </div>
                     </div>
                 </div>
 
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-5 mt-6">
-                    <div>
-                        <x-input-label :value="__('Notes')" />
-                        <textarea name="notes" rows="4" class="input-unicorn rounded-xl px-4 py-2 mt-1 block w-full" placeholder="{{ __('Sparkly notes for your client…') }}">{{ old('notes') }}</textarea>
+                <div class="row g-3 mt-1">
+                    <div class="col-md-6">
+                        <x-tabler.field :label="__('Notes')" name="notes">
+                            <textarea id="notes" name="notes" rows="4" class="form-control" placeholder="{{ __('Sparkly notes for your client…') }}">{{ old('notes') }}</textarea>
+                        </x-tabler.field>
                     </div>
-                    <div>
-                        <x-input-label :value="__('Terms')" />
-                        <textarea name="terms" rows="4" class="input-unicorn rounded-xl px-4 py-2 mt-1 block w-full" placeholder="{{ __('Payment terms…') }}">{{ old('terms') }}</textarea>
+                    <div class="col-md-6">
+                        <x-tabler.field :label="__('Terms')" name="terms">
+                            <textarea id="terms" name="terms" rows="4" class="form-control" placeholder="{{ __('Payment terms…') }}">{{ old('terms') }}</textarea>
+                        </x-tabler.field>
                     </div>
                 </div>
             </div>
+        </div>
 
-            <div class="flex items-center justify-end gap-3">
-                <a href="{{ route('invoices.index') }}" class="btn-unicorn-secondary">{{ __('Cancel') }}</a>
-                <button type="submit" class="btn-unicorn px-8 py-3">✦ {{ __('Create Invoice') }} ✦</button>
-            </div>
-        </form>
-    </div>
+        <div class="d-flex align-items-center justify-content-end gap-2">
+            <a href="{{ route('invoices.index') }}" class="btn">{{ __('Cancel') }}</a>
+            <button type="submit" class="btn btn-primary"><x-ti name="plus" /> {{ __('Create Invoice') }}</button>
+        </div>
+    </form>
 
     <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.6/Sortable.min.js" defer></script>
     <script>
@@ -351,4 +349,4 @@
             };
         }
     </script>
-</x-app-layout>
+</x-tabler.layout>

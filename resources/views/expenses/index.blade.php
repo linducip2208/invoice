@@ -1,44 +1,109 @@
-<x-app-layout>
-    <x-slot name="header"><h2 class="heading-unicorn flex items-center gap-2">🧾 {{ __('Expenses') }}</h2></x-slot>
-    <div class="max-w-6xl mx-auto space-y-6">
-        <div class="card-unicorn"><p class="text-xs text-purple-400 uppercase font-bold">{{ __('Total Expenses') }}</p><p class="text-2xl font-display font-bold">{{ number_format($totalAmount, 2) }}</p></div>
+<x-tabler.layout :title="__('Expenses')" :pretitle="__('Finance')">
+    <x-slot name="actions">
+        <a href="{{ route('expenses.ocr.upload') }}" class="btn btn-primary">
+            <x-ti name="scan" /> {{ __('OCR Receipt') }}
+        </a>
+    </x-slot>
 
-        <div class="card-unicorn">
-            <h3 class="font-display font-bold text-lg mb-4">+ {{ __('Catat Expense') }}</h3>
-            <form method="POST" action="{{ route('expenses.store') }}" enctype="multipart/form-data" class="grid grid-cols-1 md:grid-cols-6 gap-3">
+    <div class="row row-decks row-cards mb-3">
+        <x-tabler.stat :label="__('Total Expenses')" :value="number_format($totalAmount, 2)" icon="receipt" />
+    </div>
+
+    <div class="card mb-3">
+        <div class="card-header">
+            <h3 class="card-title"><x-ti name="plus" /> {{ __('Catat Expense') }}</h3>
+        </div>
+        <div class="card-body">
+            <form method="POST" action="{{ route('expenses.store') }}" enctype="multipart/form-data">
                 @csrf
-                <input type="date" name="expense_date" value="{{ now()->toDateString() }}" required class="input-unicorn rounded-xl px-3 py-2 text-sm">
-                <input type="text" name="category" placeholder="Kategori" class="input-unicorn rounded-xl px-3 py-2 text-sm">
-                <input type="text" name="description" required placeholder="Deskripsi" class="input-unicorn rounded-xl px-3 py-2 text-sm md:col-span-2">
-                <input type="number" step="0.01" min="0" name="amount" required placeholder="Jumlah" class="input-unicorn rounded-xl px-3 py-2 text-sm">
-                <select name="currency" class="input-unicorn rounded-xl px-3 py-2 text-sm"><option>IDR</option><option>USD</option></select>
-                <select name="client_id" class="input-unicorn rounded-xl px-3 py-2 text-sm md:col-span-2">
-                    <option value="">— Klien (opsional, untuk billable) —</option>
-                    @foreach($clients as $c)<option value="{{ $c->id }}">{{ $c->name }}</option>@endforeach
-                </select>
-                <input type="file" name="receipt" accept="image/*" class="text-xs md:col-span-2">
-                <label class="flex items-center gap-2 text-sm"><input type="checkbox" name="billable" value="1"> Billable</label>
-                <button class="btn-unicorn">Simpan</button>
+                <div class="row g-2">
+                    <div class="col-md-2">
+                        <x-tabler.field name="expense_date" type="date" :value="now()->toDateString()" attrs="required" />
+                    </div>
+                    <div class="col-md-2">
+                        <x-tabler.field name="category" type="text" attrs='placeholder="Kategori"' />
+                    </div>
+                    <div class="col-md-3">
+                        <x-tabler.field name="description" type="text" attrs='required placeholder="Deskripsi"' />
+                    </div>
+                    <div class="col-md-2">
+                        <x-tabler.field name="amount" type="number" attrs='step="0.01" min="0" required placeholder="Jumlah"' />
+                    </div>
+                    <div class="col-md-1">
+                        <x-tabler.field name="currency">
+                            <select id="currency" name="currency" class="form-select"><option>IDR</option><option>USD</option></select>
+                        </x-tabler.field>
+                    </div>
+                    <div class="col-md-2">
+                        <x-tabler.field name="client_id">
+                            <select id="client_id" name="client_id" class="form-select">
+                                <option value="">— {{ __('Klien (opsional, untuk billable)') }} —</option>
+                                @foreach($clients as $c)
+                                    <option value="{{ $c->id }}">{{ $c->name }}</option>
+                                @endforeach
+                            </select>
+                        </x-tabler.field>
+                    </div>
+                </div>
+                <div class="row g-2 align-items-center">
+                    <div class="col-md-4">
+                        <x-tabler.field name="receipt">
+                            <input type="file" id="receipt" name="receipt" accept="image/*" class="form-control">
+                        </x-tabler.field>
+                    </div>
+                    <div class="col-md-4">
+                        <label class="form-check">
+                            <input type="checkbox" name="billable" value="1" class="form-check-input">
+                            <span class="form-check-label">{{ __('Billable') }}</span>
+                        </label>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="btn-list justify-content-end">
+                            <button class="btn btn-primary">{{ __('Simpan') }}</button>
+                        </div>
+                    </div>
+                </div>
             </form>
         </div>
+    </div>
 
-        <div class="card-unicorn">
-            <table class="table-unicorn">
-                <thead><tr><th>Tanggal</th><th>Kategori</th><th>Deskripsi</th><th>Klien</th><th class="text-right">Jumlah</th><th></th></tr></thead>
+    <div class="card">
+        <div class="table-responsive">
+            <table class="table table-vcenter card-table">
+                <thead>
+                    <tr>
+                        <th>{{ __('Tanggal') }}</th>
+                        <th>{{ __('Kategori') }}</th>
+                        <th>{{ __('Deskripsi') }}</th>
+                        <th>{{ __('Klien') }}</th>
+                        <th class="text-end">{{ __('Jumlah') }}</th>
+                        <th class="text-end">{{ __('Actions') }}</th>
+                    </tr>
+                </thead>
                 <tbody>
                     @forelse($expenses as $e)
-                    <tr>
-                        <td>{{ $e->expense_date?->format('d M Y') }}</td>
-                        <td><span class="badge-unicorn">{{ $e->category ?? '—' }}</span></td>
-                        <td>{{ $e->description }}</td>
-                        <td>{{ $e->client?->name ?? '—' }}</td>
-                        <td class="text-right font-bold">{{ $e->currency }} {{ number_format($e->amount, 2) }}</td>
-                        <td><form method="POST" action="{{ route('expenses.destroy', $e) }}" onsubmit="return confirm('Hapus?');">@csrf @method('DELETE')<button class="text-rose-500 text-sm">×</button></form></td>
-                    </tr>
-                    @empty<tr><td colspan="6" class="text-center text-purple-400 py-8">Belum ada expense.</td></tr>@endforelse
+                        <tr>
+                            <td class="text-muted">{{ $e->expense_date?->format('d M Y') }}</td>
+                            <td><span class="badge bg-blue-lt">{{ $e->category ?? '—' }}</span></td>
+                            <td>{{ $e->description }}</td>
+                            <td class="text-muted">{{ $e->client?->name ?? '—' }}</td>
+                            <td class="text-end fw-bold">{{ $e->currency }} {{ number_format($e->amount, 2) }}</td>
+                            <td class="text-end">
+                                <x-tabler.delete-button :action="route('expenses.destroy', $e)" :confirm="__('Hapus?')" />
+                            </td>
+                        </tr>
+                    @empty
+                        <tr>
+                            <td colspan="6">
+                                <x-tabler.empty icon="receipt" :title="__('Belum ada expense.')" />
+                            </td>
+                        </tr>
+                    @endforelse
                 </tbody>
             </table>
-            <div class="mt-4">{{ $expenses->links() }}</div>
         </div>
+        @if($expenses->hasPages())
+            <div class="card-footer d-flex justify-content-center">{{ $expenses->links() }}</div>
+        @endif
     </div>
-</x-app-layout>
+</x-tabler.layout>

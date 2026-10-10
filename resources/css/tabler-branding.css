@@ -1,0 +1,123 @@
+/**
+ * Invocely brand tokens on top of Tabler.
+ * Only brand + gaps Tabler does not cover. No second framework here.
+ */
+
+:root,
+[data-bs-theme="light"] {
+  --tblr-primary: #7c5cf0;
+  --tblr-primary-rgb: 124, 92, 240;
+  --tblr-primary-fg: #ffffff;
+  --tblr-link-color: #7c5cf0;
+  --tblr-link-hover-color: #6a48e0;
+  --invocely-accent: #f472b6;
+  --invocely-accent-rgb: 244, 114, 182;
+  --invocely-brand-gradient: linear-gradient(135deg, #f472b6, #7c5cf0 55%, #38bdf8);
+  --invocely-sidebar-bg: #1e1b33;
+  --invocely-sidebar-fg: #c9c4e8;
+  /* System stack on purpose: no external font fetch, no FOUT, works offline. */
+  --tblr-font-sans-serif: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+}
+
+[data-bs-theme="dark"] {
+  --tblr-primary: #9d86f5;
+  --tblr-primary-rgb: 157, 134, 245;
+  --tblr-body-bg: #141221;
+  --tblr-body-color: #d9d5f2;
+  --tblr-card-bg: #1e1b33;
+  --tblr-border-color: #322d55;
+  --tblr-muted: #8f88b8;
+  --invocely-sidebar-bg: #141221;
+}
+
+body {
+  font-feature-settings: "cv11", "ss01";
+}
+
+.font-display {
+  font-family: var(--tblr-font-sans-serif);
+  font-weight: 700;
+  letter-spacing: -0.01em;
+}
+
+/* Brand sidebar: dark violet, active item pill */
+.navbar-vertical.invocely-nav {
+  background: var(--invocely-sidebar-bg);
+}
+.navbar-vertical.invocely-nav .navbar-brand,
+.navbar-vertical.invocely-nav .nav-link,
+.navbar-vertical.invocely-nav .navbar-heading {
+  color: var(--invocely-sidebar-fg);
+}
+.navbar-vertical.invocely-nav .nav-link .nav-link-icon {
+  color: #8f88b8;
+}
+.navbar-vertical.invocely-nav .nav-link:hover {
+  color: #fff;
+  background: rgba(255, 255, 255, 0.06);
+}
+.navbar-vertical.invocely-nav .nav-link.active {
+  color: #fff;
+  background: linear-gradient(135deg, rgba(244, 114, 182, 0.35), rgba(124, 92, 240, 0.45));
+  box-shadow: inset 2px 0 0 var(--invocely-accent);
+}
+.navbar-vertical.invocely-nav .nav-item.active > .nav-link {
+  color: #fff;
+}
+.navbar-vertical.invocely-nav .dropdown-menu {
+  background: #26214a;
+  border-color: #35305f;
+}
+.navbar-vertical.invocely-nav .dropdown-item {
+  color: var(--invocely-sidebar-fg);
+}
+.navbar-vertical.invocely-nav .dropdown-item:hover,
+.navbar-vertical.invocely-nav .dropdown-item.active {
+  color: #fff;
+  background: rgba(255, 255, 255, 0.07);
+}
+
+/* Brand gradient button + logo tile */
+.btn-brand {
+  background: var(--invocely-brand-gradient);
+  border: none;
+  color: #fff;
+  font-weight: 600;
+}
+.btn-brand:hover,
+.btn-brand:focus {
+  color: #fff;
+  filter: brightness(1.06);
+}
+.logo-tile {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 2rem;
+  height: 2rem;
+  border-radius: 0.6rem;
+  background: var(--invocely-brand-gradient);
+  color: #fff;
+  font-weight: 800;
+}
+
+/* Stat cards */
+.stat-delta-up { color: var(--tblr-green); }
+.stat-delta-down { color: var(--tblr-red); }
+
+/* Print: admin chrome off, document clean (invoice PDF views unaffected) */
+@media print {
+  .d-print-none { display: none !important; }
+}
+
+/* Touch targets on small screens */
+@media (max-width: 575.98px) {
+  .btn { min-height: 2.5rem; }
+  .nav-link { min-height: 2.75rem; }
+}
+
+/* Focus visibility (WCAG 2.2 AA) */
+:focus-visible {
+  outline: 2px solid var(--tblr-primary);
+  outline-offset: 2px;
+}

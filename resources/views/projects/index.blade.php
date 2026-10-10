@@ -1,77 +1,94 @@
-<x-app-layout>
-    <x-slot name="header">
-        <div class="flex items-center justify-between flex-wrap gap-3">
-            <div>
-                <h2 class="heading-unicorn flex items-center gap-2">{{ __('Projects') }} <span class="text-2xl">📁</span></h2>
-                <p class="text-sm text-purple-500 mt-1">✦ {{ __('Group invoice + time + expense per project') }}</p>
-            </div>
-            <a href="{{ route('projects.create') }}" class="btn-unicorn">+ {{ __('Project Baru') }}</a>
-        </div>
+<x-tabler.layout :title="__('Projects')">
+    <x-slot name="actions">
+        <a href="{{ route('projects.create') }}" class="btn btn-primary">
+            <x-ti name="plus" /> {{ __('Project Baru') }}
+        </a>
     </x-slot>
 
-    <div class="max-w-7xl mx-auto space-y-6">
-        @if(session('success'))
-            <div class="rounded-2xl bg-emerald-50 border-2 border-emerald-200 p-4 text-emerald-800">✓ {{ session('success') }}</div>
-        @endif
-
-        <form method="GET" class="card-unicorn !p-4 flex flex-wrap items-end gap-3">
-            <div>
-                <x-input-label :value="__('Status')" />
-                <select name="status" class="input-unicorn rounded-xl px-4 py-2 mt-1">
-                    <option value="">{{ __('Semua') }}</option>
-                    <option value="active"    {{ request('status')==='active' ? 'selected' : '' }}>Active</option>
-                    <option value="on_hold"   {{ request('status')==='on_hold' ? 'selected' : '' }}>On Hold</option>
-                    <option value="completed" {{ request('status')==='completed' ? 'selected' : '' }}>Completed</option>
-                    <option value="cancelled" {{ request('status')==='cancelled' ? 'selected' : '' }}>Cancelled</option>
-                </select>
-            </div>
-            <div>
-                <x-input-label :value="__('Klien')" />
-                <select name="client_id" class="input-unicorn rounded-xl px-4 py-2 mt-1">
-                    <option value="">{{ __('Semua klien') }}</option>
-                    @foreach($clients as $c)
-                        <option value="{{ $c->id }}" {{ request('client_id') == $c->id ? 'selected' : '' }}>{{ $c->name }}</option>
-                    @endforeach
-                </select>
-            </div>
-            <button type="submit" class="btn-unicorn">{{ __('Filter') }}</button>
-        </form>
-
-        @if($projects->isEmpty())
-            <div class="card-unicorn !p-12 text-center">
-                <p class="text-5xl mb-3">📁</p>
-                <p class="font-display font-bold text-lg text-purple-700">{{ __('Belum ada project') }}</p>
-                <p class="text-sm text-purple-400 mt-1 mb-4">Buat project pertama untuk mulai grouping invoice & time entry.</p>
-                <a href="{{ route('projects.create') }}" class="btn-unicorn">+ {{ __('Project Pertama') }}</a>
-            </div>
-        @else
-            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                @foreach($projects as $p)
-                    <a href="{{ route('projects.show', $p) }}" class="card-unicorn hover:shadow-unicorn-glow transition no-underline group">
-                        <div class="h-2 -mx-6 -mt-6 mb-4 rounded-t-2xl"
-                             style="background: {{ $p->color ?? 'linear-gradient(90deg, #FF7AC6, #A78BFA, #7DD3FC)' }};"></div>
-                        <div class="flex items-start justify-between gap-2">
-                            <h3 class="font-display font-bold text-lg text-purple-900 group-hover:text-pink-500 truncate">{{ $p->name }}</h3>
-                            <span class="badge-{{ match($p->status){'active'=>'mint','on_hold'=>'gold','completed'=>'blue','cancelled'=>'gray',default=>'gray'} }} text-[10px] shrink-0">{{ ucfirst(str_replace('_',' ',$p->status)) }}</span>
+    <div class="card mb-3">
+        <div class="card-body">
+            <form method="GET" action="{{ route('projects.index') }}">
+                <div class="row g-2 align-items-end">
+                    <div class="col-md-4">
+                        <x-tabler.field :label="__('Status')" name="status">
+                            <select name="status" id="status" class="form-select">
+                                <option value="">{{ __('Semua') }}</option>
+                                <option value="active" @selected(request('status') === 'active')>Active</option>
+                                <option value="on_hold" @selected(request('status') === 'on_hold')>On Hold</option>
+                                <option value="completed" @selected(request('status') === 'completed')>Completed</option>
+                                <option value="cancelled" @selected(request('status') === 'cancelled')>Cancelled</option>
+                            </select>
+                        </x-tabler.field>
+                    </div>
+                    <div class="col-md-5">
+                        <x-tabler.field :label="__('Klien')" name="client_id">
+                            <select name="client_id" id="client_id" class="form-select">
+                                <option value="">{{ __('Semua klien') }}</option>
+                                @foreach($clients as $c)
+                                    <option value="{{ $c->id }}" @selected(request('client_id') == $c->id)>{{ $c->name }}</option>
+                                @endforeach
+                            </select>
+                        </x-tabler.field>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="btn-list justify-content-end">
+                            @if(request()->anyFilled(['status', 'client_id']))
+                                <a href="{{ route('projects.index') }}" class="btn">{{ __('Reset') }}</a>
+                            @endif
+                            <button type="submit" class="btn btn-primary">{{ __('Filter') }}</button>
                         </div>
-                        <p class="text-sm text-purple-500 mt-1">👤 {{ $p->client?->name }}</p>
-                        @if($p->description)
-                            <p class="text-xs text-purple-400 mt-2 line-clamp-2">{{ $p->description }}</p>
-                        @endif
-                        <div class="grid grid-cols-2 gap-3 mt-4 pt-4 border-t border-purple-100">
-                            <div>
-                                <p class="text-[10px] uppercase tracking-wider text-purple-400">Budget</p>
-                                <p class="text-sm font-bold text-purple-900">{{ $p->budget_amount ? number_format($p->budget_amount, 0) : '—' }}</p>
-                            </div>
-                            <div>
-                                <p class="text-[10px] uppercase tracking-wider text-purple-400">Jam</p>
-                                <p class="text-sm font-bold text-purple-900">{{ $p->budget_hours ? number_format($p->budget_hours, 0) : '—' }}</p>
-                            </div>
-                        </div>
-                    </a>
-                @endforeach
-            </div>
-            <div>{{ $projects->links() }}</div>
-        @endif
+                    </div>
+                </div>
+            </form>
+        </div>
     </div>
-</x-app-layout>
+
+    @if($projects->isEmpty())
+        <div class="card">
+            <div class="card-body">
+                <x-tabler.empty icon="briefcase" :title="__('Belum ada project')"
+                    :body="__('Buat project pertama untuk mulai grouping invoice & time entry.')"
+                    :actionUrl="route('projects.create')" :actionLabel="__('Project Pertama')" />
+            </div>
+        </div>
+    @else
+        <div class="row row-cards">
+            @foreach($projects as $p)
+                <div class="col-md-6 col-lg-4">
+                    <div class="card">
+                        <div class="card-status-top" style="background: {{ $p->color ?? '#A78BFA' }};"></div>
+                        <div class="card-body">
+                            <div class="d-flex align-items-start justify-content-between gap-2">
+                                <h3 class="card-title mb-0 text-truncate">
+                                    <a href="{{ route('projects.show', $p) }}">{{ $p->name }}</a>
+                                </h3>
+                                <span class="badge bg-{{ match($p->status){'active'=>'green','on_hold'=>'yellow','completed'=>'blue','cancelled'=>'red',default=>'secondary'} }} flex-shrink-0">{{ ucfirst(str_replace('_',' ',$p->status)) }}</span>
+                            </div>
+                            <div class="text-muted small mt-1">
+                                <x-ti name="user" /> {{ $p->client?->name }}
+                            </div>
+                            @if($p->description)
+                                <p class="text-muted small mt-2 mb-0 text-truncate">{{ $p->description }}</p>
+                            @endif
+                            <div class="row g-2 mt-3 pt-3 border-top">
+                                <div class="col-6">
+                                    <div class="text-muted small text-uppercase">Budget</div>
+                                    <div class="fw-semibold">{{ $p->budget_amount ? number_format($p->budget_amount, 0) : '—' }}</div>
+                                </div>
+                                <div class="col-6">
+                                    <div class="text-muted small text-uppercase">Jam</div>
+                                    <div class="fw-semibold">{{ $p->budget_hours ? number_format($p->budget_hours, 0) : '—' }}</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            @endforeach
+        </div>
+        @if($projects->hasPages())
+            <div class="card mt-3">
+                <div class="card-footer d-flex justify-content-center">{{ $projects->links() }}</div>
+            </div>
+        @endif
+    @endif
+</x-tabler.layout>

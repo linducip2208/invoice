@@ -1,23 +1,24 @@
-<x-app-layout>
-    <x-slot name="header">
-        <div>
-            <h2 class="heading-unicorn flex items-center gap-2">{{ __('Profile') }} <span class="text-2xl">🦄</span></h2>
-            <p class="text-sm text-purple-500 mt-1">✦ {{ __('Manage your sparkly identity') }}</p>
-        </div>
-    </x-slot>
-
-    <div class="max-w-3xl mx-auto space-y-6">
-        <div class="card-unicorn">
-            <div class="rainbow-bar -mx-6 -mt-6 mb-6 rounded-t-2xl"></div>
-            @include('profile.partials.update-profile-information-form')
-        </div>
-
-        <div class="card-unicorn">
-            @include('profile.partials.update-password-form')
-        </div>
-
-        <div class="card-unicorn" style="background: linear-gradient(135deg, rgba(254,226,226,0.5), rgba(252,165,165,0.3)); border-color: rgba(248,113,113,0.4);">
-            @include('profile.partials.delete-user-form')
+<x-tabler.layout :title="__('Profile')" :pretitle="__('Account')">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card mb-3">
+                <div class="card-header"><h3 class="card-title">{{ __('Profile Information') }}</h3></div>
+                <div class="card-body">
+                    @include('profile.partials.update-profile-information-form')
+                </div>
+            </div>
+            <div class="card mb-3">
+                <div class="card-header"><h3 class="card-title">{{ __('Update Password') }}</h3></div>
+                <div class="card-body">
+                    @include('profile.partials.update-password-form')
+                </div>
+            </div>
+            <div class="card card-borderless bg-red-lt mb-3">
+                <div class="card-header"><h3 class="card-title text-danger">{{ __('Delete Account') }}</h3></div>
+                <div class="card-body">
+                    @include('profile.partials.delete-user-form')
+                </div>
+            </div>
         </div>
     </div>
-</x-app-layout>
+</x-tabler.layout>

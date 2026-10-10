@@ -10,6 +10,7 @@ use App\Models\Project;
 use App\Models\Quote;
 use App\Observers\AuditableObserver;
 use App\Observers\PaymentObserver;
+use Illuminate\Pagination\Paginator;
 use Illuminate\Support\ServiceProvider;
 
 class AppServiceProvider extends ServiceProvider
@@ -21,6 +22,9 @@ class AppServiceProvider extends ServiceProvider
 
     public function boot(): void
     {
+        // Bootstrap 5 markup so Tabler styles pagination consistently.
+        Paginator::useBootstrapFive();
+
         // Auto-audit mutations on key models
         Invoice::observe(AuditableObserver::class);
         Quote::observe(AuditableObserver::class);

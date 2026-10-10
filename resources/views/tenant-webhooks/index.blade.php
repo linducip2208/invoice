@@ -1,41 +1,76 @@
-<x-app-layout>
-    <x-slot name="header"><h2 class="heading-unicorn">🪝 {{ __('Outbound Webhooks') }}</h2></x-slot>
-    <div class="max-w-4xl mx-auto space-y-4">
-        <div class="card-unicorn">
-            <h3 class="font-display font-bold text-lg mb-3">+ {{ __('Tambah Webhook') }}</h3>
-            <form method="POST" action="{{ route('tenant-webhooks.store') }}" class="space-y-3">
+<x-tabler.layout :title="__('Outbound Webhooks')" :pretitle="__('Workspace')">
+    <div class="card mb-3">
+        <div class="card-header"><h3 class="card-title">{{ __('Tambah Webhook') }}</h3></div>
+        <div class="card-body">
+            <form method="POST" action="{{ route('tenant-webhooks.store') }}">
                 @csrf
-                <input type="url" name="url" placeholder="https://yourapp.com/webhook" required class="input-unicorn rounded-xl px-4 py-2 w-full">
-                <div class="grid grid-cols-2 sm:grid-cols-3 gap-2 text-sm">
-                    @foreach(['invoice.created','invoice.sent','invoice.paid','invoice.viewed','payment.received','client.created'] as $ev)
-                    <label class="flex items-center gap-2 p-2 rounded-lg hover:bg-purple-50">
-                        <input type="checkbox" name="events[]" value="{{ $ev }}" class="rounded border-purple-300">
-                        <span class="font-mono text-xs">{{ $ev }}</span>
-                    </label>
-                    @endforeach
+                <x-tabler.field :label="__('URL')" name="url">
+                    <input type="url" id="url" name="url" placeholder="https://yourapp.com/webhook" required class="form-control">
+                </x-tabler.field>
+                <div class="mb-3">
+                    <label class="form-label">{{ __('Events') }}</label>
+                    <div class="row g-2">
+                        @foreach(['invoice.created','invoice.sent','invoice.paid','invoice.viewed','payment.received','client.created'] as $ev)
+                            <div class="col-md-4">
+                                <label class="form-check">
+                                    <input type="checkbox" name="events[]" value="{{ $ev }}" class="form-check-input">
+                                    <span class="form-check-label font-monospace small">{{ $ev }}</span>
+                                </label>
+                            </div>
+                        @endforeach
+                    </div>
                 </div>
-                <button class="btn-unicorn">Add Webhook</button>
+                <button class="btn btn-primary"><x-ti name="plus" /> {{ __('Add Webhook') }}</button>
             </form>
         </div>
+    </div>
 
-        <div class="card-unicorn">
-            <table class="table-unicorn">
-                <thead><tr><th>URL</th><th>Events</th><th>Status</th><th>Last Fire</th><th></th></tr></thead>
+    <div class="card">
+        <div class="card-header"><h3 class="card-title">{{ __('Webhooks') }}</h3></div>
+        <div class="table-responsive">
+            <table class="table table-vcenter card-table">
+                <thead>
+                    <tr>
+                        <th>{{ __('URL') }}</th>
+                        <th class="text-center">{{ __('Events') }}</th>
+                        <th>{{ __('Status') }}</th>
+                        <th>{{ __('Last Fire') }}</th>
+                        <th class="text-end">{{ __('Actions') }}</th>
+                    </tr>
+                </thead>
                 <tbody>
                     @forelse($webhooks as $w)
-                    <tr>
-                        <td class="font-mono text-xs truncate max-w-xs">{{ $w->url }}</td>
-                        <td>{{ count($w->events ?? []) }}</td>
-                        <td><span class="badge-{{ $w->is_active ? 'success' : 'warning' }}">{{ $w->is_active ? 'Active' : 'Paused' }}</span></td>
-                        <td class="text-purple-500 text-sm">{{ $w->last_fired_at?->diffForHumans() ?? 'Never' }}</td>
-                        <td>
-                            <form method="POST" action="{{ route('tenant-webhooks.toggle', $w) }}" class="inline">@csrf<button class="text-purple-600 text-sm">{{ $w->is_active ? 'Pause' : 'Resume' }}</button></form>
-                            <form method="POST" action="{{ route('tenant-webhooks.destroy', $w) }}" class="inline" onsubmit="return confirm('Hapus?');">@csrf @method('DELETE')<button class="text-rose-500 text-sm ml-2">×</button></form>
-                        </td>
-                    </tr>
-                    @empty<tr><td colspan="5" class="text-center text-purple-400 py-8">Belum ada webhook.</td></tr>@endforelse
+                        <tr>
+                            <td class="font-monospace small text-truncate" style="max-width: 16rem;">{{ $w->url }}</td>
+                            <td class="text-center"><span class="badge bg-blue-lt">{{ count($w->events ?? []) }}</span></td>
+                            <td>
+                                @if($w->is_active)
+                                    <span class="badge bg-green-lt">{{ __('Active') }}</span>
+                                @else
+                                    <span class="badge bg-yellow-lt">{{ __('Paused') }}</span>
+                                @endif
+                            </td>
+                            <td class="text-muted">{{ $w->last_fired_at?->diffForHumans() ?? 'Never' }}</td>
+                            <td class="text-end text-nowrap">
+                                <form method="POST" action="{{ route('tenant-webhooks.toggle', $w) }}" class="d-inline">
+                                    @csrf
+                                    <button class="btn btn-sm">{{ $w->is_active ? __('Pause') : __('Resume') }}</button>
+                                </form>
+                                <form method="POST" action="{{ route('tenant-webhooks.destroy', $w) }}" class="d-inline" onsubmit="return confirm('Hapus?');">
+                                    @csrf @method('DELETE')
+                                    <button class="btn btn-sm btn-outline-danger"><x-ti name="trash" /></button>
+                                </form>
+                            </td>
+                        </tr>
+                    @empty
+                        <tr>
+                            <td colspan="5">
+                                <x-tabler.empty icon="link" :title="__('Belum ada webhook.')" />
+                            </td>
+                        </tr>
+                    @endforelse
                 </tbody>
             </table>
         </div>
     </div>
-</x-app-layout>
+</x-tabler.layout>

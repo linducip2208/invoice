@@ -1,53 +1,47 @@
-<x-app-layout>
-    <x-slot name="header">
-        <div class="flex items-center justify-between flex-wrap gap-3">
-            <div>
-                <h2 class="heading-unicorn flex items-center gap-2">{{ __('Accounting Exports') }} <span class="text-2xl">📊</span></h2>
-                <p class="text-sm text-purple-500 mt-1">✦ Export ke Jurnal/QuickBooks/Xero/CSV generic</p>
-            </div>
-            <a href="{{ route('accounting-exports.create') }}" class="btn-unicorn">+ {{ __('Generate Export') }}</a>
-        </div>
+<x-tabler.layout :title="__('Accounting Exports')" :pretitle="__('Finance')">
+    <x-slot name="actions">
+        <a href="{{ route('accounting-exports.create') }}" class="btn btn-primary">
+            <x-ti name="plus" /> {{ __('Generate Export') }}
+        </a>
     </x-slot>
 
-    <div class="max-w-5xl mx-auto">
-        @if(session('success'))<div class="rounded-2xl bg-emerald-50 border-2 border-emerald-200 p-4 text-emerald-800 mb-4">✓ {{ session('success') }}</div>@endif
-
-        <div class="card-unicorn !p-0 overflow-hidden">
-            @if($exports->isEmpty())
-                <div class="p-12 text-center">
-                    <p class="text-5xl mb-3">📊</p>
-                    <p class="font-display font-bold text-purple-700">Belum ada export</p>
-                </div>
-            @else
-                <table class="min-w-full">
-                    <thead class="bg-gradient-to-r from-pink-50 via-purple-50 to-sky-50">
+    <div class="card">
+        @if($exports->isEmpty())
+            <div class="card-body">
+                <x-tabler.empty icon="file-export" :title="__('Belum ada export')" :actionUrl="route('accounting-exports.create')" :actionLabel="__('Generate Export')" />
+            </div>
+        @else
+            <div class="table-responsive">
+                <table class="table table-vcenter card-table">
+                    <thead>
                         <tr>
-                            <th class="px-4 py-3 text-left text-[11px] font-bold text-purple-700 uppercase">Format</th>
-                            <th class="px-4 py-3 text-left text-[11px] font-bold text-purple-700 uppercase">Periode</th>
-                            <th class="px-4 py-3 text-right text-[11px] font-bold text-purple-700 uppercase">Records</th>
-                            <th class="px-4 py-3 text-left text-[11px] font-bold text-purple-700 uppercase">Generated</th>
-                            <th class="px-4 py-3"></th>
+                            <th>{{ __('Format') }}</th>
+                            <th>{{ __('Periode') }}</th>
+                            <th class="text-end">{{ __('Records') }}</th>
+                            <th>{{ __('Generated') }}</th>
+                            <th class="text-end">{{ __('Actions') }}</th>
                         </tr>
                     </thead>
                     <tbody>
                         @foreach($exports as $e)
-                            <tr class="border-t border-purple-100">
-                                <td class="px-4 py-3"><span class="badge-purple text-xs">{{ ucfirst($e->format) }}</span></td>
-                                <td class="px-4 py-3 text-sm text-purple-700">{{ $e->period_start->format('d M Y') }} - {{ $e->period_end->format('d M Y') }}</td>
-                                <td class="px-4 py-3 text-right font-bold text-purple-900">{{ $e->record_count }}</td>
-                                <td class="px-4 py-3 text-xs text-purple-500">{{ $e->created_at->diffForHumans() }} · {{ $e->generator?->name }}</td>
-                                <td class="px-4 py-3 text-right space-x-2">
-                                    <a href="{{ route('accounting-exports.download', $e) }}" class="text-pink-600 text-xs font-semibold">📥 Download</a>
-                                    <form method="POST" action="{{ route('accounting-exports.destroy', $e) }}" class="inline" onsubmit="return confirm('Hapus?')">@csrf @method('DELETE')
-                                        <button class="text-rose-500 text-xs">Hapus</button>
-                                    </form>
+                            <tr>
+                                <td><span class="badge bg-blue-lt">{{ ucfirst($e->format) }}</span></td>
+                                <td class="text-muted">{{ $e->period_start->format('d M Y') }} - {{ $e->period_end->format('d M Y') }}</td>
+                                <td class="text-end fw-bold">{{ $e->record_count }}</td>
+                                <td class="text-muted small">{{ $e->created_at->diffForHumans() }} · {{ $e->generator?->name }}</td>
+                                <td class="text-end text-nowrap">
+                                    <a href="{{ route('accounting-exports.download', $e) }}" class="btn btn-sm"><x-ti name="download" /> {{ __('Download') }}</a>
+                                    <x-tabler.delete-button :action="route('accounting-exports.destroy', $e)" :confirm="__('Hapus?')" :label="__('Hapus')" />
                                 </td>
                             </tr>
                         @endforeach
                     </tbody>
                 </table>
-                <div class="p-4">{{ $exports->links() }}</div>
+            </div>
+            @if($exports->hasPages())
+                <div class="card-footer d-flex justify-content-center">{{ $exports->links() }}</div>
             @endif
-        </div>
+        @endif
     </div>
-</x-app-layout>
+    <p class="text-muted small mt-2">{{ __('Export ke Jurnal/QuickBooks/Xero/CSV generic') }}</p>
+</x-tabler.layout>

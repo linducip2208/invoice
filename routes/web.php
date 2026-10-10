@@ -55,7 +55,7 @@ use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
     return view('welcome');
-});
+})->name('home');
 
 Route::middleware(['auth', 'verified'])->group(function () {
     // First-workspace creation for users without any workspace.

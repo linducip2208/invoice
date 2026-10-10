@@ -1,75 +1,73 @@
-<x-app-layout>
-    <x-slot name="header">
-        <div class="flex items-center justify-between flex-wrap gap-3">
-            <div>
-                <h2 class="heading-unicorn flex items-center gap-2">{{ $batch->bank_name }} {{ $batch->account_no }} <span class="text-2xl">🏦</span></h2>
-                <p class="text-sm text-purple-500 mt-1">{{ $batch->total_lines }} baris · {{ $batch->matched_count }} matched · status {{ $batch->status }}</p>
-            </div>
-            <a href="{{ route('bank-reconcile.index') }}" class="btn-unicorn-secondary text-sm">← {{ __('Semua Batch') }}</a>
-        </div>
+<x-tabler.layout :title="$batch->bank_name . ' ' . $batch->account_no" :pretitle="__('Bank Reconcile')">
+    <x-slot name="actions">
+        <a href="{{ route('bank-reconcile.index') }}" class="btn">
+            <x-ti name="arrow-left" /> {{ __('Semua Batch') }}
+        </a>
     </x-slot>
 
-    <div class="max-w-7xl mx-auto space-y-5">
-        @if(session('success'))<div class="rounded-2xl bg-emerald-50 border-2 border-emerald-200 p-4 text-emerald-800">✓ {{ session('success') }}</div>@endif
+    <p class="text-muted small mb-3">{{ $batch->total_lines }} {{ __('baris') }} · {{ $batch->matched_count }} {{ __('matched') }} · {{ __('status') }} {{ $batch->status }}</p>
 
-        @if($batch->status !== 'completed' && $batch->matched_count > 0)
-            <form method="POST" action="{{ route('bank-reconcile.finalize', $batch) }}"
-                  onsubmit="return confirm('Buat {{ $batch->matched_count }} payment dari baris yang sudah matched? Tindakan ini tidak bisa dibatalkan.')"
-                  class="card-unicorn-glow !p-5 flex items-center justify-between flex-wrap gap-3">
-                @csrf
-                <div>
-                    <p class="font-display font-bold text-purple-900">✓ Finalisasi {{ $batch->matched_count }} match</p>
-                    <p class="text-sm text-purple-500">Akan auto-create payment record + update balance invoice</p>
-                </div>
-                <button type="submit" class="btn-unicorn">🚀 {{ __('Finalisasi & Buat Payment') }}</button>
-            </form>
-        @endif
-
-        <form method="POST" action="{{ route('bank-reconcile.match', $batch) }}" class="card-unicorn !p-0 overflow-hidden">
+    @if($batch->status !== 'completed' && $batch->matched_count > 0)
+        <form method="POST" action="{{ route('bank-reconcile.finalize', $batch) }}" onsubmit="return confirm({{ Js::from(__('Buat') . ' ' . $batch->matched_count . ' ' . __('payment dari baris yang sudah matched? Tindakan ini tidak bisa dibatalkan.')) }});" class="card mb-3">
             @csrf
-            <table class="min-w-full">
-                <thead class="bg-gradient-to-r from-pink-50 via-purple-50 to-sky-50">
+            <div class="card-body">
+                <div class="row align-items-center">
+                    <div class="col">
+                        <strong><x-ti name="check" /> {{ __('Finalisasi') }} {{ $batch->matched_count }} {{ __('match') }}</strong>
+                        <div class="text-muted small">{{ __('Akan auto-create payment record + update balance invoice') }}</div>
+                    </div>
+                    <div class="col-auto">
+                        <button type="submit" class="btn btn-primary"><x-ti name="check" /> {{ __('Finalisasi & Buat Payment') }}</button>
+                    </div>
+                </div>
+            </div>
+        </form>
+    @endif
+
+    <form method="POST" action="{{ route('bank-reconcile.match', $batch) }}" class="card">
+        @csrf
+        <div class="table-responsive">
+            <table class="table table-vcenter card-table">
+                <thead>
                     <tr>
-                        <th class="px-3 py-2 text-left text-[11px] font-bold text-purple-700 uppercase">Tgl</th>
-                        <th class="px-3 py-2 text-right text-[11px] font-bold text-purple-700 uppercase">Nominal</th>
-                        <th class="px-3 py-2 text-left text-[11px] font-bold text-purple-700 uppercase">Description</th>
-                        <th class="px-3 py-2 text-left text-[11px] font-bold text-purple-700 uppercase w-72">Match Invoice</th>
-                        <th class="px-3 py-2 text-center text-[11px] font-bold text-purple-700 uppercase">Confidence</th>
+                        <th>{{ __('Tgl') }}</th>
+                        <th class="text-end">{{ __('Nominal') }}</th>
+                        <th>{{ __('Description') }}</th>
+                        <th>{{ __('Match Invoice') }}</th>
+                        <th class="text-center">{{ __('Confidence') }}</th>
                     </tr>
                 </thead>
                 <tbody>
                     @foreach($batch->lines as $line)
-                        <tr class="border-t border-purple-100 {{ $line->matched_payment_id ? 'bg-emerald-50/40' : '' }}">
-                            <td class="px-3 py-2 text-xs text-purple-500">{{ $line->trx_date->format('d/m/y') }}</td>
-                            <td class="px-3 py-2 text-right font-bold text-purple-900">{{ number_format($line->amount, 0) }}</td>
-                            <td class="px-3 py-2 text-xs text-purple-700 max-w-md truncate">{{ $line->description }}</td>
-                            <td class="px-3 py-2">
+                        <tr class="{{ $line->matched_payment_id ? 'table-success' : '' }}">
+                            <td class="text-muted small">{{ $line->trx_date->format('d/m/y') }}</td>
+                            <td class="text-end fw-bold">{{ number_format($line->amount, 0) }}</td>
+                            <td class="text-muted small text-truncate" style="max-width: 24rem;">{{ $line->description }}</td>
+                            <td>
                                 @if($line->matched_payment_id)
-                                    <span class="text-xs text-emerald-700 font-bold">✓ Payment created</span>
+                                    <span class="text-success small fw-bold"><x-ti name="check" /> {{ __('Payment created') }}</span>
                                 @else
-                                    <select name="matches[{{ $line->id }}]" class="input-unicorn rounded-lg px-2 py-1 text-xs w-full">
-                                        <option value="">— pilih —</option>
+                                    <select name="matches[{{ $line->id }}]" class="form-select form-select-sm">
+                                        <option value="">— {{ __('pilih') }} —</option>
                                         @foreach($candidates as $inv)
-                                            <option value="{{ $inv->id }}" {{ $line->matched_invoice_id === $inv->id ? 'selected' : '' }}>
-                                                {{ $inv->invoice_no }} — {{ $inv->client?->name }} ({{ number_format($inv->balance_due, 0) }})
-                                            </option>
+                                            <option value="{{ $inv->id }}" {{ $line->matched_invoice_id === $inv->id ? 'selected' : '' }}>{{ $inv->invoice_no }} — {{ $inv->client?->name }} ({{ number_format($inv->balance_due, 0) }})</option>
                                         @endforeach
                                     </select>
                                 @endif
                             </td>
-                            <td class="px-3 py-2 text-center">
-                                @php $confColor = match($line->match_confidence){'high'=>'mint','medium'=>'gold','low'=>'red','manual'=>'blue',default=>'gray'}; @endphp
-                                <span class="badge-{{ $confColor }} text-[10px]">{{ $line->match_confidence }}</span>
+                            <td class="text-center">
+                                @php $confColor = match ($line->match_confidence) {'high' => 'success', 'medium' => 'warning', 'low' => 'danger', 'manual' => 'info', default => 'secondary'}; @endphp
+                                <span class="badge bg-{{ $confColor }}">{{ $line->match_confidence }}</span>
                             </td>
                         </tr>
                     @endforeach
                 </tbody>
             </table>
-            @if($batch->status !== 'completed')
-                <div class="p-4 border-t border-purple-100 flex justify-end">
-                    <button type="submit" class="btn-unicorn">💾 {{ __('Update Match') }}</button>
-                </div>
-            @endif
-        </form>
-    </div>
-</x-app-layout>
+        </div>
+        @if($batch->status !== 'completed')
+            <div class="card-footer d-flex justify-content-end">
+                <button type="submit" class="btn btn-primary"><x-ti name="check" /> {{ __('Update Match') }}</button>
+            </div>
+        @endif
+    </form>
+</x-tabler.layout>

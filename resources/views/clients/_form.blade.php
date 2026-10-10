@@ -1,81 +1,77 @@
 @props(['client' => null])
 
-<div class="grid grid-cols-1 md:grid-cols-2 gap-5">
-    <div>
-        <x-input-label for="name" :value="__('Name *')" />
-        <x-text-input id="name" name="name" type="text" class="mt-1 block w-full" :value="old('name', $client?->name)" required autofocus />
-        <x-input-error :messages="$errors->get('name')" class="mt-2" />
+<div class="row g-3">
+    <div class="col-md-6">
+        <x-tabler.field :label="__('Name *')" name="name" type="text" :value="old('name', $client?->name)"
+            attrs="required autofocus" />
     </div>
 
-    <div>
-        <x-input-label for="company_name" :value="__('Company Name')" />
-        <x-text-input id="company_name" name="company_name" type="text" class="mt-1 block w-full" :value="old('company_name', $client?->company_name)" />
-        <x-input-error :messages="$errors->get('company_name')" class="mt-2" />
+    <div class="col-md-6">
+        <x-tabler.field :label="__('Company Name')" name="company_name" type="text" :value="old('company_name', $client?->company_name)" />
     </div>
 
-    <div>
-        <x-input-label for="email" :value="__('Email')" />
-        <x-text-input id="email" name="email" type="email" class="mt-1 block w-full" :value="old('email', $client?->email)" placeholder="client@magic.land" />
-        <x-input-error :messages="$errors->get('email')" class="mt-2" />
+    <div class="col-md-6">
+        <x-tabler.field :label="__('Email')" name="email" type="email" :value="old('email', $client?->email)"
+            attrs="placeholder=client@magic.land" />
     </div>
 
-    <div>
-        <x-input-label for="phone" :value="__('Phone')" />
-        <x-text-input id="phone" name="phone" type="text" class="mt-1 block w-full" :value="old('phone', $client?->phone)" />
-        <x-input-error :messages="$errors->get('phone')" class="mt-2" />
+    <div class="col-md-6">
+        <x-tabler.field :label="__('Phone')" name="phone" type="text" :value="old('phone', $client?->phone)" />
     </div>
 
-    <div class="md:col-span-2">
-        <x-input-label for="address" :value="__('Address')" />
-        <textarea id="address" name="address" rows="2" class="mt-1 block w-full input-unicorn rounded-xl px-4 py-2">{{ old('address', $client?->address) }}</textarea>
-        <x-input-error :messages="$errors->get('address')" class="mt-2" />
+    <div class="col-12">
+        <x-tabler.field :label="__('Address')" name="address">
+            <textarea id="address" name="address" rows="2"
+                class="form-control @error('address') is-invalid @enderror">{{ old('address', $client?->address) }}</textarea>
+        </x-tabler.field>
     </div>
 
-    <div>
-        <x-input-label for="city" :value="__('City')" />
-        <x-text-input id="city" name="city" type="text" class="mt-1 block w-full" :value="old('city', $client?->city)" />
+    <div class="col-md-6">
+        <x-tabler.field :label="__('City')" name="city" type="text" :value="old('city', $client?->city)" />
     </div>
 
-    <div>
-        <x-input-label for="state" :value="__('State')" />
-        <x-text-input id="state" name="state" type="text" class="mt-1 block w-full" :value="old('state', $client?->state)" />
+    <div class="col-md-6">
+        <x-tabler.field :label="__('State')" name="state" type="text" :value="old('state', $client?->state)" />
     </div>
 
-    <div>
-        <x-input-label for="country" :value="__('Country')" />
-        <x-text-input id="country" name="country" type="text" class="mt-1 block w-full" :value="old('country', $client?->country ?? 'Indonesia')" />
+    <div class="col-md-6">
+        <x-tabler.field :label="__('Country')" name="country" type="text" :value="old('country', $client?->country ?? 'Indonesia')" />
     </div>
 
-    <div>
-        <x-input-label for="postal_code" :value="__('Postal Code')" />
-        <x-text-input id="postal_code" name="postal_code" type="text" class="mt-1 block w-full" :value="old('postal_code', $client?->postal_code)" />
+    <div class="col-md-6">
+        <x-tabler.field :label="__('Postal Code')" name="postal_code" type="text" :value="old('postal_code', $client?->postal_code)" />
     </div>
 
-    <div>
-        <x-input-label for="tax_id" :value="__('Tax ID')" />
-        <x-text-input id="tax_id" name="tax_id" type="text" class="mt-1 block w-full" :value="old('tax_id', $client?->tax_id)" />
+    <div class="col-md-6">
+        <x-tabler.field :label="__('Tax ID')" name="tax_id" type="text" :value="old('tax_id', $client?->tax_id)" />
     </div>
 
-    <div>
-        <x-input-label for="is_active" :value="__('Status')" />
-        <select id="is_active" name="is_active" class="mt-1 block w-full input-unicorn rounded-xl px-4 py-2">
-            <option value="1" @selected(old('is_active', $client?->is_active ?? 1) == '1')>✦ {{ __('Active') }}</option>
-            <option value="0" @selected(old('is_active', $client?->is_active ?? 1) == '0')>{{ __('Inactive') }}</option>
-        </select>
+    <div class="col-md-6">
+        <x-tabler.field :label="__('Status')" name="is_active">
+            <select id="is_active" name="is_active" class="form-select">
+                <option value="1" @selected(old('is_active', $client?->is_active ?? 1) == '1')>{{ __('Active') }}</option>
+                <option value="0" @selected(old('is_active', $client?->is_active ?? 1) == '0')>{{ __('Inactive') }}</option>
+            </select>
+        </x-tabler.field>
     </div>
 
-    <div class="md:col-span-2">
-        <x-input-label for="notes" :value="__('Notes')" />
-        <textarea id="notes" name="notes" rows="3" class="mt-1 block w-full input-unicorn rounded-xl px-4 py-2">{{ old('notes', $client?->notes) }}</textarea>
-        <x-input-error :messages="$errors->get('notes')" class="mt-2" />
+    <div class="col-12">
+        <x-tabler.field :label="__('Notes')" name="notes">
+            <textarea id="notes" name="notes" rows="3"
+                class="form-control @error('notes') is-invalid @enderror">{{ old('notes', $client?->notes) }}</textarea>
+        </x-tabler.field>
     </div>
 
-    <div class="md:col-span-2">
-        <label class="inline-flex items-center gap-2.5 text-sm font-medium text-purple-700 cursor-pointer">
-            <input type="hidden" name="no_reminders" value="0" />
-            <input type="checkbox" name="no_reminders" value="1" @checked(old('no_reminders', $client?->no_reminders ?? false)) class="rounded border-purple-300 text-pink-500 focus:ring-pink-300" style="width: 1.1rem; height: 1.1rem;" />
-            {{ __('Do not send payment reminders to this client') }}
-        </label>
-        <x-input-error :messages="$errors->get('no_reminders')" class="mt-2" />
+    <div class="col-12">
+        <div class="mb-3">
+            <label class="form-check">
+                <input type="hidden" name="no_reminders" value="0" />
+                <input type="checkbox" name="no_reminders" value="1"
+                    @checked(old('no_reminders', $client?->no_reminders ?? false))
+                    class="form-check-input" />
+                <span class="form-check-label">{{ __('Do not send payment reminders to this client') }}</span>
+            </label>
+            @error('no_reminders')<div class="invalid-feedback d-block">{{ $message }}</div>@enderror
+        </div>
     </div>
 </div>

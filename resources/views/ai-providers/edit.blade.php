@@ -1,68 +1,71 @@
-<x-app-layout>
-    <x-slot name="header">
-        <h2 class="heading-unicorn flex items-center gap-2">{{ __('Edit Provider') }} — {{ $provider->name }}</h2>
-    </x-slot>
+<x-tabler.layout :title="__('Edit Provider')" :pretitle="__('Automation')" :subtitle="$provider->name">
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <div class="card">
+                <div class="card-body">
+                    <form method="POST" action="{{ route('ai-providers.update', $provider) }}">
+                        @csrf @method('PUT')
 
-    <div class="max-w-3xl mx-auto">
-        <form method="POST" action="{{ route('ai-providers.update', $provider) }}" class="card-unicorn !p-8 space-y-5">
-            @csrf @method('PUT')
+                        <x-tabler.field :label="__('Nama *')" name="name" :required="true">
+                            <input type="text" id="name" name="name" value="{{ old('name', $provider->name) }}" required class="form-control">
+                        </x-tabler.field>
 
-            <div>
-                <x-input-label :value="__('Nama *')" />
-                <x-text-input name="name" :value="old('name', $provider->name)" required class="mt-1 w-full" />
-            </div>
+                        <div class="row g-3">
+                            <div class="col-md-6">
+                                <x-tabler.field :label="__('API Format *')" name="api_format" :required="true">
+                                    <select id="api_format" name="api_format" required class="form-select">
+                                        @foreach(['openai_compatible','anthropic','gemini','image_generic','ocr_generic'] as $f)
+                                            <option value="{{ $f }}" {{ $provider->api_format === $f ? 'selected' : '' }}>{{ str_replace('_',' ', ucfirst($f)) }}</option>
+                                        @endforeach
+                                    </select>
+                                </x-tabler.field>
+                            </div>
+                            <div class="col-md-6">
+                                <x-tabler.field :label="__('Default Model')" name="default_model">
+                                    <input type="text" id="default_model" name="default_model" value="{{ old('default_model', $provider->default_model) }}" class="form-control">
+                                </x-tabler.field>
+                            </div>
+                        </div>
 
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div>
-                    <x-input-label :value="__('API Format *')" />
-                    <select name="api_format" required class="input-unicorn rounded-xl px-4 py-2 mt-1 block w-full">
-                        @foreach(['openai_compatible','anthropic','gemini','image_generic','ocr_generic'] as $f)
-                            <option value="{{ $f }}" {{ $provider->api_format === $f ? 'selected' : '' }}>{{ str_replace('_',' ', ucfirst($f)) }}</option>
-                        @endforeach
-                    </select>
+                        <x-tabler.field :label="__('Base URL *')" name="base_url" :required="true">
+                            <input type="url" id="base_url" name="base_url" value="{{ old('base_url', $provider->base_url) }}" required class="form-control">
+                        </x-tabler.field>
+
+                        <x-tabler.field :label="__('API Key (kosongin kalau tidak ganti)')" name="api_key" :help="__('Existing key tersimpan ter-encrypt. Isi field ini hanya kalau mau ganti key.')">
+                            <input type="password" id="api_key" name="api_key" placeholder="••••••••" autocomplete="new-password" class="form-control font-monospace">
+                        </x-tabler.field>
+
+                        <div class="row g-3">
+                            <div class="col-md-6">
+                                <x-tabler.field :label="__('Pricing Input ($/1k token)')" name="default_pricing_input">
+                                    <input type="number" id="default_pricing_input" name="default_pricing_input" step="0.000001" min="0" value="{{ old('default_pricing_input', $provider->default_pricing_input) }}" class="form-control">
+                                </x-tabler.field>
+                            </div>
+                            <div class="col-md-6">
+                                <x-tabler.field :label="__('Pricing Output ($/1k token)')" name="default_pricing_output">
+                                    <input type="number" id="default_pricing_output" name="default_pricing_output" step="0.000001" min="0" value="{{ old('default_pricing_output', $provider->default_pricing_output) }}" class="form-control">
+                                </x-tabler.field>
+                            </div>
+                        </div>
+
+                        <x-tabler.field :label="__('Extra Headers (JSON)')" name="extra_headers">
+                            <textarea id="extra_headers" name="extra_headers" rows="2" class="form-control font-monospace small">{{ old('extra_headers', $provider->extra_headers ? json_encode($provider->extra_headers) : '') }}</textarea>
+                        </x-tabler.field>
+
+                        <div class="mb-3">
+                            <label class="form-check">
+                                <input type="checkbox" name="is_active" value="1" {{ $provider->is_active ? 'checked' : '' }} class="form-check-input">
+                                <span class="form-check-label">{{ __('Aktif') }}</span>
+                            </label>
+                        </div>
+
+                        <div class="d-flex justify-content-end gap-2">
+                            <a href="{{ route('ai-providers.index') }}" class="btn">{{ __('Batal') }}</a>
+                            <button type="submit" class="btn btn-primary"><x-ti name="check" /> {{ __('Simpan') }}</button>
+                        </div>
+                    </form>
                 </div>
-                <div>
-                    <x-input-label :value="__('Default Model')" />
-                    <x-text-input name="default_model" :value="old('default_model', $provider->default_model)" class="mt-1 w-full" />
-                </div>
             </div>
-
-            <div>
-                <x-input-label :value="__('Base URL *')" />
-                <x-text-input name="base_url" type="url" :value="old('base_url', $provider->base_url)" required class="mt-1 w-full" />
-            </div>
-
-            <div>
-                <x-input-label :value="__('API Key (kosongin kalau tidak ganti)')" />
-                <x-text-input name="api_key" type="password" class="mt-1 w-full font-mono" placeholder="•••••••• tetap" autocomplete="new-password" />
-                <p class="text-xs text-purple-400 mt-1">🔐 Existing key tersimpan ter-encrypt. Isi field ini hanya kalau mau ganti key.</p>
-            </div>
-
-            <div class="grid grid-cols-2 gap-4">
-                <div>
-                    <x-input-label :value="__('Pricing Input ($/1k token)')" />
-                    <x-text-input name="default_pricing_input" type="number" step="0.000001" min="0" :value="old('default_pricing_input', $provider->default_pricing_input)" class="mt-1 w-full" />
-                </div>
-                <div>
-                    <x-input-label :value="__('Pricing Output ($/1k token)')" />
-                    <x-text-input name="default_pricing_output" type="number" step="0.000001" min="0" :value="old('default_pricing_output', $provider->default_pricing_output)" class="mt-1 w-full" />
-                </div>
-            </div>
-
-            <div>
-                <x-input-label :value="__('Extra Headers (JSON)')" />
-                <textarea name="extra_headers" rows="2" class="input-unicorn rounded-xl px-4 py-2 mt-1 block w-full font-mono text-xs">{{ old('extra_headers', $provider->extra_headers ? json_encode($provider->extra_headers) : '') }}</textarea>
-            </div>
-
-            <label class="flex items-center gap-3 cursor-pointer">
-                <input type="checkbox" name="is_active" value="1" {{ $provider->is_active ? 'checked' : '' }} class="rounded border-purple-300 text-pink-500 focus:ring-pink-300">
-                <span class="text-sm font-semibold text-purple-700">Aktif</span>
-            </label>
-
-            <div class="flex items-center justify-end gap-3 pt-2">
-                <a href="{{ route('ai-providers.index') }}" class="btn-unicorn-secondary">{{ __('Batal') }}</a>
-                <button type="submit" class="btn-unicorn px-8">{{ __('Simpan') }}</button>
-            </div>
-        </form>
+        </div>
     </div>
-</x-app-layout>
+</x-tabler.layout>

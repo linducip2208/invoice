@@ -1,48 +1,113 @@
-<x-app-layout>
-    <x-slot name="header"><h2 class="heading-unicorn">👥 {{ __('Team Members') }}</h2></x-slot>
-    <div class="max-w-4xl mx-auto space-y-4">
-        <div class="card-unicorn">
-            <h3 class="font-display font-bold text-lg mb-3">+ {{ __('Invite Teammate') }}</h3>
-            <form method="POST" action="{{ route('team.invite') }}" class="flex gap-2 flex-wrap">
+<x-tabler.layout :title="__('Team Members')" :pretitle="__('Workspace')">
+    @php $maxUsers = $workspace->planFeature('max_users'); @endphp
+
+    <div class="card mb-3">
+        <div class="card-header">
+            <h3 class="card-title">{{ __('Invite Teammate') }}</h3>
+        </div>
+        <div class="card-body">
+            <form method="POST" action="{{ route('team.invite') }}">
                 @csrf
-                <input type="email" name="email" placeholder="email@example.com" required class="input-unicorn rounded-xl px-4 py-2 flex-1">
-                <select name="role" class="input-unicorn rounded-xl px-3 py-2"><option value="member">Member</option><option value="admin">Admin</option></select>
-                <button class="btn-unicorn">Send Invite</button>
+                <div class="row g-2 align-items-end">
+                    <div class="col-md-6">
+                        <x-tabler.field :label="__('Email')" name="email">
+                            <input type="email" id="email" name="email" placeholder="email@example.com" required class="form-control">
+                        </x-tabler.field>
+                    </div>
+                    <div class="col-md-3">
+                        <x-tabler.field :label="__('Role')" name="role">
+                            <select id="role" name="role" class="form-select">
+                                <option value="member">Member</option>
+                                <option value="admin">Admin</option>
+                            </select>
+                        </x-tabler.field>
+                    </div>
+                    <div class="col-md-3">
+                        <button class="btn btn-primary w-100">
+                            <x-ti name="plus" /> {{ __('Send Invite') }}
+                        </button>
+                    </div>
+                </div>
             </form>
-            @php $maxUsers = $workspace->planFeature('max_users'); @endphp
-            <p class="text-xs text-purple-500 mt-2">Plan limit: {{ $maxUsers ?? '∞' }} users · Currently: {{ $members->count() + $pending->count() }}</p>
+            <p class="form-hint mt-2">{{ __('Plan limit:') }} {{ $maxUsers ?? '∞' }} · {{ __('Currently:') }} {{ $members->count() + $pending->count() }}</p>
         </div>
-
-        <div class="card-unicorn">
-            <h3 class="font-display font-bold text-lg mb-3">Active Members ({{ $members->count() }})</h3>
-            <table class="table-unicorn">
-                <thead><tr><th>Name</th><th>Email</th><th>Role</th></tr></thead>
-                <tbody>
-                    @foreach($members as $m)
-                    <tr><td class="font-bold">{{ $m->name }}</td><td>{{ $m->email }}</td><td><span class="badge-unicorn">{{ $m->pivot->role }}</span></td></tr>
-                    @endforeach
-                </tbody>
-            </table>
-        </div>
-
-        @if($pending->isNotEmpty())
-        <div class="card-unicorn">
-            <h3 class="font-display font-bold text-lg mb-3">Pending Invites ({{ $pending->count() }})</h3>
-            <table class="table-unicorn">
-                <thead><tr><th>Email</th><th>Role</th><th>Expires</th><th>Link</th><th></th></tr></thead>
-                <tbody>
-                    @foreach($pending as $inv)
-                    <tr>
-                        <td>{{ $inv->email }}</td>
-                        <td>{{ $inv->role }}</td>
-                        <td class="text-purple-500 text-sm">{{ $inv->expires_at?->diffForHumans() }}</td>
-                        <td><button onclick="navigator.clipboard.writeText('{{ url('/team/accept/' . $inv->token) }}'); this.textContent='✓'" class="text-purple-600 text-sm">Copy Link</button></td>
-                        <td><form method="POST" action="{{ route('team.invite.revoke', $inv) }}" onsubmit="return confirm('Revoke?');">@csrf @method('DELETE')<button class="text-rose-500 text-sm">×</button></form></td>
-                    </tr>
-                    @endforeach
-                </tbody>
-            </table>
-        </div>
-        @endif
     </div>
-</x-app-layout>
+
+    <div class="card mb-3">
+        <div class="card-header">
+            <h3 class="card-title">{{ __('Active Members') }} ({{ $members->count() }})</h3>
+        </div>
+        <div class="table-responsive">
+            <table class="table table-vcenter card-table">
+                <thead>
+                    <tr>
+                        <th>{{ __('Name') }}</th>
+                        <th>{{ __('Email') }}</th>
+                        <th>{{ __('Role') }}</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @forelse($members as $m)
+                        <tr>
+                            <td>
+                                <div class="d-flex align-items-center gap-2">
+                                    <span class="avatar avatar-sm">{{ strtoupper(mb_substr($m->name, 0, 1)) }}</span>
+                                    <span class="fw-semibold">{{ $m->name }}</span>
+                                </div>
+                            </td>
+                            <td class="text-muted">{{ $m->email }}</td>
+                            <td><span class="badge bg-blue-lt">{{ $m->pivot->role }}</span></td>
+                        </tr>
+                    @empty
+                        <tr>
+                            <td colspan="3">
+                                <x-tabler.empty icon="users" :title="__('No members yet')" :body="__('Invite your first teammate.')" />
+                            </td>
+                        </tr>
+                    @endforelse
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    @if($pending->isNotEmpty())
+        <div class="card">
+            <div class="card-header">
+                <h3 class="card-title">{{ __('Pending Invites') }} ({{ $pending->count() }})</h3>
+            </div>
+            <div class="table-responsive">
+                <table class="table table-vcenter card-table">
+                    <thead>
+                        <tr>
+                            <th>{{ __('Email') }}</th>
+                            <th>{{ __('Role') }}</th>
+                            <th>{{ __('Expires') }}</th>
+                            <th>{{ __('Link') }}</th>
+                            <th class="text-end">{{ __('Actions') }}</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach($pending as $inv)
+                            <tr>
+                                <td>{{ $inv->email }}</td>
+                                <td><span class="badge bg-yellow-lt">{{ $inv->role }}</span></td>
+                                <td class="text-muted">{{ $inv->expires_at?->diffForHumans() }}</td>
+                                <td>
+                                    <button type="button" onclick="navigator.clipboard.writeText('{{ url('/team/accept/' . $inv->token) }}'); this.textContent='{{ __('Copied') }}'" class="btn btn-sm">
+                                        <x-ti name="link" /> {{ __('Copy Link') }}
+                                    </button>
+                                </td>
+                                <td class="text-end">
+                                    <form method="POST" action="{{ route('team.invite.revoke', $inv) }}" class="d-inline" onsubmit="return confirm('Revoke?');">
+                                        @csrf @method('DELETE')
+                                        <button class="btn btn-sm btn-outline-danger">{{ __('Revoke') }}</button>
+                                    </form>
+                                </td>
+                            </tr>
+                        @endforeach
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    @endif
+</x-tabler.layout>

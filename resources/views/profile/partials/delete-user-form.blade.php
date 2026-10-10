@@ -1,38 +1,49 @@
-<section class="space-y-5">
-    <header>
-        <h2 class="font-display text-lg font-bold text-rose-700 flex items-center gap-2">
-            <span>⚠️</span> {{ __('Delete Account') }}
-        </h2>
-        <p class="mt-1 text-sm text-rose-600">
-            {{ __('Once deleted, all your data vanishes forever. Please download anything you need first.') }}
-        </p>
-    </header>
+<section>
+    <p class="text-muted mb-3">
+        <x-ti name="alert-triangle" class="icon text-danger" />
+        {{ __('Once deleted, all your data vanishes forever. Please download anything you need first.') }}
+    </p>
 
-    <x-danger-button x-data="" x-on:click.prevent="$dispatch('open-modal', 'confirm-user-deletion')">
-        🗑️ {{ __('Delete Account') }}
-    </x-danger-button>
+    <button type="button" class="btn btn-outline-danger" data-bs-toggle="modal" data-bs-target="#confirmUserDeletion">
+        <x-ti name="trash" /> {{ __('Delete Account') }}
+    </button>
 
-    <x-modal name="confirm-user-deletion" :show="$errors->userDeletion->isNotEmpty()" focusable>
-        <form method="post" action="{{ route('profile.destroy') }}" class="p-6">
-            @csrf @method('delete')
-
-            <h2 class="font-display text-xl font-bold text-rose-700 flex items-center gap-2">
-                <span>⚠️</span> {{ __('Are you sure?') }}
-            </h2>
-            <p class="mt-2 text-sm text-purple-700">
-                {{ __('This will permanently erase your account and all magic associated with it. Enter your password to confirm.') }}
-            </p>
-
-            <div class="mt-5">
-                <x-input-label for="password" value="{{ __('Password') }}" class="sr-only" />
-                <x-text-input id="password" name="password" type="password" class="mt-1 block w-3/4" placeholder="{{ __('Password') }}" />
-                <x-input-error :messages="$errors->userDeletion->get('password')" class="mt-2" />
+    <div class="modal fade" id="confirmUserDeletion" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <form method="post" action="{{ route('profile.destroy') }}">
+                    @csrf @method('delete')
+                    <div class="modal-header">
+                        <h5 class="modal-title">{{ __('Are you sure?') }}</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="{{ __('Close') }}"></button>
+                    </div>
+                    <div class="modal-body">
+                        <p class="text-muted">{{ __('This will permanently erase your account and all magic associated with it. Enter your password to confirm.') }}</p>
+                        <x-tabler.field :label="__('Password')" name="password">
+                            <input type="password" id="password" name="password" placeholder="{{ __('Password') }}"
+                                class="form-control @error('password', 'userDeletion') is-invalid @enderror">
+                            @error('password', 'userDeletion')<div class="invalid-feedback">{{ $message }}</div>@enderror
+                        </x-tabler.field>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn" data-bs-dismiss="modal">{{ __('Cancel') }}</button>
+                        <button type="submit" class="btn btn-danger">
+                            <x-ti name="trash" /> {{ __('Delete Forever') }}
+                        </button>
+                    </div>
+                </form>
             </div>
+        </div>
+    </div>
 
-            <div class="mt-6 flex justify-end gap-3">
-                <x-secondary-button x-on:click="$dispatch('close')">{{ __('Cancel') }}</x-secondary-button>
-                <x-danger-button>🗑️ {{ __('Delete Forever') }}</x-danger-button>
-            </div>
-        </form>
-    </x-modal>
+    @if($errors->userDeletion->isNotEmpty())
+        @push('scripts')
+        <script>
+            document.addEventListener('DOMContentLoaded', function () {
+                var el = document.getElementById('confirmUserDeletion');
+                if (el && window.bootstrap) { new bootstrap.Modal(el).show(); }
+            });
+        </script>
+        @endpush
+    @endif
 </section>
