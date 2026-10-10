@@ -128,15 +128,29 @@
 
     {{-- LIFECYCLE --}}
     <div class="card mb-5">
-        <div class="card-header"><h3 class="card-title">{{ __('From work to cash in four steps') }}</h3></div>
         <div class="card-body">
-            <ul class="steps steps-vertical">
-                <li class="step-item"><div class="h4 m-0">{{ __('Create') }}</div><div class="text-muted">{{ __('Customer, items, tax, due date.') }}</div></li>
-                <li class="step-item"><div class="h4 m-0">{{ __('Send') }}</div><div class="text-muted">{{ __('Email with PDF, or a rotatable secure link.') }}</div></li>
-                <li class="step-item"><div class="h4 m-0">{{ __('Collect') }}</div><div class="text-muted">{{ __('Partial and full payments, gateway or manual.') }}</div></li>
-                <li class="step-item"><div class="h4 m-0">{{ __('Understand') }}</div><div class="text-muted">{{ __('Aging, cash flow, and P&L from your own data.') }}</div></li>
-            </ul>
+            <h3 class="card-title mb-1">{{ __('From work to cash in four steps') }}</h3>
+            <p class="text-muted mb-4">{{ __('A straight line from effort to money in the bank.') }}</p>
+            <div class="row row-cards row-deck">
+                @foreach([
+                    ['01', __('Create'), __('Pick a customer, add line items, set terms.')],
+                    ['02', __('Send'), __('Email with PDF, or a rotatable secure link.')],
+                    ['03', __('Collect'), __('Partial and full payments, gateway or manual.')],
+                    ['04', __('Understand'), __('Aging, cash flow, and P&L from your own data.')],
+                ] as [$no, $title, $desc])
+                    <div class="col-sm-6 col-lg-3">
+                        <div class="card h-100">
+                            <div class="card-body">
+                                <div class="display-6 fw-bold text-primary mb-2">{{ $no }}</div>
+                                <div class="fw-semibold mb-1">{{ $title }}</div>
+                                <div class="text-muted small">{{ $desc }}</div>
+                            </div>
+                        </div>
+                    </div>
+                @endforeach
+            </div>
         </div>
+    </div>
     </div>
 
     {{-- PRICING nyata dari DB --}}
