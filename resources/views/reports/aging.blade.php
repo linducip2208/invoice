@@ -138,6 +138,7 @@
                                 <th>{{ __('Jatuh Tempo') }}</th>
                                 <th class="text-end">{{ __('Hari') }}</th>
                                 <th class="text-end">{{ __('Sisa') }}</th>
+                                <th class="text-end">{{ __('Aksi') }}</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -155,6 +156,14 @@
                                         @endif
                                     </td>
                                     <td class="text-end fw-bold">{{ number_format($inv->balance_due, 0) }} {{ $inv->currency }}</td>
+                                    <td class="text-end">
+                                        <form method="POST" action="{{ route('invoices.reminders.schedule', $inv) }}" class="d-inline">
+                                            @csrf
+                                            <button type="submit" class="btn btn-sm btn-outline-primary" title="{{ __('Schedule standard reminders') }}">
+                                                <x-ti name="bell" />
+                                            </button>
+                                        </form>
+                                    </td>
                                 </tr>
                             @endforeach
                         </tbody>

@@ -100,7 +100,16 @@
             <div class="card mb-3" data-docs-section id="quotations">
                 <div class="card-header"><h2 class="card-title h3">{{ __('5. Quotations') }}</h2></div>
                 <div class="card-body">
-                    <p>{{ __('Quotes have their own numbering and can be accepted, rejected or signed on the public page, then converted to an invoice exactly once (double conversion is rejected with 409).') }}</p>
+                    <p>{{ __('Quotes have their own numbering and revision counter. States: draft, sent, accepted, rejected, expired, withdrawn, converted.') }}</p>
+                    <h3 class="h4">{{ __('Approval') }}</h3>
+                    <ul>
+                        <li>{{ __('Opening the public link only lets you review — it never approves anything.') }}</li>
+                        <li>{{ __('Approve via customer-portal account (designated approver) or a 6-digit email code sent to the address on file (15 minutes, 5 attempts).') }}</li>
+                        <li>{{ __('A code proves access to that mailbox, not corporate signing authority; the approval record stores the evidence level.') }}</li>
+                        <li>{{ __('You confirm the exact revision, total, and consent text with an unchecked checkbox.') }}</li>
+                        <li>{{ __('Revisions invalidate old codes; expiry and withdrawal are enforced server-side.') }}</li>
+                        <li>{{ __('Accepted quotes convert to at most one invoice per revision (repeat-safe).') }}</li>
+                    </ul>
                 </div>
             </div>
 

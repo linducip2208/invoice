@@ -728,11 +728,14 @@ class QuoteApprovalTest extends TestCase
         $unknown = $this->post(route('public.quote.otp.request', $q2->public_token), [
             'email' => 'nobody@nowhere.test', 'purpose' => 'accept',
         ]);
+        // Same status, same redirect shape (tokens necessarily differ),
+        // same flash message.
         $this->assertEquals($known->status(), $unknown->status());
-        $this->assertEquals(
-            $known->getSession()->get('status') ?? $known->headers->get('Location'),
-            $unknown->getSession()->get('status') ?? $unknown->headers->get('Location')
-        );
+        $this->assertStringEndsWith('/verify?purpose=accept', $known->headers->get('Location'));
+        $this->assertStringEndsWith('/verify?purpose=accept', $unknown->headers->get('Location'));
+        $expectedFlash = __('If this address is on file for this quotation, an approval code was sent. It expires in 15 minutes.');
+        $known->assertSessionHas('status', $expectedFlash);
+        $unknown->assertSessionHas('status', $expectedFlash);
         $this->assertEquals(0, QuoteApprovalChallenge::where('contact_email', 'nobody@nowhere.test')->count());
     }
 

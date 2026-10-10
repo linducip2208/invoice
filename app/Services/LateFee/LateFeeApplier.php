@@ -5,6 +5,7 @@ namespace App\Services\LateFee;
 use App\Models\Invoice;
 use App\Models\InvoiceLateFee;
 use Illuminate\Support\Carbon;
+use Illuminate\Support\Facades\DB;
 
 class LateFeeApplier
 {
@@ -29,41 +30,52 @@ class LateFeeApplier
 
     public function apply(Invoice $invoice): ?InvoiceLateFee
     {
-        if (! $this->shouldApply($invoice)) return null;
+        return DB::transaction(function () use ($invoice) {
+            // Re-check under a row lock: concurrent workers/schedulers must
+            // not both pass shouldApply() and compound the fee (TOCTOU).
+            $locked = Invoice::where('id', $invoice->id)->lockForUpdate()->firstOrFail();
+            if (! $this->shouldApply($locked)) {
+                return null;
+            }
 
-        $type = $invoice->late_fee_type ?? 'percent';
-        $value = (float) ($invoice->late_fee_value ?? 0);
+            $type = $locked->late_fee_type ?? 'percent';
+            $value = (float) ($locked->late_fee_value ?? 0);
 
-        if ($value <= 0) return null;
+            if ($value <= 0) {
+                return null;
+            }
 
-        $amount = $type === 'percent'
-            ? round((float) $invoice->balance_due * $value / 100, 2)
-            : round($value, 2);
+            $amount = $type === 'percent'
+                ? round((float) $locked->balance_due * $value / 100, 2)
+                : round($value, 2);
 
-        if ($amount <= 0) return null;
+            if ($amount <= 0) {
+                return null;
+            }
 
-        $description = $type === 'percent'
-            ? "Late fee {$value}% (per {$invoice->due_date->format('d M Y')})"
-            : "Late fee {$invoice->currency} " . number_format($value, 0);
+            $description = $type === 'percent'
+                ? "Late fee {$value}% (per {$locked->due_date->format('d M Y')})"
+                : "Late fee {$locked->currency} " . number_format($value, 0);
 
-        $fee = InvoiceLateFee::create([
-            'workspace_id'  => $invoice->workspace_id,
-            'invoice_id'    => $invoice->id,
-            'applied_at'    => now(),
-            'amount'        => $amount,
-            'type'          => $type,
-            'percent_value' => $type === 'percent' ? $value : null,
-            'fixed_amount'  => $type === 'fixed' ? $value : null,
-            'description'   => $description,
-        ]);
+            $fee = InvoiceLateFee::create([
+                'workspace_id' => $locked->workspace_id,
+                'invoice_id' => $locked->id,
+                'applied_at' => now(),
+                'amount' => $amount,
+                'type' => $type,
+                'percent_value' => $type === 'percent' ? $value : null,
+                'fixed_amount' => $type === 'fixed' ? $value : null,
+                'description' => $description,
+            ]);
 
-        // Update invoice totals
-        $invoice->late_fee_total = (float) $invoice->late_fee_total + $amount;
-        $invoice->total = (float) $invoice->total + $amount;
-        $invoice->balance_due = (float) $invoice->balance_due + $amount;
-        $invoice->save();
+            // Update invoice totals
+            $locked->late_fee_total = (float) $locked->late_fee_total + $amount;
+            $locked->total = (float) $locked->total + $amount;
+            $locked->balance_due = (float) $locked->balance_due + $amount;
+            $locked->save();
 
-        return $fee;
+            return $fee;
+        });
     }
 
     public function reverse(InvoiceLateFee $fee): void

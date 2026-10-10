@@ -389,7 +389,7 @@ Route::get('/docs', fn() => view('docs'))->name('docs');
 
 Route::get('/pricing', [PricingController::class, 'index'])->name('pricing');
 
-Route::get('/i/{token}', [PublicInvoiceController::class, 'show'])->middleware('throttle:120,1')->name('public.invoice.show');
+Route::get('/i/{token}', [PublicInvoiceController::class, 'show'])->middleware('throttle:public-invoice')->name('public.invoice.show');
 
 // Inbound email webhook (no auth — provider signature verified inside)
 Route::post('/webhooks/email-inbox', [\App\Http\Controllers\Webhook\EmailInboxController::class, 'handle'])->name('webhooks.email-inbox');
@@ -406,7 +406,7 @@ Route::get ('/auth/sso/{provider}/callback', [\App\Http\Controllers\Auth\SsoCont
 // Customer Portal (separate auth guard)
 Route::prefix('portal')->group(function () {
     Route::get ('login',     [\App\Http\Controllers\Portal\PortalAuthController::class, 'showLogin'])->name('portal.login');
-    Route::post('login',     [\App\Http\Controllers\Portal\PortalAuthController::class, 'login'])->middleware('throttle:10,1')->name('portal.login.submit');
+    Route::post('login',     [\App\Http\Controllers\Portal\PortalAuthController::class, 'login'])->middleware('throttle:portal-login')->name('portal.login.submit');
 
     Route::middleware('auth:client_portal', 'portal.active')->group(function () {
         Route::post('logout',   [\App\Http\Controllers\Portal\PortalAuthController::class, 'logout'])->name('portal.logout');
@@ -419,12 +419,12 @@ Route::prefix('portal')->group(function () {
 // Public Quote — verified approval only. Viewing never mutates state;
 // every state change is POST + CSRF + throttled. Legacy instant
 // accept/reject/sign endpoints were removed (unauthenticated mutation).
-Route::get  ('/q/{token}',           [\App\Http\Controllers\PublicQuoteController::class, 'show'])->middleware('throttle:60,1')->name('public.quote.show');
-Route::post ('/q/{token}/otp',       [\App\Http\Controllers\PublicQuoteController::class, 'requestOtp'])->middleware('throttle:5,1')->name('public.quote.otp.request');
-Route::get  ('/q/{token}/verify',    [\App\Http\Controllers\PublicQuoteController::class, 'verifyForm'])->middleware('throttle:60,1')->name('public.quote.verify-form');
-Route::post ('/q/{token}/verify',    [\App\Http\Controllers\PublicQuoteController::class, 'verify'])->middleware('throttle:10,1')->name('public.quote.verify');
-Route::get  ('/q/{token}/confirm',   [\App\Http\Controllers\PublicQuoteController::class, 'confirmForm'])->middleware('throttle:60,1')->name('public.quote.confirm');
-Route::post ('/q/{token}/confirm',   [\App\Http\Controllers\PublicQuoteController::class, 'confirm'])->middleware('throttle:20,1')->name('public.quote.confirm.post');
+Route::get  ('/q/{token}',           [\App\Http\Controllers\PublicQuoteController::class, 'show'])->middleware('throttle:quote-public')->name('public.quote.show');
+Route::post ('/q/{token}/otp',       [\App\Http\Controllers\PublicQuoteController::class, 'requestOtp'])->middleware('throttle:quote-otp')->name('public.quote.otp.request');
+Route::get  ('/q/{token}/verify',    [\App\Http\Controllers\PublicQuoteController::class, 'verifyForm'])->middleware('throttle:quote-public')->name('public.quote.verify-form');
+Route::post ('/q/{token}/verify',    [\App\Http\Controllers\PublicQuoteController::class, 'verify'])->middleware('throttle:quote-verify')->name('public.quote.verify');
+Route::get  ('/q/{token}/confirm',   [\App\Http\Controllers\PublicQuoteController::class, 'confirmForm'])->middleware('throttle:quote-public')->name('public.quote.confirm');
+Route::post ('/q/{token}/confirm',   [\App\Http\Controllers\PublicQuoteController::class, 'confirm'])->middleware('throttle:quote-confirm')->name('public.quote.confirm.post');
 
 // NPS public form (post-payment satisfaction)
 Route::get ('/nps/{token}', [NpsController::class, 'show'])->name('nps.show');
