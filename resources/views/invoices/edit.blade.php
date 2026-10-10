@@ -151,7 +151,7 @@
         <!-- Summary -->
         <div class="card mb-3">
             <div class="card-body">
-                <div class="row g-4">
+                <div class="row g-3">
                     <div class="col-lg-6">
                         <h3 class="card-title mb-3">{{ __('Tax & Discount') }}</h3>
                         <x-tabler.field :label="__('Tax Rate (%)')" name="tax_rate">

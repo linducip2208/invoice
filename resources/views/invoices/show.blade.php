@@ -1,4 +1,4 @@
-<x-tabler.layout :title="__('Invoice') . ' ' . $invoice->invoice_no" :pretitle="__('Sales')">
+<x-tabler.layout :title="__('Invoice') . ' ' . $invoice->invoice_no" :pretitle="__('Sales')" :breadcrumbs="[['label' => __('Invoices'), 'url' => route('invoices.index')], ['label' => $invoice->invoice_no]]">
     <x-slot name="actions">
         @if($invoice->status === 'draft')
             <a href="{{ route('invoices.edit', $invoice) }}" class="btn">
@@ -50,7 +50,7 @@
     <!-- Invoice header card -->
     <div class="card mb-3">
         <div class="card-body">
-            <div class="row g-4">
+            <div class="row g-3">
                 <div class="col-md-6">
                     @if($ws?->logo_path)
                         <img src="{{ Storage::disk('public')->url($ws->logo_path) }}" alt="Logo" class="mb-3" style="height: 3rem;">
@@ -77,7 +77,7 @@
             </div>
 
             <hr>
-            <div class="row g-4">
+            <div class="row g-3">
                 <div class="col-md-6">
                     <h4 class="subheader mb-2">{{ __('Bill To') }}</h4>
                     <p class="fw-bold mb-0">{{ $invoice->client?->name ?? '—' }}</p>
@@ -182,7 +182,7 @@
     @if($invoice->notes || $invoice->terms)
         <div class="card mb-3">
             <div class="card-body">
-                <div class="row g-4">
+                <div class="row g-3">
                     @if($invoice->notes)
                         <div class="col-md-6">
                             <h4 class="subheader mb-2">{{ __('Notes') }}</h4>

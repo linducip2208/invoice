@@ -1,4 +1,4 @@
-<x-tabler.layout :title="$quote->quote_no" :pretitle="__('Sales')">
+<x-tabler.layout :title="$quote->quote_no" :pretitle="__('Sales')" :breadcrumbs="[['label' => __('Quotations'), 'url' => route('quotes.index')], ['label' => $quote->quote_no]]">
     <x-slot name="actions">
         <a href="{{ route('quotes.index') }}" class="btn">
             <x-ti name="arrow-left" /> {{ __('Back') }}

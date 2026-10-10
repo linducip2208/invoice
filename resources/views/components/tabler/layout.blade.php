@@ -229,6 +229,19 @@
             <div class="container-xl">
                 <div class="row g-2 align-items-center">
                     <div class="col">
+                        @isset($breadcrumbs)
+                            <nav aria-label="breadcrumb">
+                                <ol class="breadcrumb mb-1">
+                                    @foreach($breadcrumbs as $crumb)
+                                        @if(!empty($crumb['url']) && !$loop->last)
+                                            <li class="breadcrumb-item"><a href="{{ $crumb['url'] }}">{{ $crumb['label'] }}</a></li>
+                                        @else
+                                            <li class="breadcrumb-item active" aria-current="page">{{ $crumb['label'] }}</li>
+                                        @endif
+                                    @endforeach
+                                </ol>
+                            </nav>
+                        @endisset
                         @isset($pretitle)
                             <div class="page-pretitle">{{ $pretitle }}</div>
                         @endisset

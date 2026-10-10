@@ -39,7 +39,7 @@
     {{-- Detail card --}}
     <div class="card mb-3">
         <div class="card-body">
-            <div class="row g-4">
+            <div class="row g-3">
                 <div class="col-md-6">
                     <p class="subheader mb-1">{{ __('Klien') }}</p>
                     <p class="h3 mb-0">{{ $cn->invoice?->client?->name }}</p>

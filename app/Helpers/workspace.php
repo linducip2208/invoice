@@ -15,7 +15,14 @@ if (! function_exists('workspace')) {
 
         if (! $workspaceId) {
             $user = auth()->user();
-            if ($user) {
+            if ($user instanceof \App\Models\ClientPortalUser) {
+                // Portal sessions authenticate as ClientPortalUser (which has
+                // no workspaces relation): scope straight to their workspace.
+                $workspaceId = $user->workspace_id;
+                if ($workspaceId) {
+                    session(['current_workspace_id' => $workspaceId]);
+                }
+            } elseif ($user instanceof \App\Models\User) {
                 $workspace = $user->workspaces()->first();
                 if ($workspace) {
                     session(['current_workspace_id' => $workspace->id]);

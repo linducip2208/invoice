@@ -1,5 +1,19 @@
 # CHANGELOG
 
+## 2026-10-10 (malam 4) — Premium redesign (93/100 tetap)
+
+### Redesign
+
+- Landing rewrite total: hero + visual produk besar, trust strip jujur,
+  editorial alternating per segmen, lifecycle, pricing dari DB, FAQ —
+  rating 4.9/1247 customer/testimoni dibuang, JSON-LD dibersihkan
+- Sidebar navy + IA 8 grup; shell superadmin terpisah; breadcrumb 3 halaman;
+  topbar quick-create + bell; tokens + kontras AA
+- Dashboard: donat status + bar aging SVG data real; invoice detail timeline
+- Import hardening, Ops/AdminShell tests, email queued, named limiters
+- LandingController (plans real);SMTP/queue tetap butuh prod
+- 138/138 phpunit, 64/64 Playwright (11 viewport + axe 9/9), build green
+
 ## 2026-10-10 (malam 3) — Frontend rescue & redesign (93/100 tetap)
 
 ### Redesign

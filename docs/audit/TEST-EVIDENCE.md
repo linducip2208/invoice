@@ -1,4 +1,4 @@
-# TEST EVIDENCE (2026-10-10, revisi frontend-rescue)
+# TEST EVIDENCE (2026-10-10, revisi premium-redesign)
 
 ## Automated (phpunit, sqlite :memory:, fakes)
 

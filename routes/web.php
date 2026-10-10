@@ -52,9 +52,7 @@ use App\Http\Controllers\WorkspaceController;
 use App\Http\Controllers\WorkspaceSwitcherController;
 use Illuminate\Support\Facades\Route;
 
-Route::get('/', function () {
-    return view('welcome');
-})->name('home');
+Route::get('/', [\App\Http\Controllers\LandingController::class, 'index'])->name('home');
 
 Route::middleware(['auth', 'verified'])->group(function () {
     // First-workspace creation for users without any workspace.

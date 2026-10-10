@@ -102,7 +102,7 @@
             </div>
         </div>
         <div class="card-body">
-            <div class="row g-4 mb-3">
+            <div class="row g-3 mb-3">
                 <div class="col-md-6">
                     <h4 class="subheader">{{ __('Bill To') }}</h4>
                     <p class="fw-semibold mb-0">{{ $invoice->client->company_name ?: $invoice->client->name }}</p>

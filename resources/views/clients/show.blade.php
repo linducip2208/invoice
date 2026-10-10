@@ -1,4 +1,4 @@
-<x-tabler.layout :title="$client->name">
+<x-tabler.layout :title="$client->name" :pretitle="__('Sales')" :breadcrumbs="[['label' => __('Customers'), 'url' => route('clients.index')], ['label' => $client->name]]">
     <x-slot name="actions">
         <a href="{{ route('clients.index') }}" class="btn">
             <x-ti name="arrow-left" /> {{ __('Back') }}
