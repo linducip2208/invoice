@@ -23,9 +23,11 @@ class InvoiceTest extends TestCase
     protected function setUp(): void
     {
         parent::setUp();
+        $this->seedPlans();
         $this->user = User::factory()->create();
         $this->workspace = Workspace::factory()->create();
         $this->user->workspaces()->attach($this->workspace->id, ['role' => 'admin']);
+        $this->giveProPlan($this->workspace);
         session(['current_workspace_id' => $this->workspace->id]);
         $this->client = Client::factory()->create(['workspace_id' => $this->workspace->id]);
     }
@@ -40,7 +42,8 @@ class InvoiceTest extends TestCase
         $response = $this->actingAs($this->user)->get(route('invoices.index'));
 
         $response->assertStatus(200);
-        $response->assertSee('Invoices');
+        // Locale-aware: views render __('Invoices').
+        $response->assertSee(__('Invoices'));
     }
 
     #[Test]
@@ -116,7 +119,7 @@ class InvoiceTest extends TestCase
         ]);
 
         $response = $this->actingAs($this->user)
-            ->patch(route('invoices.update-status', $invoice), ['status' => 'sent']);
+            ->post(route('invoices.update-status', $invoice), ['status' => 'sent']);
 
         $this->assertDatabaseHas('invoices', [
             'id' => $invoice->id,
@@ -149,7 +152,9 @@ class InvoiceTest extends TestCase
 
         $response = $this->actingAs($this->user)->get(route('invoices.show', $otherInvoice));
 
-        $response->assertStatus(403);
+        // Cross-workspace access is denied (404 via scoped binding, or 403
+        // via the explicit controller guard). Either status proves isolation.
+        $this->assertContains($response->status(), [403, 404]);
     }
 
     #[Test]

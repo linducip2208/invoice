@@ -5,10 +5,12 @@ use App\Models\Workspace;
 if (! function_exists('workspace')) {
     function workspace(): ?Workspace
     {
-        if (app()->runningInConsole()) {
-            return null;
-        }
-
+        // NOTE: no runningInConsole() early-return here. In real console
+        // (queue/scheduler) there is no session and no auth user, so the
+        // lookups below still return null. Returning null unconditionally in
+        // console breaks feature tests (which run in console but issue HTTP
+        // requests with session + authenticated user) and disables the
+        // BelongsToWorkspace global scope exactly when it is needed.
         $workspaceId = session('current_workspace_id');
 
         if (! $workspaceId) {

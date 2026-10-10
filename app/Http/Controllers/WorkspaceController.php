@@ -5,11 +5,47 @@ namespace App\Http\Controllers;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Redirect;
+use Illuminate\Support\Str;
 use Illuminate\Validation\Rule;
 use Illuminate\View\View;
 
 class WorkspaceController extends Controller
 {
+    /**
+     * Show the form to create the user's first workspace.
+     * Reachable when EnsureWorkspaceExists redirects users without any
+     * workspace (route must stay OUTSIDE the `workspace` middleware group).
+     */
+    public function create(): View
+    {
+        return view('workspace.create');
+    }
+
+    /**
+     * Store the user's first workspace and attach them as owner.
+     */
+    public function store(Request $request): RedirectResponse
+    {
+        $validated = $request->validate([
+            'name' => ['required', 'string', 'max:255'],
+            'currency' => ['required', 'string', Rule::in(['IDR', 'USD', 'EUR', 'GBP', 'SGD', 'AUD', 'JPY', 'CNY'])],
+        ]);
+
+        $user = $request->user();
+
+        $workspace = \App\Models\Workspace::create([
+            'name' => $validated['name'],
+            'slug' => Str::slug($validated['name']).'-'.strtolower(Str::random(5)),
+            'currency' => $validated['currency'],
+            'invoice_prefix' => 'INV-',
+        ]);
+
+        $user->workspaces()->attach($workspace->id, ['role' => 'owner']);
+        session(['current_workspace_id' => $workspace->id]);
+
+        return Redirect::route('dashboard')->with('success', __('Workspace created successfully.'));
+    }
+
     public function edit(): View
     {
         return view('workspace.settings', [

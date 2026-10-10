@@ -19,9 +19,11 @@ class ClientTest extends TestCase
     protected function setUp(): void
     {
         parent::setUp();
+        $this->seedPlans();
         $this->user = User::factory()->create();
         $this->workspace = Workspace::factory()->create();
         $this->user->workspaces()->attach($this->workspace->id, ['role' => 'admin']);
+        $this->giveProPlan($this->workspace);
         session(['current_workspace_id' => $this->workspace->id]);
     }
 
@@ -33,7 +35,8 @@ class ClientTest extends TestCase
         $response = $this->actingAs($this->user)->get(route('clients.index'));
 
         $response->assertStatus(200);
-        $response->assertSee('Clients');
+        // Locale-aware: views render __('Clients') (e.g. "Klien" in id locale).
+        $response->assertSee(__('Clients'));
     }
 
     #[Test]
@@ -95,7 +98,11 @@ class ClientTest extends TestCase
 
         $response = $this->actingAs($this->user)->get(route('clients.show', $otherClient));
 
-        $response->assertStatus(403);
+        // Cross-workspace access is denied. The BelongsToWorkspace global
+        // scope resolves the binding to 404 (existence is not revealed);
+        // the explicit abort in the controller fails closed with 403 if the
+        // scope is ever bypassed. Either status proves isolation.
+        $this->assertContains($response->status(), [403, 404]);
     }
 
     #[Test]

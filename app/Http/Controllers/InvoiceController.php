@@ -9,12 +9,45 @@ use App\Models\Product;
 use App\Services\InvoiceService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Validation\Rule;
 
 class InvoiceController extends Controller
 {
     public function __construct(
         protected InvoiceService $invoiceService,
     ) {}
+
+    /**
+     * Validation rules shared by store/update. Ownership of the referenced
+     * client/products is scoped to the current workspace so IDs from other
+     * workspaces cannot be attached via request tampering.
+     */
+    protected function invoiceRules(): array
+    {
+        $workspaceId = workspace()?->id;
+
+        return [
+            'client_id'       => ['required', Rule::exists('clients', 'id')->where('workspace_id', $workspaceId)],
+            'issue_date'      => 'required|date',
+            'due_date'        => 'required|date|after_or_equal:issue_date',
+            'template'         => 'required|string|in:classic,modern,minimal,bold,elegant',
+            'invoice_layout_id' => 'nullable|exists:invoice_layouts,id',
+            'primary_color'   => 'nullable|string|max:7',
+            'accent_color'    => 'nullable|string|max:7',
+            'currency'        => 'required|string|size:3',
+            'tax_rate'        => 'nullable|numeric|min:0|max:100',
+            'discount_type'   => 'required|in:none,fixed,percent',
+            'discount_value'  => 'nullable|numeric|min:0',
+            'notes'           => 'nullable|string',
+            'terms'           => 'nullable|string',
+            'items'           => 'required|array|min:1',
+            'items.*.description' => 'required|string|max:500',
+            'items.*.quantity'    => 'required|numeric|min:0.01',
+            'items.*.unit_price'  => 'required|numeric|min:0',
+            'items.*.tax_rate'    => 'nullable|numeric|min:0|max:100',
+            'items.*.product_id'  => ['nullable', Rule::exists('products', 'id')->where('workspace_id', $workspaceId)],
+        ];
+    }
 
     public function index(Request $request)
     {
@@ -57,29 +90,10 @@ class InvoiceController extends Controller
 
     public function store(Request $request)
     {
-        $validated = $request->validate([
-            'client_id'       => 'required|exists:clients,id',
-            'issue_date'      => 'required|date',
-            'due_date'        => 'required|date|after_or_equal:issue_date',
-            'template'         => 'required|string|in:classic,modern,minimal,bold,elegant',
-            'invoice_layout_id' => 'nullable|exists:invoice_layouts,id',
-            'primary_color'   => 'nullable|string|max:7',
-            'accent_color'    => 'nullable|string|max:7',
-            'currency'        => 'required|string|size:3',
-            'tax_rate'        => 'nullable|numeric|min:0|max:100',
-            'discount_type'   => 'required|in:none,fixed,percent',
-            'discount_value'  => 'nullable|numeric|min:0',
-            'notes'           => 'nullable|string',
-            'terms'           => 'nullable|string',
-            'items'           => 'required|array|min:1',
-            'items.*.description' => 'required|string|max:500',
-            'items.*.quantity'    => 'required|numeric|min:0.01',
-            'items.*.unit_price'  => 'required|numeric|min:0',
-            'items.*.tax_rate'    => 'nullable|numeric|min:0|max:100',
-            'items.*.product_id'  => 'nullable|exists:products,id',
-        ]);
+        $validated = $request->validate($this->invoiceRules());
 
         $workspace = workspace();
+        abort_unless($workspace, 403);
         $invoiceNo = $this->invoiceService->generateInvoiceNo($workspace);
 
         $taxRate = (float) ($validated['tax_rate'] ?? 0);
@@ -143,6 +157,7 @@ class InvoiceController extends Controller
 
     public function show(Invoice $invoice)
     {
+        abort_unless($invoice->workspace_id === workspace()?->id, 403);
         $invoice->load(['items.product', 'client', 'payments', 'emailLogs', 'publicViews', 'attachments']);
 
         return view('invoices.show', compact('invoice'));
@@ -150,6 +165,7 @@ class InvoiceController extends Controller
 
     public function edit(Invoice $invoice)
     {
+        abort_unless($invoice->workspace_id === workspace()?->id, 403);
         if ($invoice->status !== 'draft') {
             return redirect()
                 ->route('invoices.show', $invoice)
@@ -166,33 +182,14 @@ class InvoiceController extends Controller
 
     public function update(Request $request, Invoice $invoice)
     {
+        abort_unless($invoice->workspace_id === workspace()?->id, 403);
         if ($invoice->status !== 'draft') {
             return redirect()
                 ->route('invoices.show', $invoice)
                 ->with('error', __('Only draft invoices can be edited.'));
         }
 
-        $validated = $request->validate([
-            'client_id'       => 'required|exists:clients,id',
-            'issue_date'      => 'required|date',
-            'due_date'        => 'required|date|after_or_equal:issue_date',
-            'template'         => 'required|string|in:classic,modern,minimal,bold,elegant',
-            'invoice_layout_id' => 'nullable|exists:invoice_layouts,id',
-            'primary_color'   => 'nullable|string|max:7',
-            'accent_color'    => 'nullable|string|max:7',
-            'currency'        => 'required|string|size:3',
-            'tax_rate'        => 'nullable|numeric|min:0|max:100',
-            'discount_type'   => 'required|in:none,fixed,percent',
-            'discount_value'  => 'nullable|numeric|min:0',
-            'notes'           => 'nullable|string',
-            'terms'           => 'nullable|string',
-            'items'           => 'required|array|min:1',
-            'items.*.description' => 'required|string|max:500',
-            'items.*.quantity'    => 'required|numeric|min:0.01',
-            'items.*.unit_price'  => 'required|numeric|min:0',
-            'items.*.tax_rate'    => 'nullable|numeric|min:0|max:100',
-            'items.*.product_id'  => 'nullable|exists:products,id',
-        ]);
+        $validated = $request->validate($this->invoiceRules());
 
         $taxRate = (float) ($validated['tax_rate'] ?? 0);
         $discountType = $validated['discount_type'];
@@ -251,6 +248,7 @@ class InvoiceController extends Controller
 
     public function destroy(Invoice $invoice)
     {
+        abort_unless($invoice->workspace_id === workspace()?->id, 403);
         if ($invoice->status !== 'draft') {
             return redirect()
                 ->route('invoices.show', $invoice)

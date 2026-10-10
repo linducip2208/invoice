@@ -22,9 +22,11 @@ class PaymentTest extends TestCase
     protected function setUp(): void
     {
         parent::setUp();
+        $this->seedPlans();
         $this->user = User::factory()->create();
         $this->workspace = Workspace::factory()->create();
         $this->user->workspaces()->attach($this->workspace->id, ['role' => 'admin']);
+        $this->giveProPlan($this->workspace);
         session(['current_workspace_id' => $this->workspace->id]);
         $this->client = Client::factory()->create(['workspace_id' => $this->workspace->id]);
     }
@@ -44,7 +46,8 @@ class PaymentTest extends TestCase
         $response = $this->actingAs($this->user)->get(route('payments.index'));
 
         $response->assertStatus(200);
-        $response->assertSee('Payments');
+        // Locale-aware: views render __('Payments') (e.g. "Pembayaran").
+        $response->assertSee(__('Payments'));
     }
 
     #[Test]
@@ -96,14 +99,20 @@ class PaymentTest extends TestCase
             'client_id' => $this->client->id,
         ]);
 
+        // withTotal(200000) builds subtotal 200000 + 10% tax = total 220000.
+        // Pay the FULL balance_due, not the subtotal.
+        $invoice->refresh();
+        $fullAmount = (float) $invoice->balance_due;
+
         $this->actingAs($this->user)->post(route('payments.store', $invoice), [
-            'amount' => 200000,
+            'amount' => $fullAmount,
             'payment_date' => now()->format('Y-m-d'),
             'payment_method' => 'cash',
         ]);
 
         $invoice->refresh();
-        $this->assertEquals(0, $invoice->balance_due);
+        $this->assertEquals(0, (float) $invoice->balance_due);
+        $this->assertEquals('paid', $invoice->status);
     }
 
     #[Test]

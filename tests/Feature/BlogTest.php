@@ -6,6 +6,7 @@ use App\Models\BlogCategory;
 use App\Models\BlogPost;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Facades\Http;
 use PHPUnit\Framework\Attributes\Test;
 use Tests\TestCase;
 
@@ -18,7 +19,10 @@ class BlogTest extends TestCase
     protected function setUp(): void
     {
         parent::setUp();
-        $this->user = User::factory()->create();
+        // Blog admin routes are superadmin-only (they publish to the public
+        // blog). Fake HTTP so IndexNow submissions never hit the network.
+        Http::fake();
+        $this->user = User::factory()->create(['is_superadmin' => true]);
     }
 
     #[Test]
@@ -109,5 +113,22 @@ class BlogTest extends TestCase
             'name' => 'Test Category',
             'slug' => 'test-category',
         ]);
+    }
+
+    #[Test]
+    public function regular_user_cannot_access_blog_admin(): void
+    {
+        $regular = User::factory()->create(['is_superadmin' => false]);
+        // Give them a workspace so the `workspace` middleware passes and the
+        // request actually reaches the `superadmin` middleware (403), instead
+        // of being redirected to workspace creation (302).
+        $workspace = \App\Models\Workspace::factory()->create();
+        $regular->workspaces()->attach($workspace->id, ['role' => 'admin']);
+
+        $this->actingAs($regular)->get(route('admin.blog.index'))->assertForbidden();
+        $this->actingAs($regular)->post(route('admin.blog.store'), [
+            'title' => 'Hacked',
+            'content' => '<p>x</p>',
+        ])->assertForbidden();
     }
 }

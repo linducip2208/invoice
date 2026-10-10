@@ -185,7 +185,9 @@
                 <x-nav-sidebar :href="route('feature.coming', 'fx-rates')"         icon="document">💱 {{ __('Exchange Rates') }}</x-nav-sidebar>
                 <x-nav-sidebar :href="route('affiliate.index')"        :active="request()->routeIs('affiliate.*')" icon="document">🤝 {{ __('Affiliate') }}</x-nav-sidebar>
                 <x-nav-sidebar :href="route('support.index')"          :active="request()->routeIs('support.*')" icon="document">💬 {{ __('Support') }}</x-nav-sidebar>
-                <x-nav-sidebar :href="route('admin.blog.index')"    :active="request()->routeIs('admin.blog.*')" icon="document">📝 {{ __('Blog Admin') }}</x-nav-sidebar>
+                @if(Auth::user()?->isSuperadmin())
+                    <x-nav-sidebar :href="route('admin.blog.index')"    :active="request()->routeIs('admin.blog.*')" icon="document">📝 {{ __('Blog Admin') }}</x-nav-sidebar>
+                @endif
 
                 @if(Auth::user()?->isSuperadmin())
                     <a href="{{ route('admin.dashboard') }}" class="flex items-center gap-2.5 px-3 py-2 rounded-xl text-sm font-semibold text-pink-600 hover:bg-pink-50 transition mt-3 border border-pink-200">

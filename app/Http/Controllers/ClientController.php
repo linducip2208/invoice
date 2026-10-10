@@ -61,6 +61,11 @@ class ClientController extends Controller
 
     public function show(Client $client): View
     {
+        // Defense-in-depth: the BelongsToWorkspace global scope normally
+        // turns cross-workspace access into a 404 before we get here, but
+        // fail closed with an explicit 403 whenever the scope is disabled
+        // (superadmin inspection, console, future unscoped queries).
+        abort_unless($client->workspace_id === workspace()?->id, 403);
         $client->loadCount('invoices');
         $invoices = $client->invoices()->latest()->paginate(10);
 
@@ -69,11 +74,13 @@ class ClientController extends Controller
 
     public function edit(Client $client): View
     {
+        abort_unless($client->workspace_id === workspace()?->id, 403);
         return view('clients.edit', compact('client'));
     }
 
     public function update(Request $request, Client $client): RedirectResponse
     {
+        abort_unless($client->workspace_id === workspace()?->id, 403);
         $validated = $request->validate([
             'name' => ['required', 'string', 'max:255'],
             'company_name' => ['nullable', 'string', 'max:255'],
@@ -96,6 +103,13 @@ class ClientController extends Controller
 
     public function destroy(Client $client): RedirectResponse
     {
+        abort_unless($client->workspace_id === workspace()?->id, 403);
+
+        if ($client->invoices()->exists()) {
+            return redirect()->route('clients.index')
+                ->with('error', __('Client cannot be deleted because it still has invoices.'));
+        }
+
         $client->delete();
 
         return redirect()->route('clients.index')->with('success', 'Client deleted successfully.');

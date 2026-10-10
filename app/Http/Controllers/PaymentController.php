@@ -60,6 +60,7 @@ class PaymentController extends Controller
 
     public function store(Request $request, Invoice $invoice): RedirectResponse
     {
+        abort_unless($invoice->workspace_id === workspace()?->id, 403);
         $validated = $request->validate([
             'amount'              => 'required|numeric|min:0.01',
             'payment_date'        => 'required|date',
@@ -123,6 +124,7 @@ class PaymentController extends Controller
 
     public function destroy(Payment $payment): RedirectResponse
     {
+        abort_unless($payment->workspace_id === workspace()?->id, 403);
         $invoice = $payment->invoice;
         $payment->delete();
         $this->recalculateInvoice($invoice);

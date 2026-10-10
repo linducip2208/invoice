@@ -199,6 +199,8 @@
                         </div>
                     </div>
 
+                    {{-- Demo credentials are dev-only: never publish passwords in production docs. --}}
+                    @if(app()->isLocal())
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-4 not-prose">
                         <!-- Superadmin -->
                         <div class="rounded-2xl p-5 border-2 border-pink-300" style="background: linear-gradient(135deg, rgba(255,228,241,0.7), rgba(237,233,254,0.5));">
@@ -245,6 +247,7 @@
                         <span>⚠️</span>
                         <span><strong>Hanya untuk demo / development.</strong> Ganti password sebelum production. Reset semua data: <code class="bg-white px-1.5 py-0.5 rounded">php artisan migrate:fresh --seed</code></span>
                     </div>
+                    @endif
 
                     <div class="mt-3 text-xs text-purple-500">
                         💡 Tip: klik field di atas untuk select-all, copy paste ke form login.

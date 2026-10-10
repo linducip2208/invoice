@@ -183,7 +183,8 @@
                 </div>
             </div>
 
-            {{-- Demo Login Box --}}
+            {{-- Demo Login Box (local/dev only — never render credentials in production) --}}
+            @if(app()->isLocal())
             <div class="bg-purple-50/70 border border-purple-200 rounded-2xl p-5 text-sm">
                 <div class="flex items-center gap-2 mb-3">
                     <span class="text-lg">🧪</span>
@@ -194,6 +195,7 @@
                     <div class="flex justify-between"><span class="font-semibold text-purple-800">Demo Admin:</span> <span>demo@invocely.test / password</span></div>
                 </div>
             </div>
+            @endif
 
             {{-- Back to home --}}
             <div class="mt-6 text-center">

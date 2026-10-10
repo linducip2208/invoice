@@ -57,6 +57,14 @@ Route::get('/', function () {
     return view('welcome');
 });
 
+Route::middleware(['auth', 'verified'])->group(function () {
+    // First-workspace creation for users without any workspace.
+    // MUST stay outside the `workspace` middleware group to avoid a
+    // redirect loop (EnsureWorkspaceExists redirects here).
+    Route::get('/workspace/create', [WorkspaceController::class, 'create'])->name('workspace.create');
+    Route::post('/workspace', [WorkspaceController::class, 'store'])->name('workspace.store');
+});
+
 Route::middleware(['auth', 'verified', 'workspace'])->group(function () {
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
 
@@ -161,8 +169,10 @@ Route::middleware(['auth', 'verified', 'workspace'])->group(function () {
     // Dashboard Widgets
     Route::get   ('dashboard/customize',                    [\App\Http\Controllers\DashboardWidgetController::class, 'customize'])->name('dashboard.customize');
     Route::post  ('dashboard/widgets',                      [\App\Http\Controllers\DashboardWidgetController::class, 'store'])->name('dashboard.widgets.store');
-    Route::put   ('dashboard/widgets/{widget}',             [\App\Http\Controllers\DashboardWidgetController::class, 'update'])->name('dashboard.widgets.update');
+    // NOTE: `reorder` must be registered BEFORE `widgets/{widget}` or the
+    // literal "reorder" is captured as the {widget} parameter.
     Route::put   ('dashboard/widgets/reorder',              [\App\Http\Controllers\DashboardWidgetController::class, 'reorder'])->name('dashboard.widgets.reorder');
+    Route::put   ('dashboard/widgets/{widget}',             [\App\Http\Controllers\DashboardWidgetController::class, 'update'])->name('dashboard.widgets.update');
     Route::delete('dashboard/widgets/{widget}',             [\App\Http\Controllers\DashboardWidgetController::class, 'destroy'])->name('dashboard.widgets.destroy');
 
     // Accounting Exports
@@ -309,17 +319,20 @@ Route::middleware(['auth', 'verified', 'workspace'])->group(function () {
     Route::post  ('team/invite',                  [TeamController::class, 'invite'])->name('team.invite');
     Route::delete('team/invite/{invite}',         [TeamController::class, 'revoke'])->name('team.invite.revoke');
 
-    // Blog admin
-    Route::get   ('blog/admin',                              [\App\Http\Controllers\Admin\BlogController::class, 'index'])->name('admin.blog.index');
-    Route::get   ('blog/admin/create',                       [\App\Http\Controllers\Admin\BlogController::class, 'create'])->name('admin.blog.create');
-    Route::post  ('blog/admin',                              [\App\Http\Controllers\Admin\BlogController::class, 'store'])->name('admin.blog.store');
-    Route::get   ('blog/admin/{post}/edit',                  [\App\Http\Controllers\Admin\BlogController::class, 'edit'])->name('admin.blog.edit');
-    Route::put   ('blog/admin/{post}',                       [\App\Http\Controllers\Admin\BlogController::class, 'update'])->name('admin.blog.update');
-    Route::delete('blog/admin/{post}',                       [\App\Http\Controllers\Admin\BlogController::class, 'destroy'])->name('admin.blog.destroy');
-    Route::get   ('blog/admin/categories',                   [\App\Http\Controllers\Admin\BlogController::class, 'categories'])->name('admin.blog.categories');
-    Route::post  ('blog/admin/categories',                   [\App\Http\Controllers\Admin\BlogController::class, 'storeCategory'])->name('admin.blog.categories.store');
-    Route::put   ('blog/admin/categories/{category}',        [\App\Http\Controllers\Admin\BlogController::class, 'updateCategory'])->name('admin.blog.categories.update');
-    Route::delete('blog/admin/categories/{category}',        [\App\Http\Controllers\Admin\BlogController::class, 'destroyCategory'])->name('admin.blog.categories.destroy');
+    // Blog admin — superadmin only. These routes publish to the PUBLIC blog,
+    // so they must not be reachable by regular workspace users.
+    Route::middleware('superadmin')->group(function () {
+        Route::get   ('blog/admin',                              [\App\Http\Controllers\Admin\BlogController::class, 'index'])->name('admin.blog.index');
+        Route::get   ('blog/admin/create',                       [\App\Http\Controllers\Admin\BlogController::class, 'create'])->name('admin.blog.create');
+        Route::post  ('blog/admin',                              [\App\Http\Controllers\Admin\BlogController::class, 'store'])->name('admin.blog.store');
+        Route::get   ('blog/admin/{post}/edit',                  [\App\Http\Controllers\Admin\BlogController::class, 'edit'])->name('admin.blog.edit');
+        Route::put   ('blog/admin/{post}',                       [\App\Http\Controllers\Admin\BlogController::class, 'update'])->name('admin.blog.update');
+        Route::delete('blog/admin/{post}',                       [\App\Http\Controllers\Admin\BlogController::class, 'destroy'])->name('admin.blog.destroy');
+        Route::get   ('blog/admin/categories',                   [\App\Http\Controllers\Admin\BlogController::class, 'categories'])->name('admin.blog.categories');
+        Route::post  ('blog/admin/categories',                   [\App\Http\Controllers\Admin\BlogController::class, 'storeCategory'])->name('admin.blog.categories.store');
+        Route::put   ('blog/admin/categories/{category}',        [\App\Http\Controllers\Admin\BlogController::class, 'updateCategory'])->name('admin.blog.categories.update');
+        Route::delete('blog/admin/categories/{category}',        [\App\Http\Controllers\Admin\BlogController::class, 'destroyCategory'])->name('admin.blog.categories.destroy');
+    });
 
     // Feature scaffolds (placeholder pages until real implementation)
     Route::get('feature/{feature}', [ComingSoonController::class, 'index'])->name('feature.coming');
