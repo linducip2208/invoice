@@ -69,7 +69,7 @@ class QuoteApprovalService
             'subtotal' => sprintf('%.2f', (float) $quote->subtotal),
             'tax_rate' => sprintf('%.2f', (float) $quote->tax_rate),
             'tax_amount' => sprintf('%.2f', (float) $quote->tax_amount),
-            'discount_type' => (string) $quote->discount_type,
+            'discount_type' => (string) ($quote->discount_type ?? 'none'),
             'discount_value' => sprintf('%.2f', (float) $quote->discount_value),
             'discount_amount' => sprintf('%.2f', (float) $quote->discount_amount),
             'total' => sprintf('%.2f', (float) $quote->total),
@@ -144,7 +144,7 @@ class QuoteApprovalService
             if ($live->count() >= 3) {
                 return ['error' => 'too_many_challenges'];
             }
-            $recent = $live->firstWhere('contact_email', $contactEmail);
+            $recent = $live->firstWhere(fn ($c) => $c->contact_email === $contactEmail && $c->purpose === $purpose);
             if ($recent && $recent->last_sent_at && $recent->last_sent_at->diffInSeconds(now()) < self::OTP_RESEND_COOLDOWN_SECONDS) {
                 return ['error' => 'resend_cooldown'];
             }
@@ -235,6 +235,18 @@ class QuoteApprovalService
         return DB::transaction(function () use ($quote, $identity, $correlationId) {
             $locked = Quote::where('id', $quote->id)->lockForUpdate()->firstOrFail();
 
+            // Idempotency FIRST (same approver + revision + outcome): repeat
+            // POSTs / double-clicks return the recorded event instead of an
+            // error, and never create a second effect.
+            $existing = QuoteApprovalEvent::where('quote_id', $locked->id)
+                ->where('revision', $identity['revision'] ?? $locked->revision)
+                ->where('outcome', 'accepted')
+                ->where('approver_email', $identity['email'])
+                ->first();
+            if ($existing) {
+                return ['event' => $existing, 'duplicate' => true];
+            }
+
             if ($reason = self::eligibility($locked)) {
                 return ['error' => $reason];
             }
@@ -251,19 +263,18 @@ class QuoteApprovalService
                     return ['error' => 'challenge_invalid'];
                 }
             }
+            // Defense in depth: a designated approver revoked between page
+            // render and submit must fail closed here too (controller also
+            // rechecks, but the service is the final authority).
+            if (! empty($identity['portal_user'])) {
+                $pu = $identity['portal_user']->fresh();
+                if (! $pu || ! $pu->is_active || ! $pu->can_approve_quotes) {
+                    return ['error' => 'approver_revoked'];
+                }
+            }
             // High-risk policy: portal designated approver only.
             if (self::requiresPortalApproval($locked) && ($identity['method'] ?? null) !== 'portal') {
                 return ['error' => 'portal_required'];
-            }
-
-            // Idempotency: same approver + revision + outcome already recorded.
-            $existing = QuoteApprovalEvent::where('quote_id', $locked->id)
-                ->where('revision', $locked->revision)
-                ->where('outcome', 'accepted')
-                ->where('approver_email', $identity['email'])
-                ->first();
-            if ($existing) {
-                return ['event' => $existing, 'duplicate' => true];
             }
 
             // Authoritative server-side totals live on the quote row itself
@@ -271,26 +282,40 @@ class QuoteApprovalService
             $hash = self::documentHash($locked);
             $now = now();
 
-            $event = QuoteApprovalEvent::create([
-                'workspace_id' => $locked->workspace_id,
-                'quote_id' => $locked->id,
-                'revision' => $locked->revision,
-                'client_id' => $locked->client_id,
-                'approver_portal_user_id' => $identity['portal_user']->id ?? null,
-                'approver_name' => $identity['name'],
-                'approver_role' => $identity['role'] ?? null,
-                'approver_email' => $identity['email'],
-                'verification_method' => $identity['method'],
-                'authority_basis' => $identity['authority'],
-                'consent_text_version' => self::CONSENT_VERSION,
-                'consent_text_snapshot' => self::consentText($locked),
-                'document_sha256' => $hash,
-                'outcome' => 'accepted',
-                'decided_at' => $now,
-                'ip' => request()->ip(),
-                'user_agent' => substr(request()->userAgent() ?? '', 0, 500),
-                'correlation_id' => $correlationId ?? (string) Str::uuid(),
-            ]);
+            try {
+                $event = QuoteApprovalEvent::create([
+                    'workspace_id' => $locked->workspace_id,
+                    'quote_id' => $locked->id,
+                    'revision' => $locked->revision,
+                    'client_id' => $locked->client_id,
+                    'approver_portal_user_id' => $identity['portal_user']->id ?? null,
+                    'approver_name' => $identity['name'],
+                    'approver_role' => $identity['role'] ?? null,
+                    'approver_email' => $identity['email'],
+                    'verification_method' => $identity['method'],
+                    'authority_basis' => $identity['authority'],
+                    'consent_text_version' => self::CONSENT_VERSION,
+                    'consent_text_snapshot' => self::consentText($locked),
+                    'document_sha256' => $hash,
+                    'outcome' => 'accepted',
+                    'decided_at' => $now,
+                    'ip' => request()->ip(),
+                    'user_agent' => substr(request()->userAgent() ?? '', 0, 500),
+                    'correlation_id' => $correlationId ?? (string) Str::uuid(),
+                ]);
+            } catch (\Illuminate\Database\QueryException $e) {
+                // Lost a concurrent race on the unique evidence key: the
+                // winner's row is the single effect; return it idempotently.
+                $winner = QuoteApprovalEvent::where('quote_id', $locked->id)
+                    ->where('revision', $locked->revision)
+                    ->where('outcome', 'accepted')
+                    ->where('approver_email', $identity['email'])
+                    ->first();
+                if ($winner) {
+                    return ['event' => $winner, 'duplicate' => true];
+                }
+                throw $e;
+            }
 
             $locked->update(['status' => 'accepted', 'accepted_at' => $now]);
 
@@ -318,6 +343,15 @@ class QuoteApprovalService
         return DB::transaction(function () use ($quote, $identity, $reason, $correlationId) {
             $locked = Quote::where('id', $quote->id)->lockForUpdate()->firstOrFail();
 
+            $existing = QuoteApprovalEvent::where('quote_id', $locked->id)
+                ->where('revision', $identity['revision'] ?? $locked->revision)
+                ->where('outcome', 'rejected')
+                ->where('approver_email', $identity['email'])
+                ->first();
+            if ($existing) {
+                return ['event' => $existing, 'duplicate' => true];
+            }
+
             if ($check = self::eligibility($locked)) {
                 return ['error' => $check];
             }
@@ -331,38 +365,47 @@ class QuoteApprovalService
                     return ['error' => 'challenge_invalid'];
                 }
             }
-
-            $existing = QuoteApprovalEvent::where('quote_id', $locked->id)
-                ->where('revision', $locked->revision)
-                ->where('outcome', 'rejected')
-                ->where('approver_email', $identity['email'])
-                ->first();
-            if ($existing) {
-                return ['event' => $existing, 'duplicate' => true];
+            if (! empty($identity['portal_user'])) {
+                $pu = $identity['portal_user']->fresh();
+                if (! $pu || ! $pu->is_active || ! $pu->can_approve_quotes) {
+                    return ['error' => 'approver_revoked'];
+                }
             }
 
             $now = now();
-            $event = QuoteApprovalEvent::create([
-                'workspace_id' => $locked->workspace_id,
-                'quote_id' => $locked->id,
-                'revision' => $locked->revision,
-                'client_id' => $locked->client_id,
-                'approver_portal_user_id' => $identity['portal_user']->id ?? null,
-                'approver_name' => $identity['name'],
-                'approver_role' => $identity['role'] ?? null,
-                'approver_email' => $identity['email'],
-                'verification_method' => $identity['method'],
-                'authority_basis' => $identity['authority'],
-                'consent_text_version' => self::CONSENT_VERSION,
-                'consent_text_snapshot' => self::consentText($locked),
-                'document_sha256' => self::documentHash($locked),
-                'outcome' => 'rejected',
-                'decline_reason' => $reason ? substr($reason, 0, 500) : null,
-                'decided_at' => $now,
-                'ip' => request()->ip(),
-                'user_agent' => substr(request()->userAgent() ?? '', 0, 500),
-                'correlation_id' => $correlationId ?? (string) Str::uuid(),
-            ]);
+            try {
+                $event = QuoteApprovalEvent::create([
+                    'workspace_id' => $locked->workspace_id,
+                    'quote_id' => $locked->id,
+                    'revision' => $locked->revision,
+                    'client_id' => $locked->client_id,
+                    'approver_portal_user_id' => $identity['portal_user']->id ?? null,
+                    'approver_name' => $identity['name'],
+                    'approver_role' => $identity['role'] ?? null,
+                    'approver_email' => $identity['email'],
+                    'verification_method' => $identity['method'],
+                    'authority_basis' => $identity['authority'],
+                    'consent_text_version' => self::CONSENT_VERSION,
+                    'consent_text_snapshot' => self::consentText($locked),
+                    'document_sha256' => self::documentHash($locked),
+                    'outcome' => 'rejected',
+                    'decline_reason' => $reason ? substr($reason, 0, 500) : null,
+                    'decided_at' => $now,
+                    'ip' => request()->ip(),
+                    'user_agent' => substr(request()->userAgent() ?? '', 0, 500),
+                    'correlation_id' => $correlationId ?? (string) Str::uuid(),
+                ]);
+            } catch (\Illuminate\Database\QueryException $e) {
+                $winner = QuoteApprovalEvent::where('quote_id', $locked->id)
+                    ->where('revision', $locked->revision)
+                    ->where('outcome', 'rejected')
+                    ->where('approver_email', $identity['email'])
+                    ->first();
+                if ($winner) {
+                    return ['event' => $winner, 'duplicate' => true];
+                }
+                throw $e;
+            }
 
             $locked->update(['status' => 'rejected']);
 

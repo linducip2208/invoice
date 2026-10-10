@@ -330,6 +330,7 @@ class PublicQuoteController extends Controller
             'withdrawn' => __('This quotation was withdrawn by the issuer.'),
             'expired' => __('This quotation has expired.'),
             'revision_changed' => __('The quotation changed since your review. Please review the new revision.'),
+            'approver_revoked' => __('Your approver access was revoked. Contact the business.'),
             'portal_required' => __('This quotation requires approval by an authorized portal approver.'),
             'challenge_invalid' => __('Your verification is no longer valid. Start over.'),
             default => __('Approval could not be recorded in the current state.'),
