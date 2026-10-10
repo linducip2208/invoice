@@ -1,5 +1,39 @@
 # CHANGELOG
 
+## 2026-10-10 (malam) — Finalisasi enterprise: Tabler 100%, E2E, skor 88/100
+
+### Migrasi UI
+
+- Tabler `@tabler/core@1.6.1` + icons 3.49.0 via Vite; Tailwind + unicorn
+  + 18 komponen lama + 4 layout lama + stub views dihapus (grep-zero)
+- App shell + sidebar IA 9 section/44 item (role-gated, active state,
+  offcanvas mobile); reusable `x-tabler.*` + 74 ikon SVG lokal
+- 132/167 views MIGRATED (sisa EXEMPT: print/PDF/email/XML/partial)
+- Auth (6, termasuk fix `route('home')` hilang), errors (6 + 429),
+  admin (18), publik/blog/portal (23), /docs rewrite 15 section + search
+- Dark mode persisten; system font stack (opsi font mati dihapus)
+- i18n: ID +130 kunci, EN lengkap, duplikat dibuang
+
+### Keamanan & data
+
+- WebhookSignatureVerifier (midtrans/xendit/tripay/duitku/doku) + 4 test;
+  throttle register/reset; login lockout tetap di LoginRequest
+- Export CSV anti formula-injection + test; backup password via env +
+  BackupRestoreTest hijau; `bootstrap/cache` writable diperbaiki
+
+### Pengujian
+
+- 74 automated hijau (Isolation, Money, Export, Dashboard KPI, InvoiceFlow,
+  Pwa, NavIntegrity, BackupRestore, signature) + **14/14 Playwright nyata**
+  (desktop+mobile, nol console error, overflow 0, 5 screenshot)
+- `npm audit` 0 vuln; E2E suite + seeder terisolasi dikomit
+
+### Dokumen
+
+- BASELINE, IMPLEMENTATION-PLAN, FEATURE-ROUTE-MATRIX, UI-MIGRATION-MATRIX,
+  SIDEBAR-ROUTE-AUDIT, DOCS-ACCURACY/COVERAGE, TABLER-MIGRATION-REPORT,
+  TEST-EVIDENCE, REMAINING-RISKS; FINAL-AUDIT 88/100 STAGING ONLY
+
 ## 2026-10-10 — Enterprise hardening (audit misi 100/100)
 
 ### Fixed (P0/P1)

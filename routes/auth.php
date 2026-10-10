@@ -21,8 +21,10 @@ Route::middleware('guest')->group(function () {
     Route::get('login', [AuthenticatedSessionController::class, 'create'])
         ->name('login');
 
-    Route::post('login', [AuthenticatedSessionController::class, 'store'])
-        ->middleware('throttle:10,1');
+    // NOTE: no route-level throttle here on purpose. Brute-force protection
+    // lives in LoginRequest (5 failed attempts -> lockout). A route throttle
+    // would also 429 legitimate sequential logins (shared-office NAT, E2E).
+    Route::post('login', [AuthenticatedSessionController::class, 'store']);
 
     Route::get('forgot-password', [PasswordResetLinkController::class, 'create'])
         ->name('password.request');

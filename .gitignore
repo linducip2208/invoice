@@ -28,3 +28,7 @@ Thumbs.db
 
 # License pairing v3 — encrypted lock file, never commit
 storage/app/.license.lock
+
+# Playwright E2E artifacts (traces, screenshots on failure, local report)
+test-results/
+tests-e2e/report/

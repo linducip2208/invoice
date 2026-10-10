@@ -111,11 +111,19 @@ eksplisit). Dibuktikan: `ClientTest::client_is_scoped_to_workspace`,
 | Marketplace | `marketplace.index` | auth | static view | — | STUB | transparan "Coming Soon Q3 2026" |
 | Feature scaffolds | `feature.coming` | auth | ComingSoonController | — | STUB | 6 link sidebar, transparan |
 
-## Bukti pengujian
+## Bukti pengujian (revisi finalisasi 2026-10-10)
 
-- `php artisan test`: **48 passed, 0 failed** (Unit 2 EfakturXml + Feature 46).
-- `npm run build`: sukses.
-- `composer validate`: valid. `php -l`: bersih. `node --check sw.js`: OK.
+- `php artisan test`: **74 passed, 0 failed** (Client 6 · Invoice 8 · Payment 5 ·
+  Blog 8 · Pseo 10 · Workspace 4 · Webhook 9 · EfakturXml 2 · Money 5 ·
+  Isolation 4 · Export 3 · Dashboard 1 · InvoiceFlow 1 · Pwa 3 ·
+  NavIntegrity 4 · BackupRestore 1).
+- Playwright nyata: **14/14** (7 skenario × desktop+mobile), nol console error,
+  overflow 0, 5 screenshot di `docs/audit/shots/`.
+- UI: Tabler 100% halaman aktif (132 MIGRATED + EXEMPT sah); sidebar 44/44 PASS.
+- `npm run build`: sukses. `composer validate`: valid. `npm audit`: 0 vuln.
+- `node --check sw.js`: OK. `php artisan route:list`: 301.
+- Belum: import-CSV baris-gagal, queue jobs khusus, gateway sandbox (BLOCKED),
+  install PWA device nyata (BLOCKED).
 - Browser E2E (Playwright): **belum dijalankan** — tidak tersedia di environment ini.
 - Visual regression per viewport: **belum** — lihat Known Limitations.
 - Cakupan yang belum ada: auth/2FA flows, queue jobs, mail dispatch, plan enforcement

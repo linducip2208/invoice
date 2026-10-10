@@ -166,7 +166,7 @@
                 </button>
                 <div class="navbar-nav flex-row order-md-last ms-auto">
                     @if($ws)
-                        <div class="nav-item dropdown me-2 d-none d-sm-flex">
+                        <div class="nav-item dropdown me-2 d-flex">
                             <a href="#" class="nav-link d-flex lh-1 p-0 px-2" data-bs-toggle="dropdown"
                                 aria-label="{{ __('Switch workspace') }}" aria-expanded="false">
                                 <span class="avatar avatar-sm">{{ strtoupper(mb_substr($ws->name ?? 'W', 0, 1)) }}</span>

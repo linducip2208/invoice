@@ -1,197 +1,173 @@
-# UI-MIGRATION MATRIX (generated 2026-10-10, 191 views)
+# UI-MIGRATION MATRIX (2026-10-10, 167 views, 132 MIGRATED)
 
-Status awal semua: NOT_MIGRATED. Kolom unicorn=YES berarti memakai design system lama.
+EXEMPT = print/email/XML/JS yang memang tidak memakai design system admin (sesuai misi).
 
-| View | Lines | Layout | Unicorn | Alpine | route() refs | Status |
-|---|---|---|---|---|---|---|
-| `accounting-exports/create.blade.php` | 34 | x-app-layout | YES | no | 1 | NOT_MIGRATED |
-| `accounting-exports/index.blade.php` | 54 | x-app-layout | YES | no | 1 | NOT_MIGRATED |
-| `admin/_layout.blade.php` | 116 | partial/none | YES | yes | 3 | NOT_MIGRATED |
-| `admin/blog/categories.blade.php` | 78 | partial/none | YES | no | 2 | NOT_MIGRATED |
-| `admin/blog/create.blade.php` | 67 | partial/none | YES | no | 2 | NOT_MIGRATED |
-| `admin/blog/edit.blade.php` | 66 | partial/none | YES | no | 1 | NOT_MIGRATED |
-| `admin/blog/index.blade.php` | 66 | partial/none | YES | no | 2 | NOT_MIGRATED |
-| `admin/branding/edit.blade.php` | 190 | partial/none | YES | yes | 1 | NOT_MIGRATED |
-| `admin/coupons/index.blade.php` | 46 | partial/none | YES | no | 1 | NOT_MIGRATED |
-| `admin/dashboard.blade.php` | 57 | partial/none | YES | no | 0 | NOT_MIGRATED |
-| `admin/manual-payments/index.blade.php` | 80 | partial/none | YES | no | 1 | NOT_MIGRATED |
-| `admin/plans/_form.blade.php` | 81 | partial/none | YES | no | 2 | NOT_MIGRATED |
-| `admin/plans/create.blade.php` | 4 | partial/none | no | no | 0 | NOT_MIGRATED |
-| `admin/plans/edit.blade.php` | 4 | partial/none | no | no | 0 | NOT_MIGRATED |
-| `admin/plans/index.blade.php` | 36 | partial/none | YES | no | 1 | NOT_MIGRATED |
-| `admin/subscriptions/index.blade.php` | 38 | partial/none | YES | no | 0 | NOT_MIGRATED |
-| `admin/subscriptions/manual.blade.php` | 260 | partial/none | no | yes | 3 | NOT_MIGRATED |
-| `admin/subscriptions/show.blade.php` | 73 | partial/none | YES | no | 0 | NOT_MIGRATED |
-| `admin/users/index.blade.php` | 27 | partial/none | YES | no | 0 | NOT_MIGRATED |
-| `admin/users/show.blade.php` | 25 | partial/none | YES | no | 0 | NOT_MIGRATED |
-| `admin/workspaces/index.blade.php` | 26 | partial/none | YES | no | 0 | NOT_MIGRATED |
-| `admin/workspaces/show.blade.php` | 92 | partial/none | no | no | 0 | NOT_MIGRATED |
-| `affiliate/index.blade.php` | 25 | x-app-layout | YES | no | 0 | NOT_MIGRATED |
-| `ai-providers/create.blade.php` | 91 | x-app-layout | YES | yes | 2 | NOT_MIGRATED |
-| `ai-providers/edit.blade.php` | 69 | x-app-layout | YES | no | 1 | NOT_MIGRATED |
-| `ai-providers/index.blade.php` | 83 | x-app-layout | YES | no | 1 | NOT_MIGRATED |
-| `api-tokens/index.blade.php` | 45 | x-app-layout | YES | no | 1 | NOT_MIGRATED |
-| `approval-rules/index.blade.php` | 119 | x-app-layout | YES | no | 2 | NOT_MIGRATED |
-| `approvals/index.blade.php` | 86 | x-app-layout | YES | no | 1 | NOT_MIGRATED |
-| `audit-logs/index.blade.php` | 21 | x-app-layout | YES | no | 0 | NOT_MIGRATED |
-| `auth/confirm-password.blade.php` | 88 | partial/none | no | no | 2 | NOT_MIGRATED |
-| `auth/forgot-password.blade.php` | 112 | partial/none | no | no | 3 | NOT_MIGRATED |
-| `auth/login.blade.php` | 213 | partial/none | YES | no | 4 | NOT_MIGRATED |
-| `auth/register.blade.php` | 183 | partial/none | no | no | 3 | NOT_MIGRATED |
-| `auth/reset-password.blade.php` | 114 | partial/none | no | no | 3 | NOT_MIGRATED |
-| `auth/verify-email.blade.php` | 95 | partial/none | no | no | 3 | NOT_MIGRATED |
-| `bank-reconcile/create.blade.php` | 42 | x-app-layout | YES | no | 1 | NOT_MIGRATED |
-| `bank-reconcile/index.blade.php` | 56 | x-app-layout | YES | no | 1 | NOT_MIGRATED |
-| `bank-reconcile/show.blade.php` | 76 | x-app-layout | YES | no | 1 | NOT_MIGRATED |
-| `billing/manual.blade.php` | 105 | x-app-layout | YES | no | 1 | NOT_MIGRATED |
-| `billing/show.blade.php` | 188 | x-app-layout | YES | yes | 2 | NOT_MIGRATED |
-| `blog/feed.blade.php` | 21 | partial/none | no | no | 0 | NOT_MIGRATED |
-| `blog/index.blade.php` | 58 | x-layouts.seo | YES | no | 1 | NOT_MIGRATED |
-| `blog/show.blade.php` | 88 | x-layouts.seo | YES | no | 1 | NOT_MIGRATED |
-| `clients/_form.blade.php` | 82 | partial/none | YES | no | 0 | NOT_MIGRATED |
-| `clients/create.blade.php` | 26 | x-app-layout | YES | no | 2 | NOT_MIGRATED |
-| `clients/edit.blade.php` | 26 | x-app-layout | YES | no | 1 | NOT_MIGRATED |
-| `clients/import.blade.php` | 20 | x-app-layout | YES | no | 1 | NOT_MIGRATED |
-| `clients/index.blade.php` | 99 | x-app-layout | YES | no | 2 | NOT_MIGRATED |
-| `clients/portal-users.blade.php` | 64 | x-app-layout | YES | no | 1 | NOT_MIGRATED |
-| `clients/show.blade.php` | 104 | x-app-layout | YES | no | 1 | NOT_MIGRATED |
-| `coming-soon.blade.php` | 28 | x-app-layout | YES | no | 2 | NOT_MIGRATED |
-| `components/admin-layout.blade.php` | 3 | partial/none | no | no | 0 | NOT_MIGRATED |
-| `components/application-logo.blade.php` | 65 | partial/none | no | no | 0 | NOT_MIGRATED |
-| `components/auth-session-status.blade.php` | 8 | partial/none | no | no | 0 | NOT_MIGRATED |
-| `components/branding-head.blade.php` | 32 | partial/none | YES | no | 0 | NOT_MIGRATED |
-| `components/danger-button.blade.php` | 4 | partial/none | YES | no | 0 | NOT_MIGRATED |
-| `components/dropdown-link.blade.php` | 2 | partial/none | no | no | 0 | NOT_MIGRATED |
-| `components/dropdown.blade.php` | 36 | partial/none | no | yes | 0 | NOT_MIGRATED |
-| `components/free-tier-watermark.blade.php` | 11 | partial/none | no | no | 0 | NOT_MIGRATED |
-| `components/input-error.blade.php` | 10 | partial/none | no | no | 0 | NOT_MIGRATED |
-| `components/input-label.blade.php` | 6 | partial/none | no | no | 0 | NOT_MIGRATED |
-| `components/invoice-render.blade.php` | 143 | partial/none | no | no | 0 | NOT_MIGRATED |
-| `components/layouts/seo.blade.php` | 86 | x-layouts.seo,@extends | YES | no | 4 | NOT_MIGRATED |
-| `components/mobile-bottom-nav.blade.php` | 38 | partial/none | YES | no | 0 | NOT_MIGRATED |
-| `components/modal.blade.php` | 79 | partial/none | no | yes | 0 | NOT_MIGRATED |
-| `components/nav-link.blade.php` | 12 | partial/none | no | no | 0 | NOT_MIGRATED |
-| `components/nav-sidebar.blade.php` | 31 | partial/none | YES | no | 0 | NOT_MIGRATED |
-| `components/primary-button.blade.php` | 4 | partial/none | YES | no | 0 | NOT_MIGRATED |
-| `components/responsive-nav-link.blade.php` | 12 | partial/none | no | no | 0 | NOT_MIGRATED |
-| `components/secondary-button.blade.php` | 4 | partial/none | YES | no | 0 | NOT_MIGRATED |
-| `components/text-input.blade.php` | 4 | partial/none | YES | no | 0 | NOT_MIGRATED |
-| `coupons/index.blade.php` | 128 | x-app-layout | YES | no | 1 | NOT_MIGRATED |
-| `credit-notes/create.blade.php` | 82 | x-app-layout | YES | no | 2 | NOT_MIGRATED |
-| `credit-notes/index.blade.php` | 106 | x-app-layout | YES | no | 2 | NOT_MIGRATED |
-| `credit-notes/show.blade.php` | 104 | x-app-layout | YES | no | 1 | NOT_MIGRATED |
-| `dashboard.blade.php` | 18 | x-app-layout | no | no | 0 | NOT_MIGRATED |
-| `dashboard/customize.blade.php` | 97 | x-app-layout | YES | yes | 2 | NOT_MIGRATED |
-| `dashboard/index.blade.php` | 168 | x-app-layout | YES | no | 6 | NOT_MIGRATED |
-| `docs.blade.php` | 786 | partial/none | YES | no | 5 | NOT_MIGRATED |
-| `email-forwards/index.blade.php` | 60 | x-app-layout | YES | no | 1 | NOT_MIGRATED |
-| `emails/invoice-reminder.blade.php` | 43 | partial/none | no | no | 0 | NOT_MIGRATED |
-| `emails/invoice.blade.php` | 102 | partial/none | no | no | 0 | NOT_MIGRATED |
-| `embed/demo.blade.php` | 43 | x-app-layout | YES | no | 0 | NOT_MIGRATED |
-| `embed/invoice.blade.php` | 63 | partial/none | no | no | 0 | NOT_MIGRATED |
-| `embed/widget-js.blade.php` | 28 | partial/none | no | no | 0 | NOT_MIGRATED |
-| `errors/403.blade.php` | 13 | x-guest-layout | YES | no | 1 | NOT_MIGRATED |
-| `errors/404.blade.php` | 13 | x-guest-layout | YES | no | 1 | NOT_MIGRATED |
-| `errors/419.blade.php` | 13 | x-guest-layout | YES | no | 1 | NOT_MIGRATED |
-| `errors/500.blade.php` | 13 | x-guest-layout | YES | no | 1 | NOT_MIGRATED |
-| `errors/503.blade.php` | 12 | x-guest-layout | YES | no | 0 | NOT_MIGRATED |
-| `expenses/index.blade.php` | 45 | x-app-layout | YES | no | 1 | NOT_MIGRATED |
-| `expenses/ocr-review.blade.php` | 94 | x-app-layout | YES | no | 1 | NOT_MIGRATED |
-| `expenses/ocr-upload.blade.php` | 37 | x-app-layout | YES | no | 2 | NOT_MIGRATED |
-| `exports/index.blade.php` | 21 | x-app-layout | YES | no | 3 | NOT_MIGRATED |
-| `gateways/index.blade.php` | 319 | x-app-layout | YES | no | 1 | NOT_MIGRATED |
-| `invoice-layouts/builder.blade.php` | 226 | x-app-layout | YES | yes | 2 | NOT_MIGRATED |
-| `invoice-layouts/index.blade.php` | 48 | x-app-layout | YES | no | 1 | NOT_MIGRATED |
-| `invoices/_send-modal.blade.php` | 45 | partial/none | YES | no | 0 | NOT_MIGRATED |
-| `invoices/create.blade.php` | 355 | x-app-layout | YES | yes | 5 | NOT_MIGRATED |
-| `invoices/edit.blade.php` | 294 | x-app-layout | YES | yes | 0 | NOT_MIGRATED |
-| `invoices/index.blade.php` | 104 | x-app-layout | YES | no | 2 | NOT_MIGRATED |
-| `invoices/pdf-custom.blade.php` | 144 | partial/none | no | no | 0 | NOT_MIGRATED |
-| `invoices/qris.blade.php` | 66 | x-app-layout | YES | yes | 0 | NOT_MIGRATED |
-| `invoices/reminders.blade.php` | 152 | x-app-layout | YES | no | 0 | NOT_MIGRATED |
-| `invoices/show.blade.php` | 328 | x-app-layout | YES | yes | 0 | NOT_MIGRATED |
-| `invoices/tax-details.blade.php` | 124 | x-app-layout | YES | yes | 0 | NOT_MIGRATED |
-| `invoices/templates/bilingual.blade.php` | 151 | partial/none | no | no | 0 | NOT_MIGRATED |
-| `invoices/templates/bold.blade.php` | 151 | partial/none | no | no | 0 | NOT_MIGRATED |
-| `invoices/templates/classic.blade.php` | 188 | partial/none | no | no | 0 | NOT_MIGRATED |
-| `invoices/templates/elegant.blade.php` | 149 | partial/none | no | no | 0 | NOT_MIGRATED |
-| `invoices/templates/minimal.blade.php` | 133 | partial/none | no | no | 0 | NOT_MIGRATED |
-| `invoices/templates/modern.blade.php` | 162 | partial/none | no | no | 0 | NOT_MIGRATED |
-| `invoices/whatsapp-preview.blade.php` | 44 | x-app-layout | YES | no | 0 | NOT_MIGRATED |
-| `layouts/app.blade.php` | 357 | partial/none | YES | yes | 45 | NOT_MIGRATED |
-| `layouts/guest.blade.php` | 46 | partial/none | YES | no | 0 | NOT_MIGRATED |
-| `layouts/navigation.blade.php` | 101 | partial/none | no | yes | 3 | NOT_MIGRATED |
-| `layouts/seo.blade.php` | 71 | partial/none | YES | no | 4 | NOT_MIGRATED |
-| `license/pair-success.blade.php` | 85 | partial/none | no | no | 0 | NOT_MIGRATED |
-| `license/pair-wizard.blade.php` | 99 | partial/none | no | no | 0 | NOT_MIGRATED |
-| `marketplace/index.blade.php` | 32 | x-app-layout | YES | no | 0 | NOT_MIGRATED |
-| `mobile/quick-invoice.blade.php` | 49 | x-app-layout | YES | no | 1 | NOT_MIGRATED |
-| `mobile/quick-payment.blade.php` | 44 | x-app-layout | YES | no | 1 | NOT_MIGRATED |
-| `notifications/index.blade.php` | 25 | x-app-layout | YES | no | 1 | NOT_MIGRATED |
-| `payments/_form.blade.php` | 133 | partial/none | YES | no | 0 | NOT_MIGRATED |
-| `payments/_list.blade.php` | 52 | partial/none | YES | no | 0 | NOT_MIGRATED |
-| `payments/index.blade.php` | 127 | x-app-layout | YES | no | 1 | NOT_MIGRATED |
-| `placeholder.blade.php` | 19 | x-app-layout | YES | no | 1 | NOT_MIGRATED |
-| `portal/dashboard.blade.php` | 82 | partial/none | YES | no | 4 | NOT_MIGRATED |
-| `portal/invoices.blade.php` | 66 | partial/none | YES | no | 4 | NOT_MIGRATED |
-| `portal/login.blade.php` | 48 | partial/none | YES | no | 1 | NOT_MIGRATED |
-| `portal/quotes.blade.php` | 54 | partial/none | YES | no | 4 | NOT_MIGRATED |
-| `pricing/compare.blade.php` | 72 | @extends | YES | no | 2 | NOT_MIGRATED |
-| `pricing/index.blade.php` | 154 | @extends | YES | yes | 1 | NOT_MIGRATED |
-| `products/_form.blade.php` | 42 | partial/none | YES | no | 0 | NOT_MIGRATED |
-| `products/create.blade.php` | 26 | x-app-layout | YES | no | 2 | NOT_MIGRATED |
-| `products/edit.blade.php` | 26 | x-app-layout | YES | no | 1 | NOT_MIGRATED |
-| `products/index.blade.php` | 111 | x-app-layout | YES | no | 2 | NOT_MIGRATED |
-| `profile/edit.blade.php` | 24 | x-app-layout | YES | no | 0 | NOT_MIGRATED |
-| `profile/partials/delete-user-form.blade.php` | 39 | partial/none | no | yes | 1 | NOT_MIGRATED |
-| `profile/partials/update-password-form.blade.php` | 35 | partial/none | no | yes | 1 | NOT_MIGRATED |
-| `profile/partials/update-profile-information-form.blade.php` | 50 | partial/none | no | yes | 2 | NOT_MIGRATED |
-| `projects/create.blade.php` | 79 | x-app-layout | YES | no | 2 | NOT_MIGRATED |
-| `projects/edit.blade.php` | 81 | x-app-layout | YES | no | 0 | NOT_MIGRATED |
-| `projects/index.blade.php` | 78 | x-app-layout | YES | no | 1 | NOT_MIGRATED |
-| `projects/show.blade.php` | 105 | x-app-layout | YES | no | 1 | NOT_MIGRATED |
-| `public/invoice.blade.php` | 283 | partial/none | YES | no | 0 | NOT_MIGRATED |
-| `public/nps/show.blade.php` | 56 | partial/none | YES | yes | 0 | NOT_MIGRATED |
-| `public/nps/thanks.blade.php` | 23 | partial/none | YES | no | 0 | NOT_MIGRATED |
-| `public/quotes/show.blade.php` | 270 | partial/none | YES | yes | 0 | NOT_MIGRATED |
-| `quotes/create.blade.php` | 52 | x-app-layout | YES | yes | 2 | NOT_MIGRATED |
-| `quotes/index.blade.php` | 33 | x-app-layout | YES | no | 1 | NOT_MIGRATED |
-| `quotes/show.blade.php` | 42 | x-app-layout | YES | no | 1 | NOT_MIGRATED |
-| `recurring/create.blade.php` | 164 | x-app-layout | YES | yes | 2 | NOT_MIGRATED |
-| `recurring/edit.blade.php` | 158 | x-app-layout | YES | yes | 1 | NOT_MIGRATED |
-| `recurring/index.blade.php` | 92 | x-app-layout | YES | no | 2 | NOT_MIGRATED |
-| `report-subscriptions/index.blade.php` | 87 | x-app-layout | YES | no | 1 | NOT_MIGRATED |
-| `reports/aging.blade.php` | 201 | x-app-layout | YES | no | 1 | NOT_MIGRATED |
-| `reports/cashflow.blade.php` | 99 | x-app-layout | YES | no | 1 | NOT_MIGRATED |
-| `reports/index.blade.php` | 153 | x-app-layout | YES | no | 0 | NOT_MIGRATED |
-| `reports/pl.blade.php` | 103 | x-app-layout | YES | no | 1 | NOT_MIGRATED |
-| `reports/tax.blade.php` | 98 | x-app-layout | YES | no | 1 | NOT_MIGRATED |
-| `robots.blade.php` | 28 | partial/none | no | no | 0 | NOT_MIGRATED |
-| `seo/alternatives.blade.php` | 121 | @extends | YES | no | 2 | NOT_MIGRATED |
-| `seo/best-tools.blade.php` | 117 | @extends | YES | no | 2 | NOT_MIGRATED |
-| `seo/compare.blade.php` | 144 | @extends | YES | no | 2 | NOT_MIGRATED |
-| `seo/templates.blade.php` | 128 | @extends | YES | no | 2 | NOT_MIGRATED |
-| `settings/2fa/setup.blade.php` | 77 | x-app-layout | YES | no | 1 | NOT_MIGRATED |
-| `settings/2fa/show.blade.php` | 82 | x-app-layout | YES | no | 3 | NOT_MIGRATED |
-| `settings/custom-domain.blade.php` | 102 | x-app-layout | YES | no | 3 | NOT_MIGRATED |
-| `sitemap.blade.php` | 59 | partial/none | no | no | 0 | NOT_MIGRATED |
-| `stubs/activity.blade.php` | 21 | x-app-layout | YES | no | 0 | NOT_MIGRATED |
-| `stubs/bulk.blade.php` | 32 | x-app-layout | YES | no | 2 | NOT_MIGRATED |
-| `stubs/client-portal.blade.php` | 17 | x-app-layout | YES | no | 1 | NOT_MIGRATED |
-| `stubs/custom-domain.blade.php` | 25 | x-app-layout | YES | no | 0 | NOT_MIGRATED |
-| `stubs/dunning.blade.php` | 27 | x-app-layout | YES | no | 0 | NOT_MIGRATED |
-| `stubs/email-templates.blade.php` | 23 | x-app-layout | YES | no | 0 | NOT_MIGRATED |
-| `stubs/fx-rates.blade.php` | 21 | x-app-layout | YES | no | 0 | NOT_MIGRATED |
-| `stubs/indonesia-tax.blade.php` | 31 | x-app-layout | YES | no | 0 | NOT_MIGRATED |
-| `stubs/late-fee.blade.php` | 26 | x-app-layout | YES | no | 0 | NOT_MIGRATED |
-| `stubs/onboarding.blade.php` | 29 | x-app-layout | YES | no | 5 | NOT_MIGRATED |
-| `stubs/two-factor.blade.php` | 25 | x-app-layout | YES | no | 0 | NOT_MIGRATED |
-| `support/create.blade.php` | 17 | x-app-layout | YES | no | 2 | NOT_MIGRATED |
-| `support/index.blade.php` | 25 | x-app-layout | YES | no | 1 | NOT_MIGRATED |
-| `support/show.blade.php` | 28 | x-app-layout | YES | no | 1 | NOT_MIGRATED |
-| `team/index.blade.php` | 49 | x-app-layout | YES | no | 1 | NOT_MIGRATED |
-| `tenant-webhooks/index.blade.php` | 42 | x-app-layout | YES | no | 1 | NOT_MIGRATED |
-| `time-entries/index.blade.php` | 51 | x-app-layout | YES | no | 1 | NOT_MIGRATED |
-| `welcome.blade.php` | 370 | partial/none | YES | yes | 6 | NOT_MIGRATED |
-| `workspace/create.blade.php` | 43 | x-app-layout | YES | no | 1 | NOT_MIGRATED |
-| `workspace/settings.blade.php` | 140 | x-app-layout | YES | no | 1 | NOT_MIGRATED |
+| View | Lines | route() refs | Status |
+|---|---|---|---|
+| `accounting-exports/create.blade.php` | 34 | 2 | MIGRATED |
+| `accounting-exports/index.blade.php` | 48 | 1 | MIGRATED |
+| `admin/blog/categories.blade.php` | 101 | 2 | MIGRATED |
+| `admin/blog/create.blade.php` | 84 | 2 | MIGRATED |
+| `admin/blog/edit.blade.php` | 87 | 1 | MIGRATED |
+| `admin/blog/index.blade.php` | 63 | 2 | MIGRATED |
+| `admin/branding/edit.blade.php` | 208 | 1 | MIGRATED |
+| `admin/coupons/index.blade.php` | 130 | 1 | MIGRATED |
+| `admin/dashboard.blade.php` | 64 | 0 | MIGRATED |
+| `admin/manual-payments/index.blade.php` | 185 | 1 | MIGRATED |
+| `admin/plans/_form.blade.php` | 173 | 2 | PARTIAL (no layout root) |
+| `admin/plans/create.blade.php` | 10 | 1 | MIGRATED |
+| `admin/plans/edit.blade.php` | 10 | 1 | MIGRATED |
+| `admin/plans/index.blade.php` | 59 | 1 | MIGRATED |
+| `admin/subscriptions/index.blade.php` | 84 | 1 | MIGRATED |
+| `admin/subscriptions/manual.blade.php` | 323 | 3 | MIGRATED |
+| `admin/subscriptions/show.blade.php` | 106 | 1 | MIGRATED |
+| `admin/users/index.blade.php` | 79 | 1 | MIGRATED |
+| `admin/users/show.blade.php` | 67 | 1 | MIGRATED |
+| `admin/workspaces/index.blade.php` | 76 | 1 | MIGRATED |
+| `admin/workspaces/show.blade.php` | 130 | 1 | MIGRATED |
+| `affiliate/index.blade.php` | 29 | 0 | MIGRATED |
+| `ai-providers/create.blade.php` | 97 | 2 | MIGRATED |
+| `ai-providers/edit.blade.php` | 72 | 1 | MIGRATED |
+| `ai-providers/index.blade.php` | 71 | 1 | MIGRATED |
+| `api-tokens/index.blade.php` | 80 | 1 | MIGRATED |
+| `approval-rules/index.blade.php` | 110 | 2 | MIGRATED |
+| `approvals/index.blade.php` | 70 | 1 | MIGRATED |
+| `audit-logs/index.blade.php` | 38 | 0 | MIGRATED |
+| `auth/confirm-password.blade.php` | 19 | 1 | MIGRATED |
+| `auth/forgot-password.blade.php` | 25 | 2 | MIGRATED |
+| `auth/login.blade.php` | 63 | 4 | MIGRATED |
+| `auth/register.blade.php` | 39 | 3 | MIGRATED |
+| `auth/reset-password.blade.php` | 27 | 3 | MIGRATED |
+| `auth/verify-email.blade.php` | 22 | 2 | MIGRATED |
+| `bank-reconcile/create.blade.php` | 47 | 2 | MIGRATED |
+| `bank-reconcile/index.blade.php` | 54 | 1 | MIGRATED |
+| `bank-reconcile/show.blade.php` | 74 | 1 | MIGRATED |
+| `billing/manual.blade.php` | 95 | 1 | MIGRATED |
+| `billing/show.blade.php` | 169 | 2 | MIGRATED |
+| `blog/feed.blade.php` | 21 | 0 | EXEMPT (print/email/xml/js) |
+| `blog/index.blade.php` | 52 | 1 | MIGRATED |
+| `blog/show.blade.php` | 83 | 3 | MIGRATED |
+| `clients/_form.blade.php` | 78 | 0 | PARTIAL (no layout root) |
+| `clients/create.blade.php` | 24 | 2 | MIGRATED |
+| `clients/edit.blade.php` | 24 | 1 | MIGRATED |
+| `clients/import.blade.php` | 32 | 2 | MIGRATED |
+| `clients/index.blade.php` | 95 | 2 | MIGRATED |
+| `clients/portal-users.blade.php` | 80 | 1 | MIGRATED |
+| `clients/show.blade.php` | 123 | 1 | MIGRATED |
+| `coming-soon.blade.php` | 21 | 2 | MIGRATED |
+| `components/free-tier-watermark.blade.php` | 11 | 0 | EXEMPT (print watermark) |
+| `components/input-error.blade.php` | 10 | 0 | PARTIAL (no layout root) |
+| `components/tabler/alert.blade.php` | 46 | 0 | PARTIAL (no layout root) |
+| `components/tabler/delete-button.blade.php` | 11 | 0 | PARTIAL (no layout root) |
+| `components/tabler/empty.blade.php` | 13 | 0 | PARTIAL (no layout root) |
+| `components/tabler/field.blade.php` | 18 | 0 | PARTIAL (no layout root) |
+| `components/tabler/guest.blade.php` | 36 | 0 | PARTIAL (no layout root) |
+| `components/tabler/layout.blade.php` | 269 | 6 | PARTIAL (no layout root) |
+| `components/tabler/public.blade.php` | 84 | 6 | PARTIAL (no layout root) |
+| `components/tabler/stat.blade.php` | 20 | 0 | PARTIAL (no layout root) |
+| `components/tabler/status-badge.blade.php` | 14 | 0 | PARTIAL (no layout root) |
+| `components/ti.blade.php` | 16 | 0 | PARTIAL (no layout root) |
+| `coupons/index.blade.php` | 115 | 1 | MIGRATED |
+| `credit-notes/create.blade.php` | 72 | 2 | MIGRATED |
+| `credit-notes/index.blade.php` | 97 | 2 | MIGRATED |
+| `credit-notes/show.blade.php` | 94 | 1 | MIGRATED |
+| `dashboard.blade.php` | 8 | 0 | MIGRATED |
+| `dashboard/customize.blade.php` | 99 | 2 | MIGRATED |
+| `dashboard/index.blade.php` | 83 | 6 | MIGRATED |
+| `docs.blade.php` | 278 | 1 | MIGRATED |
+| `email-forwards/index.blade.php` | 62 | 1 | MIGRATED |
+| `emails/invoice-reminder.blade.php` | 43 | 0 | EXEMPT (print/email/xml/js) |
+| `emails/invoice.blade.php` | 102 | 0 | EXEMPT (print/email/xml/js) |
+| `embed/demo.blade.php` | 51 | 0 | MIGRATED |
+| `embed/invoice.blade.php` | 57 | 0 | PARTIAL (no layout root) |
+| `embed/widget-js.blade.php` | 28 | 0 | EXEMPT (print/email/xml/js) |
+| `errors/403.blade.php` | 17 | 1 | MIGRATED |
+| `errors/404.blade.php` | 17 | 1 | MIGRATED |
+| `errors/419.blade.php` | 16 | 1 | MIGRATED |
+| `errors/429.blade.php` | 16 | 0 | MIGRATED |
+| `errors/500.blade.php` | 17 | 1 | MIGRATED |
+| `errors/503.blade.php` | 16 | 0 | MIGRATED |
+| `expenses/index.blade.php` | 110 | 2 | MIGRATED |
+| `expenses/ocr-review.blade.php` | 92 | 1 | MIGRATED |
+| `expenses/ocr-upload.blade.php` | 32 | 2 | MIGRATED |
+| `exports/index.blade.php` | 35 | 3 | MIGRATED |
+| `gateways/index.blade.php` | 295 | 1 | MIGRATED |
+| `invoice-layouts/builder.blade.php` | 240 | 2 | MIGRATED |
+| `invoice-layouts/index.blade.php` | 50 | 1 | MIGRATED |
+| `invoices/_send-modal.blade.php` | 36 | 0 | PARTIAL (no layout root) |
+| `invoices/create.blade.php` | 353 | 5 | MIGRATED |
+| `invoices/edit.blade.php` | 290 | 0 | MIGRATED |
+| `invoices/index.blade.php` | 105 | 2 | MIGRATED |
+| `invoices/pdf-custom.blade.php` | 144 | 0 | EXEMPT (print/email/xml/js) |
+| `invoices/qris.blade.php` | 72 | 0 | MIGRATED |
+| `invoices/reminders.blade.php` | 140 | 0 | MIGRATED |
+| `invoices/show.blade.php` | 338 | 0 | MIGRATED |
+| `invoices/tax-details.blade.php` | 119 | 0 | MIGRATED |
+| `invoices/templates/bilingual.blade.php` | 151 | 0 | EXEMPT (print/email/xml/js) |
+| `invoices/templates/bold.blade.php` | 151 | 0 | EXEMPT (print/email/xml/js) |
+| `invoices/templates/classic.blade.php` | 188 | 0 | EXEMPT (print/email/xml/js) |
+| `invoices/templates/elegant.blade.php` | 149 | 0 | EXEMPT (print/email/xml/js) |
+| `invoices/templates/minimal.blade.php` | 133 | 0 | EXEMPT (print/email/xml/js) |
+| `invoices/templates/modern.blade.php` | 162 | 0 | EXEMPT (print/email/xml/js) |
+| `invoices/whatsapp-preview.blade.php` | 37 | 0 | MIGRATED |
+| `license/pair-success.blade.php` | 48 | 0 | MIGRATED |
+| `license/pair-wizard.blade.php` | 57 | 0 | MIGRATED |
+| `marketplace/index.blade.php` | 28 | 0 | MIGRATED |
+| `mobile/quick-invoice.blade.php` | 52 | 1 | MIGRATED |
+| `mobile/quick-payment.blade.php` | 45 | 1 | MIGRATED |
+| `notifications/index.blade.php` | 35 | 1 | MIGRATED |
+| `payments/_form.blade.php` | 118 | 0 | PARTIAL (no layout root) |
+| `payments/_list.blade.php` | 46 | 0 | PARTIAL (no layout root) |
+| `payments/index.blade.php` | 111 | 1 | MIGRATED |
+| `portal/dashboard.blade.php` | 74 | 4 | MIGRATED |
+| `portal/invoices.blade.php` | 59 | 3 | MIGRATED |
+| `portal/login.blade.php` | 34 | 1 | MIGRATED |
+| `portal/quotes.blade.php` | 50 | 3 | MIGRATED |
+| `pricing/compare.blade.php` | 83 | 2 | MIGRATED |
+| `pricing/index.blade.php` | 137 | 1 | MIGRATED |
+| `products/_form.blade.php` | 43 | 0 | PARTIAL (no layout root) |
+| `products/create.blade.php` | 24 | 2 | MIGRATED |
+| `products/edit.blade.php` | 24 | 1 | MIGRATED |
+| `products/index.blade.php` | 116 | 2 | MIGRATED |
+| `profile/edit.blade.php` | 25 | 0 | MIGRATED |
+| `profile/partials/delete-user-form.blade.php` | 50 | 1 | PARTIAL (no layout root) |
+| `profile/partials/update-password-form.blade.php` | 32 | 1 | PARTIAL (no layout root) |
+| `profile/partials/update-profile-information-form.blade.php` | 44 | 2 | PARTIAL (no layout root) |
+| `projects/create.blade.php` | 86 | 2 | MIGRATED |
+| `projects/edit.blade.php` | 86 | 0 | MIGRATED |
+| `projects/index.blade.php` | 95 | 2 | MIGRATED |
+| `projects/show.blade.php` | 136 | 1 | MIGRATED |
+| `public/invoice.blade.php` | 231 | 0 | MIGRATED |
+| `public/nps/show.blade.php` | 46 | 0 | MIGRATED |
+| `public/nps/thanks.blade.php` | 22 | 0 | MIGRATED |
+| `public/quotes/show.blade.php` | 245 | 0 | MIGRATED |
+| `quotes/create.blade.php` | 89 | 2 | MIGRATED |
+| `quotes/index.blade.php` | 56 | 1 | MIGRATED |
+| `quotes/show.blade.php` | 78 | 1 | MIGRATED |
+| `recurring/create.blade.php` | 160 | 2 | MIGRATED |
+| `recurring/edit.blade.php` | 156 | 1 | MIGRATED |
+| `recurring/index.blade.php` | 87 | 2 | MIGRATED |
+| `report-subscriptions/index.blade.php` | 85 | 1 | MIGRATED |
+| `reports/aging.blade.php` | 167 | 1 | MIGRATED |
+| `reports/cashflow.blade.php` | 99 | 1 | MIGRATED |
+| `reports/index.blade.php` | 124 | 0 | MIGRATED |
+| `reports/pl.blade.php` | 90 | 1 | MIGRATED |
+| `reports/tax.blade.php` | 104 | 1 | MIGRATED |
+| `robots.blade.php` | 28 | 0 | EXEMPT (print/email/xml/js) |
+| `seo/alternatives.blade.php` | 106 | 2 | MIGRATED |
+| `seo/best-tools.blade.php` | 104 | 2 | MIGRATED |
+| `seo/compare.blade.php` | 131 | 2 | MIGRATED |
+| `seo/templates.blade.php` | 114 | 2 | MIGRATED |
+| `settings/2fa/setup.blade.php` | 70 | 1 | MIGRATED |
+| `settings/2fa/show.blade.php` | 82 | 3 | MIGRATED |
+| `settings/custom-domain.blade.php` | 101 | 3 | MIGRATED |
+| `sitemap.blade.php` | 59 | 0 | EXEMPT (print/email/xml/js) |
+| `support/create.blade.php` | 30 | 2 | MIGRATED |
+| `support/index.blade.php` | 44 | 1 | MIGRATED |
+| `support/show.blade.php` | 44 | 1 | MIGRATED |
+| `team/index.blade.php` | 114 | 1 | MIGRATED |
+| `tenant-webhooks/index.blade.php` | 77 | 1 | MIGRATED |
+| `time-entries/index.blade.php` | 97 | 1 | MIGRATED |
+| `welcome.blade.php` | 163 | 5 | MIGRATED |
+| `workspace/create.blade.php` | 36 | 1 | MIGRATED |
+| `workspace/settings.blade.php` | 154 | 2 | MIGRATED |

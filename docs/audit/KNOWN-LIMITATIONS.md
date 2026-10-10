@@ -1,14 +1,25 @@
 # KNOWN LIMITATIONS & RISIKO RESIDUAL
 
-Tanggal: 2026-10-10. Kejujuran di atas skor: yang belum terbukti lulus
-tercatat di sini, bukan diklaim lulus.
+Tanggal: 2026-10-10 (revisi finalisasi). Yang belum terbukti lulus tercatat
+di sini, bukan diklaim lulus.
+
+## 0. Ditutup dalam misi finalisasi
+
+- ~~Tabler tidak diadopsi~~ → Tabler 1.6.1 penuh, Tailwind dihapus (TABLER-MIGRATION-REPORT).
+- ~~Signature webhook tak ada kode~~ → verifier per-provider + 4 test (tanpa secret tetap guards; live = butuh secret).
+- ~~Backup/restore tak teruji~~ → BackupRestoreTest hijau (sqlite); mysqldump: password via env.
+- ~~bootstrap/cache read-only~~ → diperbaiki (writable); pastikan di server.
+- ~~Route home hilang~~ → didaftarkan (auth pages 500 diperbaiki).
+- ~~Alpine :aria-label JS error~~ → diperbaiki (terbukti via E2E console check).
+- ~~CSV formula injection~~ → safeCell + test.
+- ~~npm audit 8 vuln~~ → 0 setelah audit fix.
 
 ## 1. BLOCKED — butuh kredensial / layanan eksternal
 
 | # | Item | Dampak | Jalan keluar |
 |---|---|---|---|
-| B1 | Verifikasi signature webhook payment (Midtrans/Xendit/Tripay/Doku/dll.) | Endpoint menerima callback tanpa HMAC; guards transaksional + replay + amount-wins membatasi, tapi spoofing penuh belum ditutup | Konfigurasi secret per gateway + verifikasi per format provider, uji dengan sandbox |
-| B2 | Verifikasi signature webhook billing | Sama seperti B1 untuk subscription | Sama |
+| B1 | Verifikasi signature webhook payment (Midtrans/Xendit/Tripay/Duitku/DOKU) | Kode + 4 test dengan fake secret; tanpa secret, callback unsigned masih diproses dengan guards | Isi secret provider per workspace, uji replay di sandbox |
+| B2 | Verifikasi signature webhook billing | Sama seperti B1 | Sama |
 | B3 | Kirim email nyata (invoice, reminder, reset) | `MAIL_MAILER=log` default; tidak ada pengiriman nyata teruji | SMTP prod + uji kirim + verifikasi antrean |
 | B4 | WhatsApp / QRIS / AI provider / OAuth real | Alur kode ada, tidak ada kredensial untuk uji end-to-end | Kredensial sandbox provider |
 | B5 | Browser E2E (Playwright) + visual regression per viewport | Tidak dijalankan; tidak ada console-error proof | Jalankan di workstation dengan browser |

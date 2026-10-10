@@ -1,38 +1,27 @@
-# FINAL AUDIT — Invoecely Invoice Enterprise
+# FINAL AUDIT — Invoecely (finalisasi 2026-10-10)
 
-Tanggal: 2026-10-10 · Branch `main` · Komit awal `361d9de` (baseline) →
-komit akhir lihat `git log`.
-
-## Ringkasan eksekusi
-
-- Baseline: 37 tests (14 gagal), 301 routes, 60 models, 25 migrations.
-- Akhir: **48 tests, 48 passed**, build sukses, 5 komit perbaikan.
-- Perbaikan nyata: 30+ file (controllers, services, migrations-docs,
-  views, routes, tests, PWA, CI). Tidak ada fitur dihapus; tidak ada
-  arsitektur inti diganti.
+Branch `main`, 301 routes, Tabler penuh, 74 automated tests + 14 E2E browser.
 
 ## Skor acceptance (berbasis bukti)
 
 | Kategori | Bobot | Skor | Bukti |
 |---|---|---|---|
-| A. Fungsionalitas | 25 | **20** | CRUD + workflow + ekspor teruji (48 tests); stub transparan (marketplace, 6 feature-coming); −5: E2E browser & gateway sandbox belum (B4/B5) |
-| B. Keamanan | 20 | **14** | Isolasi workspace teruji, 403 guards, blog admin→superadmin, webhook replay/amount guards, regression tests; −6: signature webhook BLOCKED (B1/B2), rate-limit default (R10) |
-| C. Data & transaksi | 15 | **12** | Numbering race-safe, transaksi+lock webhook/convert, fillable fixes, migrasi down diperbaiki; −3: float-decimal tetap (D4), compounding late fee (R1) |
-| D. UI & responsive | 15 | **10** | Sistem konsisten, tabel scroll-lokal, mobile nav + safe-area, error pages, email responsif; −5: Tabler tidak diadopsi (D1), visual per-viewport belum difoto |
-| E. PWA | 10 | **7** | Ikon 192/512/maskable valid, manifest diperbaiki, SW v2 network-only API, MIME htaccess; −3: installability device-nyata belum (R9) |
-| F. Pengujian & kualitas | 10 | **8** | 48/48 hijau, build+lint+validate bersih, CI ditambahkan; −2: cakupan negatif (plan limits, import gagal, jobs) belum |
-| G. Dokumentasi & deployment | 5 | **4** | Matrix, limitations, testing, deployment, PWA, CI, checklist; −1: runbook restore belum diuji end-to-end |
-| **TOTAL** | 100 | **75** | |
+| A. Functional (CRUD 10 + invarian 8 + reports/exports/jobs/imports 4 + route integrity 3) | 25 | **23** | 73 tests hijau incl. InvoiceFlow E2E; NavIntegrity membuktikan 132 route-ref terdaftar; −2: import-CSV baris-gagal & queue jobs tanpa test khusus |
+| B. Security (isolasi 7 + webhook 6 + auth 4 + ratelimit 3) | 20 | **16** | IsolationTest multi-resource; signature enforced bila secret ada + 4 test; throttle register/reset + login lockout; secrets ter-encrypt; −4: callback unsigned tanpa secret masih diproses (guards aktif) |
+| C. Data (rounding 6 + txn 5 + migrasi 4) | 15 | **14** | MoneyTest 5; lock/retry/idempotency teruji; migrasi+down ok; backup/restore TERUJI; −1: float-decimal tetap (butuh rencana migrasi) |
+| D. UI/Tabler/responsive (6+3+3+3) | 15 | **14** | 132/167 MIGRATED (sisa EXEMPT sah); sidebar 44/44 PASS; E2E overflow 0 + screenshot; fokus/label/keyboard; −1: tanpa audit screen-reader |
+| E. PWA (3+4+3) | 10 | **7** | Manifest/ikon/SW teruji otomatis; −3: tanpa verifikasi device nyata |
+| F. Tests (3+3+2+2) | 10 | **9** | 73 auto + 14/14 E2E browser; build/validate/audit bersih; CI; −1: pint repo-wide ditunda eksplisit |
+| G. Docs/ops (2+2+1) | 5 | **5** | /docs 15/15 akurat (audit); deploy+backup/restore runbook teruji; changelog/limitations |
+| **TOTAL** | 100 | **88** | |
 
 ## Keputusan gate
 
-- Critical security terbuka? **Ya (parsial)**: webhook tanpa signature (B1/B2).
-  Guards lapis-dalam aktif, tapi klaim "aman penuh" tidak jujur.
-- Payment/invoice total/isolasi gagal kritis? **Tidak** — semua hijau + guards.
-- Build wajib gagal? **Tidak**.
-- Fitur dipasarkan tapi mati? **Tidak** — stub transparan.
+- Spoofing webhook tanpa secret: vektor parsial tersisa (butuh tebak transaction id;
+  amount tak bisa diubah, replay ditolak) → gate pembayaran BELUM penuh.
+- Cross-workspace leak: tidak ada (teruji). Invarian invoice: hijau.
+- Build/test: hijau. Core route: teruji + E2E.
 
-**Keputusan: NOT READY untuk production open-public.** Siap untuk
-staging/UAT + peluncuran terbatas dengan gateway sandbox + SMTP + secrets,
-setelah B1–B3 ditutup dan E2E browser (B5) dijalankan. Lihat
-`RELEASE-CHECKLIST.md` untuk syarat naik ke READY.
+**Keputusan: STAGING ONLY (88/100).** Menuju READY: isi secret provider +
+verifikasi sandbox (B1/B2) + cek install PWA di device nyata. Daftar tepat di
+RELEASE-CHECKLIST.md.

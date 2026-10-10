@@ -30,11 +30,11 @@
         </div>
 
         <div class="d-flex align-items-center justify-content-center gap-2 flex-wrap mb-4">
-            <div class="btn-group" role="group" :aria-label="__('Billing period')">
+            <div class="btn-group" role="group" aria-label="{{ __('Billing period') }}">
                 <button type="button" @click="period = 'monthly'" :class="period === 'monthly' ? 'btn btn-primary' : 'btn'" class="btn">{{ __('Monthly') }}</button>
                 <button type="button" @click="period = 'yearly'" :class="period === 'yearly' ? 'btn btn-primary' : 'btn'" class="btn">{{ __('Yearly') }} <span class="badge bg-green-lt ms-1">{{ __('-17%') }}</span></button>
             </div>
-            <div class="btn-group" role="group" :aria-label="__('Currency')">
+            <div class="btn-group" role="group" aria-label="{{ __('Currency') }}">
                 <button type="button" @click="currency = 'IDR'" :class="currency === 'IDR' ? 'btn btn-primary' : 'btn'" class="btn">IDR</button>
                 <button type="button" @click="currency = 'USD'" :class="currency === 'USD' ? 'btn btn-primary' : 'btn'" class="btn">USD</button>
             </div>
