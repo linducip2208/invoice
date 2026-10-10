@@ -20,7 +20,6 @@ use App\Http\Controllers\ExpenseController;
 use App\Http\Controllers\ExportController;
 use App\Http\Controllers\NotificationController;
 use App\Http\Controllers\QuoteController;
-use App\Http\Controllers\StubController;
 use App\Http\Controllers\SupportController;
 use App\Http\Controllers\TeamController;
 use App\Http\Controllers\TenantWebhookController;

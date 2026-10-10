@@ -53,9 +53,27 @@ class ExportController extends Controller
     {
         return response()->streamDownload(function () use ($headers, $rows) {
             $out = fopen('php://output', 'w');
-            fputcsv($out, $headers);
-            foreach ($rows as $row) fputcsv($out, $row);
+            fputcsv($out, array_map([$this, 'safeCell'], $headers));
+            foreach ($rows as $row) {
+                fputcsv($out, array_map([$this, 'safeCell'], (array) $row));
+            }
             fclose($out);
         }, $filename, ['Content-Type' => 'text/csv']);
+    }
+
+    /**
+     * OWASP CSV formula-injection defense: a cell starting with = + - @
+     * (or tab/CR) can execute as a spreadsheet formula. Prefixing with a
+     * single quote forces plain-text treatment in Excel/LibreOffice.
+     */
+    public function safeCell(mixed $value): mixed
+    {
+        if (! is_string($value) || $value === '') {
+            return $value;
+        }
+        return match (true) {
+            in_array($value[0], ['=', '+', '-', '@', "\t", "\r"], true) => "'" . $value,
+            default => $value,
+        };
     }
 }

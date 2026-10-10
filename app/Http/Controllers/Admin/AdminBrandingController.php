@@ -63,17 +63,6 @@ class AdminBrandingController extends Controller
         ],
     ];
 
-    public const FONTS = [
-        'Comfortaa' => 'Comfortaa (rounded, friendly)',
-        'Quicksand' => 'Quicksand (geometric, modern)',
-        'Figtree'   => 'Figtree (clean, professional)',
-        'Inter'     => 'Inter (neutral, system-like)',
-        'Poppins'   => 'Poppins (geometric)',
-        'Lora'      => 'Lora (serif, elegant)',
-        'Playfair Display' => 'Playfair Display (luxury serif)',
-        'Space Grotesk' => 'Space Grotesk (technical)',
-    ];
-
     public function edit(): View
     {
         $branding = [
@@ -95,7 +84,6 @@ class AdminBrandingController extends Controller
         return view('admin.branding.edit', [
             'branding' => $branding,
             'themes'   => self::THEMES,
-            'fonts'    => self::FONTS,
         ]);
     }
 
@@ -108,8 +96,6 @@ class AdminBrandingController extends Controller
             'primary_color' => 'required|string|max:7',
             'accent_color'  => 'required|string|max:7',
             'sky_color'     => 'required|string|max:7',
-            'font_display'  => 'required|string|max:50',
-            'font_body'     => 'required|string|max:50',
             'footer_text'   => 'nullable|string|max:255',
             'support_email' => 'nullable|email|max:255',
             'support_url'   => 'nullable|url|max:255',
@@ -150,9 +136,10 @@ class AdminBrandingController extends Controller
             $this->set('branding.favicon_path', null);
         }
 
-        // Save text/color settings
+        // Save text/color settings (font_* keys are legacy: kept in storage,
+        // no longer edited since the UI uses the offline system stack).
         foreach (['app_name', 'tagline', 'theme_preset', 'primary_color', 'accent_color',
-                 'sky_color', 'font_display', 'font_body', 'footer_text',
+                 'sky_color', 'footer_text',
                  'support_email', 'support_url'] as $field) {
             $this->set('branding.' . $field, $validated[$field] ?? null);
         }

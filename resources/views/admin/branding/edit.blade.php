@@ -127,27 +127,7 @@
                 <h3 class="card-title">{{ __('Typography') }}</h3>
             </div>
             <div class="card-body">
-                <div class="row g-2">
-                    <div class="col-md-6">
-                        <x-tabler.field :label="__('Display Font (headings)')" name="font_display">
-                            <select id="font_display" name="font_display" x-model="form.font_display" class="form-select @error('font_display') is-invalid @enderror">
-                                @foreach($fonts as $name => $label)
-                                    <option value="{{ $name }}">{{ $label }}</option>
-                                @endforeach
-                            </select>
-                        </x-tabler.field>
-                    </div>
-                    <div class="col-md-6">
-                        <x-tabler.field :label="__('Body Font (main text)')" name="font_body">
-                            <select id="font_body" name="font_body" x-model="form.font_body" class="form-select @error('font_body') is-invalid @enderror">
-                                @foreach($fonts as $name => $label)
-                                    <option value="{{ $name }}">{{ $label }}</option>
-                                @endforeach
-                            </select>
-                        </x-tabler.field>
-                    </div>
-                </div>
-                <p class="text-muted small mb-0">{{ __('Fonts are loaded automatically from fonts.bunny.net (Google Fonts mirror).') }}</p>
+                <p class="text-muted small mb-0">{{ __('The interface uses the system font stack on purpose: no external font downloads, no layout shift, works fully offline.') }}</p>
             </div>
         </div>
 

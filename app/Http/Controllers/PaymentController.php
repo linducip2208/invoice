@@ -214,6 +214,28 @@ class PaymentController extends Controller
             return response()->json(['status' => 'payment not found'], 404);
         }
 
+        // Signature gate: when the workspace configured a verification secret
+        // for this provider, an invalid signature is rejected (403) with NO
+        // state change. Without a secret we fall through to the hardening
+        // guards below and log loudly (live coverage BLOCKED until secrets).
+        $payment = Payment::where('gateway_transaction_id', $transactionId)->first();
+        $verdict = app(\App\Services\WebhookSignatureVerifier::class)
+            ->verify($gateway, $request, $payment->paymentGateway);
+        if ($verdict['mode'] === 'signature' && ! $verdict['verified']) {
+            Log::warning('Payment webhook rejected: invalid signature', [
+                'gateway' => $gateway,
+                'reason' => $verdict['reason'],
+            ]);
+            return response()->json(['status' => 'invalid signature'], 403);
+        }
+        if ($verdict['mode'] !== 'signature') {
+            Log::warning('Payment webhook processed without signature verification', [
+                'gateway' => $gateway,
+                'mode' => $verdict['mode'],
+                'reason' => $verdict['reason'],
+            ]);
+        }
+
         DB::transaction(function () use ($transactionId, $status, $gateway, $request) {
             // Lock the row so concurrent deliveries serialize.
             $payment = Payment::where('gateway_transaction_id', $transactionId)->lockForUpdate()->first();

@@ -35,6 +35,25 @@ class BillingWebhookController extends Controller
 
         $event = $this->extractEvent($gateway, $request);
 
+        // Same signature gate as payment webhooks: verified secrets are
+        // enforced, missing secrets fall through with a loud log.
+        $verdict = app(\App\Services\WebhookSignatureVerifier::class)
+            ->verify($gateway, $request, $subscription->paymentGateway);
+        if ($verdict['mode'] === 'signature' && ! $verdict['verified']) {
+            Log::warning('Billing webhook rejected: invalid signature', [
+                'gateway' => $gateway,
+                'reason' => $verdict['reason'],
+            ]);
+            return response()->json(['status' => 'invalid signature'], 403);
+        }
+        if ($verdict['mode'] !== 'signature') {
+            Log::warning('Billing webhook processed without signature verification', [
+                'gateway' => $gateway,
+                'mode' => $verdict['mode'],
+                'reason' => $verdict['reason'],
+            ]);
+        }
+
         DB::transaction(function () use ($event, $subscription, $request) {
             // Re-lock inside the transaction so concurrent deliveries
             // serialize instead of double-extending the period.
