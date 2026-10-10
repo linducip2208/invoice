@@ -88,6 +88,97 @@
     </div>
 
     <div class="row row-deck row-cards mb-3">
+        <div class="col-lg-4">
+            <div class="card h-100">
+                <div class="card-header">
+                    <h3 class="card-title">{{ __('Invoice status') }}</h3>
+                </div>
+                <div class="card-body">
+                    @php
+                        $slices = [
+                            ['label' => __('Paid'), 'color' => '#2fb344', 'value' => $statusCounts['paid'] ?? 0],
+                            ['label' => __('Sent'), 'color' => '#4299e1', 'value' => ($statusCounts['sent'] ?? 0) + ($statusCounts['partial'] ?? 0)],
+                            ['label' => __('Draft'), 'color' => '#a8a3e0', 'value' => $statusCounts['draft'] ?? 0],
+                            ['label' => __('Overdue'), 'color' => '#d63939', 'value' => $statusCounts['overdue'] ?? 0],
+                            ['label' => __('Cancelled'), 'color' => '#6c757d', 'value' => $statusCounts['cancelled'] ?? 0],
+                        ];
+                        $donutTotal = max(1, array_sum(array_column($slices, 'value')));
+                        $offset = 25;
+                    @endphp
+                    @if(array_sum(array_column($slices, 'value')) > 0)
+                        <div class="row g-2 align-items-center">
+                            <div class="col-auto">
+                                <svg width="120" height="120" viewBox="0 0 42 42" role="img" aria-label="{{ __('Invoice status distribution') }}">
+                                    <circle cx="21" cy="21" r="15.915" fill="transparent" stroke="#e9ecef" stroke-width="6" />
+                                    @foreach($slices as $s)
+                                        @if($s['value'] > 0)
+                                            <circle cx="21" cy="21" r="15.915" fill="transparent" stroke="{{ $s['color'] }}" stroke-width="6"
+                                                stroke-dasharray="{{ round($s['value'] / $donutTotal * 100, 1) }} {{ round(100 - $s['value'] / $donutTotal * 100, 1) }}"
+                                                stroke-dashoffset="{{ $offset }}" stroke-linecap="butt" />
+                                            @php $offset -= $s['value'] / $donutTotal * 100; @endphp
+                                        @endif
+                                    @endforeach
+                                    <text x="21" y="23" text-anchor="middle" font-size="7" font-weight="bold" fill="currentColor">{{ $donutTotal }}</text>
+                                </svg>
+                            </div>
+                            <div class="col">
+                                @foreach($slices as $s)
+                                    <div class="d-flex align-items-center gap-2 mb-1">
+                                        <span class="badge-dot" style="background: {{ $s['color'] }}"></span>
+                                        <span class="text-muted">{{ $s['label'] }}</span>
+                                        <span class="ms-auto fw-semibold">{{ $s['value'] }}</span>
+                                    </div>
+                                @endforeach
+                            </div>
+                        </div>
+                    @else
+                        <p class="text-muted mb-0">{{ __('No invoices yet.') }}</p>
+                    @endif
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-8">
+            <div class="card h-100">
+                <div class="card-header">
+                    <h3 class="card-title">{{ __('Receivables aging') }}</h3>
+                    <div class="card-actions">
+                        <a href="{{ route('reports.aging') }}" class="btn btn-sm">{{ __('View') }}</a>
+                    </div>
+                </div>
+                <div class="card-body">
+                    @php
+                        $buckets = [
+                            __('Current') => $aging['current'],
+                            __('1–30 days') => $aging['1_30'],
+                            __('31–60 days') => $aging['31_60'],
+                            __('61–90 days') => $aging['61_90'],
+                            __('90+ days') => $aging['over_90'],
+                        ];
+                        $maxBucket = max(1, max($buckets));
+                    @endphp
+                    @if(array_sum($buckets) > 0)
+                        @foreach($buckets as $label => $value)
+                            <div class="row g-2 align-items-center mb-2">
+                                <div class="col-3 col-md-2 text-muted small">{{ $label }}</div>
+                                <div class="col-6 col-md-8">
+                                    <div class="progress" style="height: 0.65rem;" role="progressbar"
+                                        aria-valuenow="{{ round($value) }}" aria-valuemin="0" aria-valuemax="{{ round($maxBucket) }}"
+                                        aria-label="{{ $label }}: {{ number_format($value, 0) }}">
+                                        <div class="progress-bar bg-primary" style="width: {{ round($value / $maxBucket * 100, 1) }}%"></div>
+                                    </div>
+                                </div>
+                                <div class="col-3 col-md-2 text-end fw-semibold text-nowrap">{{ number_format($value, 0) }}</div>
+                            </div>
+                        @endforeach
+                    @else
+                        <p class="text-muted mb-0">{{ __('Nothing outstanding.') }}</p>
+                    @endif
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row row-deck row-cards mb-3">
         <div class="col-lg-6">
             <div class="card h-100">
                 <div class="card-header">

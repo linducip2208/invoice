@@ -1,4 +1,4 @@
-<x-tabler.layout :title="__('Workspaces')" :pretitle="__('Superadmin')">
+<x-tabler.admin-layout :title="__('Workspaces')" :pretitle="__('Superadmin')">
     <div class="card mb-3">
         <div class="card-body">
             <form method="GET" action="{{ route('admin.workspaces.index') }}">
@@ -72,4 +72,4 @@
             <div class="card-footer d-flex justify-content-center">{{ $workspaces->links() }}</div>
         @endif
     </div>
-</x-tabler.layout>
+</x-tabler.admin-layout>

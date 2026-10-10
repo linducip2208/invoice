@@ -5,16 +5,19 @@
 
 :root,
 [data-bs-theme="light"] {
-  --tblr-primary: #7c5cf0;
-  --tblr-primary-rgb: 124, 92, 240;
+  /* #6d4ae0: white text = 5.67:1 (AA). The lighter brand violet is kept
+     for gradients/decoration only, never behind small text. */
+  --tblr-primary: #6d4ae0;
+  --tblr-primary-rgb: 109, 74, 224;
   --tblr-primary-fg: #ffffff;
-  --tblr-link-color: #7c5cf0;
-  --tblr-link-hover-color: #6a48e0;
+  --tblr-link-color: #6d4ae0;
+  --tblr-link-hover-color: #5a38c4;
   --invocely-accent: #f472b6;
   --invocely-accent-rgb: 244, 114, 182;
-  --invocely-brand-gradient: linear-gradient(135deg, #f472b6, #7c5cf0 55%, #38bdf8);
-  --invocely-sidebar-bg: #1e1b33;
-  --invocely-sidebar-fg: #c9c4e8;
+  --invocely-brand-gradient: linear-gradient(135deg, #f472b6, #6d4ae0 55%, #38bdf8);
+  /* Deep navy sidebar: professional financial-SaaS chrome around the violet brand. */
+  --invocely-sidebar-bg: #17203a;
+  --invocely-sidebar-fg: #c3cde6;
   /* System stack on purpose: no external font fetch, no FOUT, works offline. */
   --tblr-font-sans-serif: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
 }
@@ -27,7 +30,7 @@
   --tblr-card-bg: #1e1b33;
   --tblr-border-color: #322d55;
   --tblr-muted: #8f88b8;
-  --invocely-sidebar-bg: #141221;
+  --invocely-sidebar-bg: #0f1526;
 }
 
 body {
@@ -50,7 +53,7 @@ body {
   color: var(--invocely-sidebar-fg);
 }
 .navbar-vertical.invocely-nav .nav-link .nav-link-icon {
-  color: #8f88b8;
+  color: #8b98b8;
 }
 .navbar-vertical.invocely-nav .nav-link:hover {
   color: #fff;
@@ -65,8 +68,8 @@ body {
   color: #fff;
 }
 .navbar-vertical.invocely-nav .dropdown-menu {
-  background: #26214a;
-  border-color: #35305f;
+  background: #202a4a;
+  border-color: #2c3a5f;
 }
 .navbar-vertical.invocely-nav .dropdown-item {
   color: var(--invocely-sidebar-fg);
@@ -77,7 +80,9 @@ body {
   background: rgba(255, 255, 255, 0.07);
 }
 
-/* Brand gradient button + logo tile */
+/* Brand gradient button + logo tile.
+   NOTE: gradient backgrounds cannot guarantee text contrast; use .btn-brand
+   for large display text only, never for small button labels. */
 .btn-brand {
   background: var(--invocely-brand-gradient);
   border: none;
@@ -121,3 +126,41 @@ body {
   outline: 2px solid var(--tblr-primary);
   outline-offset: 2px;
 }
+
+/* Links inside running text must not rely on color alone
+   (axe link-in-text-block). Nav buttons/badges unaffected. */
+.card-body p a,
+.empty-subtitle a,
+.alert a,
+.footer a {
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
+/* Footer links: body-color text passes contrast on page bg; nav lists
+   keep their muted styling via more specific rules elsewhere. */
+.footer .list-inline a {
+  color: var(--tblr-body-color);
+}
+
+/* Status tint badges: Tabler's own -lt text colors fail WCAG AA at small
+   sizes (axe-proven, e.g. 2.48:1) and are !important, so these overrides
+   are !important too. Text colors verified 4.9–9.7:1 (computed). */
+.badge.bg-success-lt,
+.badge.bg-green-lt { color: #18702c !important; }
+.badge.bg-warning-lt,
+.badge.bg-yellow-lt { color: #7a4d00 !important; }
+.badge.bg-danger-lt,
+.badge.bg-red-lt { color: #a11a0e !important; }
+.badge.bg-info-lt,
+.badge.bg-azure-lt,
+.badge.bg-blue-lt { color: #175a9e !important; }
+.badge.bg-secondary-lt { color: #495057 !important; }
+.badge.bg-dark-lt { color: #1d273b !important; }
+
+/* Alert body text: Tabler's tinted text colors fail AA (axe-proven 2.83:1).
+   Dark variants verified 5.6:1+ on the alert backgrounds. */
+.alert.alert-info { color: #175a9e; }
+.alert.alert-success { color: #18702c; }
+.alert.alert-warning { color: #7a4d00; }
+.alert.alert-danger { color: #a11a0e; }

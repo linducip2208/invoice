@@ -1,4 +1,4 @@
-<x-tabler.layout :title="__('Plans')" :pretitle="__('Superadmin')" :subtitle="__(':count plans', ['count' => $plans->count()])">
+<x-tabler.admin-layout :title="__('Plans')" :pretitle="__('Superadmin')" :subtitle="__(':count plans', ['count' => $plans->count()])">
     <x-slot name="actions">
         <a href="{{ route('admin.plans.create') }}" class="btn btn-primary">
             <x-ti name="plus" /> {{ __('New Plan') }}
@@ -55,4 +55,4 @@
             </table>
         </div>
     </div>
-</x-tabler.layout>
+</x-tabler.admin-layout>

@@ -23,3 +23,10 @@ Branch `main`. 128 automated tests + 30 E2E browser, semua hijau.
 
 **Keputusan: STAGING ONLY (93/100).** Menuju production: secret provider +
 sandbox (B1/B2) + PWA device. Rincian: RELEASE-CHECKLIST.md.
+
+## Adendum redesign frontend (2026-10-10)
+
+Sidebar IA 8 grup, landing rewrite tanpa klaim palsu, dashboard donat+aging,
+superadmin shell terpisah, kontras AA terverifikasi axe (9/9),
+138/138 phpunit, 64/64 Playwright, 11 viewport overflow 0.
+Detail: FRONTEND-*.md. Skor tidak berubah (93): temuan baru nihil kritis.

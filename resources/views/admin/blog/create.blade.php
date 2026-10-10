@@ -1,4 +1,4 @@
-<x-tabler.layout :title="__('New Article')" :pretitle="__('Superadmin')">
+<x-tabler.admin-layout :title="__('New Article')" :pretitle="__('Superadmin')">
     <x-slot name="actions">
         <a href="{{ route('admin.blog.index') }}" class="btn">
             <x-ti name="arrow-left" /> {{ __('Back to Blog') }}
@@ -80,4 +80,4 @@
             </form>
         </div>
     </div>
-</x-tabler.layout>
+</x-tabler.admin-layout>

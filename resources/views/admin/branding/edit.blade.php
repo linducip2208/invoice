@@ -1,4 +1,4 @@
-<x-tabler.layout :title="__('Branding & Theme')" :pretitle="__('Superadmin')"
+<x-tabler.admin-layout :title="__('Branding & Theme')" :pretitle="__('Superadmin')"
     :subtitle="__('Whitelabel — set the app name, logo, colors, and theme. Applies across the app (login, dashboard, public pages, email).')">
     <form method="POST" action="{{ route('admin.branding.update') }}" enctype="multipart/form-data"
         x-data="brandingForm({{ Js::from($branding) }}, {{ Js::from($themes) }})">
@@ -204,4 +204,4 @@
             };
         }
     </script>
-</x-tabler.layout>
+</x-tabler.admin-layout>

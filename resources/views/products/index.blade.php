@@ -85,9 +85,9 @@
                             </td>
                             <td>
                                 @if($product->is_active)
-                                    <span class="badge bg-green">{{ __('Active') }}</span>
+                                    <span class="badge bg-green-lt">{{ __('Active') }}</span>
                                 @else
-                                    <span class="badge bg-red">{{ __('Inactive') }}</span>
+                                    <span class="badge bg-red-lt">{{ __('Inactive') }}</span>
                                 @endif
                             </td>
                             <td class="text-end text-nowrap">

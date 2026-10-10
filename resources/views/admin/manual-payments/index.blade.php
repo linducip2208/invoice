@@ -1,4 +1,4 @@
-<x-tabler.layout :title="__('Manual Payments')" :pretitle="__('Superadmin')">
+<x-tabler.admin-layout :title="__('Manual Payments')" :pretitle="__('Superadmin')">
     <div class="card mb-3">
         <div class="card-header">
             <h3 class="card-title">{{ __('Pending Verification') }} ({{ $pending->count() }})</h3>
@@ -181,4 +181,4 @@
             </div>
         @endif
     </div>
-</x-tabler.layout>
+</x-tabler.admin-layout>

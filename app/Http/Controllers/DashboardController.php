@@ -61,6 +61,33 @@ class DashboardController extends Controller
             ->take(5)
             ->get();
 
+        // Status distribution (counts) for the donut chart.
+        $statusCounts = Invoice::query()
+            ->selectRaw('status, COUNT(*) AS c')
+            ->groupBy('status')
+            ->pluck('c', 'status')
+            ->all();
+
+        // Receivables aging buckets (outstanding balance by days overdue).
+        $aging = ['current' => 0.0, '1_30' => 0.0, '31_60' => 0.0, '61_90' => 0.0, 'over_90' => 0.0];
+        $openInvoices = Invoice::query()
+            ->whereIn('status', ['sent', 'partial', 'overdue'])
+            ->where('balance_due', '>', 0)
+            ->get(['due_date', 'balance_due']);
+        $today = now()->startOfDay();
+        foreach ($openInvoices as $inv) {
+            $days = $inv->due_date ? $today->diffInDays($inv->due_date, false) : 0;
+            $overdue = $days < 0 ? -$days : 0;
+            $bucket = match (true) {
+                $overdue === 0 => 'current',
+                $overdue <= 30 => '1_30',
+                $overdue <= 60 => '31_60',
+                $overdue <= 90 => '61_90',
+                default => 'over_90',
+            };
+            $aging[$bucket] += (float) $inv->balance_due;
+        }
+
         return view('dashboard.index', compact(
             'totalRevenue',
             'outstandingAmount',
@@ -71,7 +98,9 @@ class DashboardController extends Controller
             'trend',
             'trendLabels',
             'overdueInvoices',
-            'pendingQuotes'
+            'pendingQuotes',
+            'statusCounts',
+            'aging'
         ));
     }
 }

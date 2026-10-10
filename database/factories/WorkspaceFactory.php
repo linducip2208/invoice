@@ -23,7 +23,7 @@ class WorkspaceFactory extends Factory
             'currency' => 'IDR',
             'invoice_prefix' => 'INV-',
             'default_template' => 'classic',
-            'primary_color' => '#A78BFA',
+            'primary_color' => '#6d4ae0',
             'accent_color' => '#FF7AC6',
         ];
     }

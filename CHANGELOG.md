@@ -1,5 +1,24 @@
 # CHANGELOG
 
+## 2026-10-10 (malam 3) — Frontend rescue & redesign (93/100 tetap)
+
+### Redesign
+
+- Sidebar IA 8 grup + topbar quick-create + bell unread; shell superadmin
+  terpisah (PLATFORM/REVENUE/OPERATIONS); hapus section ganda
+- Landing rewrite: hero jujur, preview ilustratif berlabel, 6 kapabilitas
+  terverifikasi, workflow, pricing pointer, trust terverifikasi, FAQ, CTA —
+  rating/customer-count/testimoni palsu dibuang + JSON-LD dibersihkan
+- Dashboard: donat status + bar aging (SVG data real), copy profesional
+- Invoice detail: rotate-link + timeline audit; helper `format_money()`
+- A11y: badge/alert/footer/primary kontras AA terverifikasi axe 9/9
+  (badge -lt override, primary #6d4ae0, prose underline); branding default
+  diperbaiki (factory + helper)
+- i18n batch; ImportPlan/Import hardening (baris-gagal terisolasi, email
+  tervalidasi); OpsTest (scheduler/mail/PDF); AdminShellTest; email_logs
+  status 'queued' (migrasi + rollback teruji); named rate limiters
+- 138/138 phpunit, 64/64 Playwright (4 suite), 11 viewport overflow 0
+
 ## 2026-10-10 (malam 2) — Secure quote approval + financial integrity (93/100)
 
 ### Keamanan approval (P0)

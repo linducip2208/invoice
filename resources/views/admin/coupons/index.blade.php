@@ -1,4 +1,4 @@
-<x-tabler.layout :title="__('Coupons')" :pretitle="__('Superadmin')">
+<x-tabler.admin-layout :title="__('Coupons')" :pretitle="__('Superadmin')">
     <div class="card mb-3">
         <div class="card-header">
             <h3 class="card-title">{{ __('New Coupon') }}</h3>
@@ -126,4 +126,4 @@
             <div class="card-footer d-flex justify-content-center">{{ $coupons->links() }}</div>
         @endif
     </div>
-</x-tabler.layout>
+</x-tabler.admin-layout>

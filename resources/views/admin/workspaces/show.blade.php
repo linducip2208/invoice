@@ -1,4 +1,4 @@
-<x-tabler.layout :title="$workspace->name" :pretitle="__('Superadmin')">
+<x-tabler.admin-layout :title="$workspace->name" :pretitle="__('Superadmin')">
     <x-slot name="actions">
         <a href="{{ route('admin.workspaces.index') }}" class="btn">
             <x-ti name="arrow-left" /> {{ __('Back to Workspaces') }}
@@ -126,4 +126,4 @@
             </div>
         </div>
     </div>
-</x-tabler.layout>
+</x-tabler.admin-layout>

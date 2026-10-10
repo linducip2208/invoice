@@ -228,10 +228,10 @@
                         <table class="table table-vcenter">
                             <thead><tr><th>{{ __('Area') }}</th><th>{{ __('Status') }}</th></tr></thead>
                             <tbody>
-                                <tr><td>{{ __('Core invoicing, payments (manual), reports, billing') }}</td><td><span class="badge bg-green">{{ __('Active') }}</span></td></tr>
-                                <tr><td>{{ __('Gateway checkout, WhatsApp, QRIS, AI') }}</td><td><span class="badge bg-yellow">{{ __('Partial — needs provider credentials') }}</span></td></tr>
-                                <tr><td>{{ __('Webhook signature verification') }}</td><td><span class="badge bg-red">{{ __('Blocked — needs provider secrets') }}</span></td></tr>
-                                <tr><td>{{ __('Marketplace, selected sidebar scaffolds') }}</td><td><span class="badge bg-azure">{{ __('Coming Soon') }}</span></td></tr>
+                                <tr><td>{{ __('Core invoicing, payments (manual), reports, billing') }}</td><td><span class="badge bg-green-lt">{{ __('Active') }}</span></td></tr>
+                                <tr><td>{{ __('Gateway checkout, WhatsApp, QRIS, AI') }}</td><td><span class="badge bg-yellow-lt">{{ __('Partial — needs provider credentials') }}</span></td></tr>
+                                <tr><td>{{ __('Webhook signature verification') }}</td><td><span class="badge bg-red-lt">{{ __('Blocked — needs provider secrets') }}</span></td></tr>
+                                <tr><td>{{ __('Marketplace, selected sidebar scaffolds') }}</td><td><span class="badge bg-azure-lt">{{ __('Coming Soon') }}</span></td></tr>
                             </tbody>
                         </table>
                     </div>

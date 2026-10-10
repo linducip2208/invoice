@@ -1,4 +1,4 @@
-<x-tabler.layout :title="__('Manual Subscription')" :pretitle="__('Superadmin')" :subtitle="__('Override a plan for any workspace — no transfer or proof submission needed.')">
+<x-tabler.admin-layout :title="__('Manual Subscription')" :pretitle="__('Superadmin')" :subtitle="__('Override a plan for any workspace — no transfer or proof submission needed.')">
     <div class="card mb-3">
         <div class="card-body">
             <ul class="mb-0 text-muted small">
@@ -319,4 +319,4 @@
             </table>
         </div>
     </div>
-</x-tabler.layout>
+</x-tabler.admin-layout>

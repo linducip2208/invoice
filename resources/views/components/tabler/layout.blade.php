@@ -128,28 +128,15 @@
                         @endforeach
                     @endforeach
                     @if($isSuper)
-                        <li class="nav-item navbar-heading">{{ __('Superadmin') }}</li>
-                        @foreach([
-                            $link('admin.dashboard', 'admin.dashboard', 'layout-dashboard', __('Platform Dashboard')),
-                            $link('admin.users.index', 'admin.users.*', 'users', __('Users')),
-                            $link('admin.workspaces.index', 'admin.workspaces.*', 'building', __('Workspaces')),
-                            $link('admin.plans.index', 'admin.plans.*', 'wallet', __('Plans')),
-                            $link('admin.subscriptions.index', 'admin.subscriptions.*', 'repeat', __('Subscriptions')),
-                            $link('admin.manual-payments.index', 'admin.manual-payments.*', 'cash', __('Manual Payments')),
-                            $link('admin.coupons.index', 'admin.coupons.*', 'percentage', __('Coupons')),
-                            $link('admin.branding.edit', 'admin.branding.*', 'palette', __('Branding')),
-                            $link('admin.blog.index', 'admin.blog.*', 'file-text', __('Blog Management')),
-                        ] as $item)
-                            <li class="nav-item{{ $item['active'] ? ' active' : '' }}">
-                                <a class="nav-link{{ $item['active'] ? ' active' : '' }}" href="{{ $item['href'] }}"
-                                    @if($item['active']) aria-current="page" @endif>
-                                    <span class="nav-link-icon d-md-none d-lg-inline-block">
-                                        <x-ti :name="$item['icon']" />
-                                    </span>
-                                    <span class="nav-link-title">{{ $item['label'] }}</span>
-                                </a>
-                            </li>
-                        @endforeach
+                        <li class="nav-item navbar-heading">{{ __('Platform') }}</li>
+                        <li class="nav-item{{ request()->routeIs('admin.*') ? ' active' : '' }}">
+                            <a class="nav-link{{ request()->routeIs('admin.*') ? ' active' : '' }}" href="{{ route('admin.dashboard') }}">
+                                <span class="nav-link-icon d-md-none d-lg-inline-block">
+                                    <x-ti name="shield-lock" />
+                                </span>
+                                <span class="nav-link-title">{{ __('Platform Admin') }}</span>
+                            </a>
+                        </li>
                     @endif
                 </ul>
             </div>
@@ -181,7 +168,7 @@
                         <a href="{{ route('notifications.index') }}" class="btn btn-icon position-relative" aria-label="{{ __('Notifications') }}">
                             <x-ti name="bell" />
                             @if($unreadCount > 0)
-                                <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-red">{{ $unreadCount > 9 ? '9+' : $unreadCount }}</span>
+                                <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-red-lt">{{ $unreadCount > 9 ? '9+' : $unreadCount }}</span>
                             @endif
                         </a>
                     </div>

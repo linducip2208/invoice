@@ -1,4 +1,4 @@
-<x-tabler.layout :title="$user->name" :pretitle="__('Superadmin')">
+<x-tabler.admin-layout :title="$user->name" :pretitle="__('Superadmin')">
     <x-slot name="actions">
         <a href="{{ route('admin.users.index') }}" class="btn">
             <x-ti name="arrow-left" /> {{ __('Back to Users') }}
@@ -63,4 +63,4 @@
             </table>
         </div>
     </div>
-</x-tabler.layout>
+</x-tabler.admin-layout>

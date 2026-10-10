@@ -94,7 +94,7 @@
                                 <td class="text-end {{ $row->buckets['61_90'] > 0 ? 'fw-bold' : 'text-muted' }}">{{ $row->buckets['61_90'] > 0 ? number_format($row->buckets['61_90'], 0) : '—' }}</td>
                                 <td class="text-end">
                                     @if($row->buckets['over_90'] > 0)
-                                        <span class="badge bg-red">{{ number_format($row->buckets['over_90'], 0) }}</span>
+                                        <span class="badge bg-red-lt">{{ number_format($row->buckets['over_90'], 0) }}</span>
                                     @else
                                         <span class="text-muted">—</span>
                                     @endif
@@ -150,7 +150,7 @@
                                     <td class="text-muted small">{{ $inv->due_date->format('d M Y') }}</td>
                                     <td class="text-end">
                                         @if($inv->days_overdue > 0)
-                                            <span class="badge bg-red">{{ $inv->days_overdue }}</span>
+                                            <span class="badge bg-red-lt">{{ $inv->days_overdue }}</span>
                                         @else
                                             <span class="text-muted">—</span>
                                         @endif

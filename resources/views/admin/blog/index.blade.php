@@ -1,4 +1,4 @@
-<x-tabler.layout :title="__('Blog')" :pretitle="__('Superadmin')" :subtitle="__('Manage blog content for SEO and organic traffic.')">
+<x-tabler.admin-layout :title="__('Blog')" :pretitle="__('Superadmin')" :subtitle="__('Manage blog content for SEO and organic traffic.')">
     <x-slot name="actions">
         <a href="{{ route('admin.blog.categories') }}" class="btn">
             <x-ti name="file-text" /> {{ __('Categories') }}
@@ -59,4 +59,4 @@
             <div class="card-footer d-flex justify-content-center">{{ $posts->links() }}</div>
         @endif
     </div>
-</x-tabler.layout>
+</x-tabler.admin-layout>

@@ -19,16 +19,16 @@ if (! function_exists('branding')) {
     {
         static $defaults = [
             'app_name'      => 'Invocely',
-            'tagline'       => 'Magical invoicing for dreamy businesses',
+            'tagline'       => 'Simple invoicing for small businesses',
             'logo_path'     => null,
             'favicon_path'  => null,
-            'primary_color' => '#A78BFA',
-            'accent_color'  => '#FF7AC6',
-            'sky_color'     => '#7DD3FC',
+            'primary_color' => '#6d4ae0',
+            'accent_color'  => '#F472B6',
+            'sky_color'     => '#38BDF8',
             'font_display'  => 'Comfortaa',
             'font_body'     => 'Quicksand',
             'theme_preset'  => 'unicorn',
-            'footer_text'   => '✦ Magical invoicing 🦄',
+            'footer_text'   => 'Simple invoicing for small businesses',
             'support_email' => 'support@invocely.test',
             'support_url'   => null,
         ];

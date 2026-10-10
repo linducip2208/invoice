@@ -50,21 +50,21 @@
                             <td class="fw-semibold">{{ $u->email }}</td>
                             <td>
                                 @if(!$u->is_active)
-                                    <span class="badge bg-red">{{ __('Revoked') }}</span>
+                                    <span class="badge bg-red-lt">{{ __('Revoked') }}</span>
                                 @elseif($u->can_approve_quotes)
-                                    <span class="badge bg-green">{{ __('Approver') }}</span>
+                                    <span class="badge bg-green-lt">{{ __('Approver') }}</span>
                                 @else
-                                    <span class="badge bg-azure">{{ __('Viewer') }}</span>
+                                    <span class="badge bg-azure-lt">{{ __('Viewer') }}</span>
                                 @endif
                                 @if(!$u->email_verified_at)
-                                    <span class="badge bg-yellow" title="{{ __('No verified channel yet — cannot approve until first login') }}">{{ __('Unverified') }}</span>
+                                    <span class="badge bg-yellow-lt" title="{{ __('No verified channel yet — cannot approve until first login') }}">{{ __('Unverified') }}</span>
                                 @endif
                             </td>
                             <td class="text-muted">
                                 @if($u->last_login_at)
                                     {{ $u->last_login_at->diffForHumans() }}
                                 @else
-                                    <span class="badge bg-yellow">{{ __('Belum pernah login') }}</span>
+                                    <span class="badge bg-yellow-lt">{{ __('Belum pernah login') }}</span>
                                 @endif
                             </td>
                             <td class="text-end text-nowrap">

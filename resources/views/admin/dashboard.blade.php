@@ -1,4 +1,4 @@
-<x-tabler.layout :title="__('Dashboard')" :pretitle="__('Superadmin')">
+<x-tabler.admin-layout :title="__('Dashboard')" :pretitle="__('Superadmin')">
     <div class="row row-cards mb-3">
         <x-tabler.stat :label="__('Total Users')" :value="number_format($totalUsers)" icon="users" />
         <x-tabler.stat :label="__('Total Workspaces')" :value="number_format($totalWorkspaces)" icon="building" />
@@ -60,4 +60,4 @@
             </table>
         </div>
     </div>
-</x-tabler.layout>
+</x-tabler.admin-layout>
