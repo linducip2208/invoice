@@ -11,7 +11,8 @@ class Quote extends Model
     use BelongsToWorkspace;
 
     protected $fillable = [
-        'workspace_id', 'client_id', 'quote_no', 'status', 'issue_date', 'expiry_date',
+        'workspace_id', 'client_id', 'quote_no', 'status', 'revision',
+        'issue_date', 'expiry_date',
         'subtotal', 'tax_rate', 'tax_amount', 'discount_value', 'discount_type', 'discount_amount',
         'total', 'currency', 'items', 'notes', 'terms', 'converted_invoice_id', 'public_token', 'accepted_at',
     ];
@@ -47,8 +48,22 @@ class Quote extends Model
         return match ($this->status) {
             'accepted', 'converted' => 'success',
             'rejected', 'expired' => 'danger',
+            'withdrawn' => 'dark',
             'sent' => 'info',
             default => 'warning',
         };
+    }
+
+    public function approvalEvents() { return $this->hasMany(QuoteApprovalEvent::class); }
+    public function challenges() { return $this->hasMany(QuoteApprovalChallenge::class); }
+
+    public function isTerminal(): bool
+    {
+        return in_array($this->status, ['accepted', 'rejected', 'expired', 'converted', 'withdrawn'], true);
+    }
+
+    public function isExpired(): bool
+    {
+        return $this->expiry_date && $this->expiry_date->isPast();
     }
 }

@@ -327,6 +327,14 @@ class InvoiceController extends Controller
             ->with('success', __('Invoice cancelled.'));
     }
 
+    public function rotateLink(Invoice $invoice)
+    {
+        abort_unless($invoice->workspace_id === workspace()?->id, 403);
+        $invoice->update(['public_token' => (string) \Illuminate\Support\Str::uuid()]);
+
+        return back()->with('success', __('Public invoice link rotated. The old link no longer works.'));
+    }
+
     public function updateStatus(Request $request, Invoice $invoice)
     {
         $validated = $request->validate([

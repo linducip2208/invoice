@@ -90,7 +90,12 @@ class WorkspaceController extends Controller
             'default_template' => ['required', 'string', Rule::in(['classic', 'modern', 'minimal', 'bold', 'elegant'])],
             'primary_color' => ['required', 'string', 'max:7', 'regex:/^#[0-9A-Fa-f]{6}$/'],
             'accent_color' => ['required', 'string', 'max:7', 'regex:/^#[0-9A-Fa-f]{6}$/'],
+            'quote_auto_convert' => ['nullable', 'string', Rule::in(['manual', 'draft_on_accept'])],
+            'quote_high_risk_threshold' => ['nullable', 'numeric', 'min:0'],
         ]);
+
+        // Back-compat for stale settings tabs submitted without the new fields.
+        $validated['quote_auto_convert'] ??= $workspace->quote_auto_convert ?? 'manual';
 
         if ($request->hasFile('logo')) {
             $validated['logo_path'] = $request->file('logo')->store('logos', 'public');

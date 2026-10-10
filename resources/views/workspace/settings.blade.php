@@ -129,6 +129,25 @@
                             @error('accent_color')<div class="invalid-feedback d-block">{{ $message }}</div>@enderror
                         </x-tabler.field>
                     </div>
+                    <div class="col-md-6">
+                        <x-tabler.field :label="__('After quote approval')" name="quote_auto_convert"
+                            :help="__('Manual keeps conversion in workspace hands; auto creates a draft invoice on acceptance.')">
+                            <select id="quote_auto_convert" name="quote_auto_convert" class="form-select">
+                                <option value="manual" @selected(old('quote_auto_convert', $workspace->quote_auto_convert ?? 'manual') === 'manual')>{{ __('Manual conversion') }}</option>
+                                <option value="draft_on_accept" @selected(old('quote_auto_convert', $workspace->quote_auto_convert ?? 'manual') === 'draft_on_accept')>{{ __('Auto-create draft invoice') }}</option>
+                            </select>
+                        </x-tabler.field>
+                    </div>
+                    <div class="col-md-6">
+                        <x-tabler.field :label="__('High-risk threshold (optional)')" name="quote_high_risk_threshold"
+                            :help="__('Quotes at/above this total require a signed-in designated approver — email codes are refused. Empty disables.')">
+                            <input type="number" id="quote_high_risk_threshold" name="quote_high_risk_threshold" min="0" step="0.01"
+                                value="{{ old('quote_high_risk_threshold', $workspace->quote_high_risk_threshold) }}" class="form-control">
+                        </x-tabler.field>
+                    </div>
+                            @error('accent_color')<div class="invalid-feedback d-block">{{ $message }}</div>@enderror
+                        </x-tabler.field>
+                    </div>
                 </div>
             </div>
             <div class="card-footer text-end">

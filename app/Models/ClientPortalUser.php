@@ -14,6 +14,7 @@ class ClientPortalUser extends Authenticatable
     protected $fillable = [
         'client_id', 'workspace_id', 'email', 'password_hash',
         'last_login_at', 'remember_token', 'email_verified_at',
+        'can_approve_quotes', 'is_active',
     ];
 
     protected $hidden = ['password_hash', 'remember_token'];
@@ -28,6 +29,8 @@ class ClientPortalUser extends Authenticatable
         return [
             'last_login_at' => 'datetime',
             'email_verified_at' => 'datetime',
+            'can_approve_quotes' => 'boolean',
+            'is_active' => 'boolean',
         ];
     }
 

@@ -32,6 +32,7 @@ class AppServiceProvider extends ServiceProvider
         CreditNote::observe(AuditableObserver::class);
         Client::observe(AuditableObserver::class);
         Project::observe(AuditableObserver::class);
+        \App\Models\QuoteApprovalEvent::observe(AuditableObserver::class);
 
         // Update client payment behavior stats on payment events
         Payment::observe(PaymentObserver::class);

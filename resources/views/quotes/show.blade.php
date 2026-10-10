@@ -3,11 +3,20 @@
         <a href="{{ route('quotes.index') }}" class="btn">
             <x-ti name="arrow-left" /> {{ __('Back') }}
         </a>
-        @if($quote->status !== 'converted')
-            <form method="POST" action="{{ route('quotes.convert', $quote) }}" class="d-inline">@csrf<button class="btn btn-primary"><x-ti name="file-invoice" /> {{ __('Convert to Invoice') }}</button></form>
-        @else
-            <a href="{{ route('invoices.show', $quote->converted_invoice_id) }}" class="btn btn-primary">{{ __('View Invoice') }}</a>
+        @if($quote->status === 'draft')
+            <form method="POST" action="{{ route('quotes.send', $quote) }}" class="d-inline">@csrf<button class="btn btn-primary"><x-ti name="send" /> {{ __('Send to client') }}</button></form>
         @endif
+        @if(in_array($quote->status, ['draft', 'sent']))
+            <a href="{{ route('public.quote.show', $quote->public_token) }}" target="_blank" rel="noopener" class="btn"><x-ti name="eye" /> {{ __('Public link') }}</a>
+            <form method="POST" action="{{ route('quotes.withdraw', $quote) }}" class="d-inline" onsubmit="return confirm({{ Js::from(__('Withdraw this quote? Outstanding links and codes become invalid.')) }});">@csrf<button class="btn btn-outline-warning">{{ __('Withdraw') }}</button></form>
+        @endif
+        @if(in_array($quote->status, ['rejected', 'withdrawn', 'expired']))
+            <form method="POST" action="{{ route('quotes.reopen', $quote) }}" class="d-inline">@csrf<button class="btn btn-outline-info">{{ __('Reopen as new revision') }}</button></form>
+        @endif
+        @if(in_array($quote->status, ['accepted', 'converted']))
+            <form method="POST" action="{{ route('quotes.convert', $quote) }}" class="d-inline">@csrf<button class="btn btn-primary"><x-ti name="file-invoice" /> {{ $quote->status === 'converted' ? __('View Invoice') : __('Convert to Invoice') }}</button></form>
+        @endif
+        <form method="POST" action="{{ route('quotes.rotate-link', $quote) }}" class="d-inline" onsubmit="return confirm({{ Js::from(__('Rotate the public link? The old link stops working.')) }});">@csrf<button class="btn btn-sm btn-ghost-secondary" title="{{ __('Rotate public link') }}"><x-ti name="refresh" /></button></form>
     </x-slot>
 
     <div class="card mb-3">
@@ -71,6 +80,30 @@
             <div class="card-body">
                 <h4 class="subheader mb-2">{{ __('Terms:') }}</h4>
                 <p class="mb-0">{{ $quote->terms }}</p>
+            </div>
+        </div>
+    @endif
+
+    @php $events = $quote->approvalEvents()->latest('decided_at')->get(); @endphp
+    @if($events->isNotEmpty())
+        <div class="card mt-3">
+            <div class="card-header"><h3 class="card-title"><x-ti name="history" /> {{ __('Approval history') }}</h3></div>
+            <div class="table-responsive">
+                <table class="table table-vcenter card-table">
+                    <thead><tr><th>{{ __('When (UTC)') }}</th><th>{{ __('Outcome') }}</th><th>{{ __('Revision') }}</th><th>{{ __('Approver') }}</th><th>{{ __('Via') }}</th><th>{{ __('Document hash') }}</th></tr></thead>
+                    <tbody>
+                        @foreach($events as $ev)
+                            <tr>
+                                <td class="text-muted">{{ $ev->decided_at }}</td>
+                                <td><x-tabler.status-badge :status="$ev->outcome === 'accepted' ? 'accepted' : 'rejected'" /></td>
+                                <td>v{{ $ev->revision }}</td>
+                                <td>{{ $ev->approver_name }} <span class="text-muted small">({{ $ev->approver_email }})</span></td>
+                                <td class="text-muted">{{ $ev->verification_method }} · {{ $ev->authority_basis }}</td>
+                                <td><code class="small">{{ substr($ev->document_sha256, 0, 16) }}…</code></td>
+                            </tr>
+                        @endforeach
+                    </tbody>
+                </table>
             </div>
         </div>
     @endif

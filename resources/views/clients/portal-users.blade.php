@@ -39,6 +39,7 @@
                 <thead>
                     <tr>
                         <th>{{ __('Email') }}</th>
+                        <th>{{ __('Status') }}</th>
                         <th>{{ __('Last Login') }}</th>
                         <th class="text-end">{{ __('Actions') }}</th>
                     </tr>
@@ -47,6 +48,18 @@
                     @forelse ($portalUsers as $u)
                         <tr>
                             <td class="fw-semibold">{{ $u->email }}</td>
+                            <td>
+                                @if(!$u->is_active)
+                                    <span class="badge bg-red">{{ __('Revoked') }}</span>
+                                @elseif($u->can_approve_quotes)
+                                    <span class="badge bg-green">{{ __('Approver') }}</span>
+                                @else
+                                    <span class="badge bg-azure">{{ __('Viewer') }}</span>
+                                @endif
+                                @if(!$u->email_verified_at)
+                                    <span class="badge bg-yellow" title="{{ __('No verified channel yet — cannot approve until first login') }}">{{ __('Unverified') }}</span>
+                                @endif
+                            </td>
                             <td class="text-muted">
                                 @if($u->last_login_at)
                                     {{ $u->last_login_at->diffForHumans() }}
@@ -55,6 +68,20 @@
                                 @endif
                             </td>
                             <td class="text-end text-nowrap">
+                                <form method="POST" action="{{ route('portal-users.toggle-approve', $u) }}" class="d-inline">
+                                    @csrf
+                                    <button type="submit" class="btn btn-sm {{ $u->can_approve_quotes ? 'btn-outline-yellow' : 'btn-outline-green' }}"
+                                        title="{{ $u->can_approve_quotes ? __('Revoke approver rights') : __('Designate as quote approver') }}">
+                                        <x-ti name="{{ $u->can_approve_quotes ? 'x' : 'check' }}" />
+                                    </button>
+                                </form>
+                                <form method="POST" action="{{ route('portal-users.toggle-active', $u) }}" class="d-inline">
+                                    @csrf
+                                    <button type="submit" class="btn btn-sm {{ $u->is_active ? 'btn-outline-red' : 'btn-outline-green' }}"
+                                        title="{{ $u->is_active ? __('Revoke access immediately') : __('Re-enable access') }}">
+                                        <x-ti name="lock" />
+                                    </button>
+                                </form>
                                 <x-tabler.delete-button :action="route('portal-users.destroy', $u)"
                                     :confirm="__('Hapus akses :email?', ['email' => $u->email])"
                                     :label="__('Hapus')" />
@@ -62,7 +89,7 @@
                         </tr>
                     @empty
                         <tr>
-                            <td colspan="3">
+                            <td colspan="4">
                                 <x-tabler.empty icon="users" :title="__('Belum ada akses portal untuk klien ini.')" />
                             </td>
                         </tr>

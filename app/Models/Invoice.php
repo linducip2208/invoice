@@ -19,6 +19,7 @@ class Invoice extends Model
         'tax_amount', 'discount_type', 'discount_value', 'discount_amount',
         'total', 'amount_paid', 'balance_due', 'currency',
         'notes', 'terms', 'public_token', 'last_sent_at',
+        'quote_id', 'quote_revision',
     ];
 
     protected function casts(): array

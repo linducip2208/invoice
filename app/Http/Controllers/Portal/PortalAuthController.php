@@ -23,12 +23,21 @@ class PortalAuthController extends Controller
         ]);
 
         $user = ClientPortalUser::where('email', $credentials['email'])->first();
-        if (! $user || ! Hash::check($credentials['password'], $user->password_hash)) {
+        // Generic message either way: no email enumeration. Revoked
+        // contacts (is_active=false) cannot sign in at all.
+        if (! $user || ! $user->is_active || ! Hash::check($credentials['password'], $user->password_hash)) {
             return back()->withErrors(['email' => 'Email atau password salah.'])->onlyInput('email');
         }
 
         Auth::guard('client_portal')->login($user, $request->boolean('remember'));
-        $user->update(['last_login_at' => now()]);
+        // First successful login proves the designated address received its
+        // credentials (sent via the workspace out-of-band). This marks the
+        // channel verified for OTP/approval use — it does NOT prove
+        // corporate signing authority (see approval evidence docs).
+        $user->update([
+            'last_login_at' => now(),
+            'email_verified_at' => $user->email_verified_at ?? now(),
+        ]);
         $request->session()->regenerate();
 
         return redirect()->route('portal.dashboard');

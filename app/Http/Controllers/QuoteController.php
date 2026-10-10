@@ -102,63 +102,62 @@ class QuoteController extends Controller
     {
         abort_unless($quote->workspace_id === workspace()?->id, 403);
 
-        // Lock the quote row inside the transaction so a double-click / retry
-        // cannot convert the same quote twice (TOCTOU).
-        $invoice = DB::transaction(function () use ($quote, $service) {
-            $locked = Quote::where('id', $quote->id)->lockForUpdate()->firstOrFail();
+        $result = app(\App\Services\QuoteConversionService::class)
+            ->convert($quote, 'user:' . auth()->id());
 
-            if ($locked->status === 'converted' || $locked->converted_invoice_id) {
-                abort(409, __('Quote already converted.'));
-            }
+        if (isset($result['error'])) {
+            return back()->with('error', __('Quote cannot be converted in its current state.'));
+        }
 
-            $quoteWorkspace = $locked->workspace;
-            abort_unless($quoteWorkspace, 403);
+        return redirect()
+            ->route('invoices.show', $result['invoice'])
+            ->with('success', $result['duplicate'] ?? false
+                ? __('Conversion already exists — showing the existing invoice.')
+                : __('Quote converted to invoice.'));
+    }
 
-            $totals = InvoiceService::calculateTotals($locked->items, $locked->tax_rate, 'none', 0);
+    public function send(Quote $quote, \App\Services\QuoteApprovalService $approvals)
+    {
+        abort_unless($quote->workspace_id === workspace()?->id, 403);
+        $result = $approvals->send($quote);
+        if (isset($result['error'])) {
+            return back()->with('error', __('Only draft quotes can be sent.'));
+        }
+        return back()->with('success', __('Quote sent to client.'));
+    }
 
-            $invoice = Invoice::create([
-                'workspace_id' => $locked->workspace_id,
-                'client_id'    => $locked->client_id,
-                'invoice_no'   => $service->generateInvoiceNo($quoteWorkspace),
-                'status'       => 'draft',
-                'template'     => $quoteWorkspace->default_template ?? 'classic',
-                'issue_date'   => now()->toDateString(),
-                'due_date'     => now()->addDays(30)->toDateString(),
-                'subtotal'     => $totals['subtotal'],
-                'tax_rate'     => $locked->tax_rate,
-                'tax_amount'   => $totals['tax_amount'],
-                'discount_type' => 'none',
-                'discount_value' => 0,
-                'discount_amount' => 0,
-                'total'        => $totals['total'],
-                'amount_paid'  => 0,
-                'balance_due'  => $totals['total'],
-                'currency'     => $locked->currency,
-                'notes'        => $locked->notes,
-                'terms'        => $locked->terms,
-            ]);
+    public function withdraw(Request $request, Quote $quote, \App\Services\QuoteApprovalService $approvals)
+    {
+        abort_unless($quote->workspace_id === workspace()?->id, 403);
+        $validated = $request->validate(['reason' => ['nullable', 'string', 'max:500']]);
+        $result = $approvals->withdraw($quote, 'user:' . auth()->id(), $validated['reason'] ?? null);
+        if (isset($result['error'])) {
+            return back()->with('error', __('Accepted quotes cannot be withdrawn.'));
+        }
+        return back()->with('success', __('Quote withdrawn. Outstanding approval links are now invalid.'));
+    }
 
-            foreach ($locked->items as $i => $item) {
-                $qty = (float) $item['quantity'];
-                $price = (float) $item['unit_price'];
-                $itemTax = (float) ($item['tax_rate'] ?? 0);
-                $sub = round($qty * $price, 2);
-                $invoice->items()->create([
-                    'description' => $item['description'],
-                    'quantity'    => $qty,
-                    'unit_price'  => $price,
-                    'tax_rate'    => $itemTax,
-                    'tax_amount'  => round($sub * $itemTax / 100, 2),
-                    'subtotal'    => $sub,
-                    'total'       => round($sub + ($sub * $itemTax / 100), 2),
-                    'sort_order'  => $i,
-                ]);
-            }
+    public function reopen(Request $request, Quote $quote, \App\Services\QuoteApprovalService $approvals)
+    {
+        abort_unless($quote->workspace_id === workspace()?->id, 403);
+        $validated = $request->validate(['reason' => ['nullable', 'string', 'max:500']]);
+        $result = $approvals->reopen($quote, 'user:' . auth()->id(), $validated['reason'] ?? null);
+        if (isset($result['error'])) {
+            return back()->with('error', __('Only rejected, withdrawn or expired quotes can be reopened.'));
+        }
+        return back()->with('success', __('Quote reopened as revision :rev. History is preserved.', ['rev' => $result['revision']]));
+    }
 
-            $locked->update(['status' => 'converted', 'converted_invoice_id' => $invoice->id]);
-            return $invoice;
-        });
+    public function convert(Quote $quote)
+    {
+        abort_unless($quote->workspace_id === workspace()?->id, 403);
+        return $this->convertToInvoice($quote, app(InvoiceService::class));
+    }
 
-        return redirect()->route('invoices.show', $invoice)->with('success', 'Quote converted to invoice.');
+    public function rotateLink(Quote $quote, \App\Services\QuoteApprovalService $approvals)
+    {
+        abort_unless($quote->workspace_id === workspace()?->id, 403);
+        $approvals->rotatePublicToken($quote);
+        return back()->with('success', __('Public link rotated. Old links and pending codes are now invalid.'));
     }
 }

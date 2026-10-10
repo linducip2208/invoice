@@ -22,6 +22,7 @@ return Application::configure(basePath: dirname(__DIR__))
             'workspace'   => \App\Http\Middleware\EnsureWorkspaceExists::class,
             'plan'        => \App\Http\Middleware\EnforcePlanLimits::class,
             'superadmin'  => \App\Http\Middleware\EnsureSuperadmin::class,
+            'portal.active' => \App\Http\Middleware\EnsurePortalActive::class,
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {
