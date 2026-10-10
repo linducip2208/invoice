@@ -177,6 +177,27 @@ body {
   outline-offset: 2px;
 }
 
+/* Skip link: hidden until keyboard focus (a11y best practice) */
+.skip-link {
+  position: absolute;
+  left: 1rem;
+  top: -4rem;
+  z-index: 1050;
+  background: var(--tblr-primary);
+  color: #fff;
+  padding: 0.5rem 1rem;
+  border-radius: 0.5rem;
+  font-weight: 600;
+  transition: top 0.15s ease-in-out;
+}
+.skip-link:focus-visible,
+.skip-link:focus {
+  top: 1rem;
+  color: #fff;
+  outline: 2px solid #fff;
+  outline-offset: 2px;
+}
+
 /* Links inside running text must not rely on color alone
    (axe link-in-text-block). Nav buttons/badges unaffected. */
 .card-body p a,

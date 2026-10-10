@@ -37,7 +37,7 @@
                     <div class="card-header">
                         <div>
                             <div class="subheader">{{ __('Sample invoice') }}</div>
-                            <h3 class="card-title mb-0"><x-ti name="file-invoice" /> INV-2026-0042 · Contoso Studio</h3>
+                            <h2 class="card-title mb-0 fs-3"><x-ti name="file-invoice" /> INV-2026-0042 · Contoso Studio</h2>
                         </div>
                         <div class="card-actions">
                             <span class="badge bg-warning-lt">{{ __('Partial') }}</span>

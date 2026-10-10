@@ -39,3 +39,16 @@ PWA device nyata, screen reader manusia — lihat FINAL-AUDIT.md.
     nyata tetap manual). Payment: `WebhookSignatureVerifier` + 403 +
     lock/replay/stored-amount terverifikasi di kode; sandbox live BLOCKED
     (butuh kredensial asli).
+
+## Ronde 3 (2026-10-10, sweep a11y semantik)
+
+13. Tanpa landmark `<main>` di semua layout → `<main id="main-content">`
+    di `layout`/`admin-layout`/`public`/`guest`.
+14. Tanpa skip-link → `.skip-link` (muncul saat fokus keyboard) + CSS.
+15. Halaman app tanpa `h1` (`h2.page-title`) → `h1` (class dipertahankan).
+16. Input tanpa label di `invoices/create` (color hex, baris item Alpine) →
+    `aria-label` (termasuk dinamis per baris).
+17. Judul `<title>` blog ganda ("Blog — Invocely — Invocely") → seoMeta
+    tanpa suffix app.name (`BlogController`, karena layout sudah menambahkannya).
+18. Lompat heading h1→h3 di hero landing → judul preview jadi `h2`.
+19.axe tetap acuan otomatis (8/8); screen-reader manusia tetap manual.

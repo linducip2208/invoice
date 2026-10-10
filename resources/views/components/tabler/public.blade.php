@@ -29,6 +29,7 @@
     @stack('head')
 </head>
 <body>
+<a href="#main-content" class="skip-link">{{ __('Skip to main content') }}</a>
 <div class="page">
     <header class="navbar navbar-expand-md d-print-none">
         <div class="container-xl">
@@ -57,11 +58,11 @@
         </div>
     </header>
     <div class="page-wrapper">
-        <div class="page-body">
+        <main class="page-body" id="main-content">
             <div class="container-xl">
                 {{ $slot }}
             </div>
-        </div>
+        </main>
         <footer class="footer footer-transparent">
             <div class="container-xl">
                 <div class="row text-center align-items-center flex-row-reverse">

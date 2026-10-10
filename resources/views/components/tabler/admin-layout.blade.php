@@ -17,6 +17,7 @@
     @stack('head')
 </head>
 <body>
+<a href="#main-content" class="skip-link">{{ __('Skip to main content') }}</a>
 <div class="page">
     <aside class="navbar navbar-vertical navbar-expand-lg invocely-nav d-print-none" data-bs-theme="dark">
         <div class="container-fluid">
@@ -114,7 +115,7 @@
                 <div class="row g-2 align-items-center">
                     <div class="col">
                         <div class="page-pretitle">{{ __('Platform administration') }}</div>
-                        <h2 class="page-title">{{ $title ?? __('Platform') }}</h2>
+                        <h1 class="page-title">{{ $title ?? __('Platform') }}</h1>
                         @isset($subtitle)
                             <div class="text-muted mt-1">{{ $subtitle }}</div>
                         @endisset
@@ -128,12 +129,12 @@
             </div>
         </div>
 
-        <div class="page-body">
+        <main class="page-body" id="main-content">
             <div class="container-xl">
                 <x-tabler.alert />
                 {{ $slot }}
             </div>
-        </div>
+        </main>
 
         <footer class="footer footer-transparent d-print-none">
             <div class="container-xl">

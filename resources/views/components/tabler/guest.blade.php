@@ -18,8 +18,9 @@
     @stack('head')
 </head>
 <body class="d-flex flex-column">
+<a href="#main-content" class="skip-link">{{ __('Skip to main content') }}</a>
 <div class="page page-center">
-    <div class="container container-tight py-4">
+    <main class="container container-tight py-4" id="main-content">
         <div class="text-center mb-4">
             <a href="/" class="navbar-brand navbar-brand-autodark" aria-label="{{ branding('app_name') }} home">
                 <span class="logo-tile">I</span>
@@ -28,7 +29,7 @@
         </div>
         <x-tabler.alert />
         {{ $slot }}
-    </div>
+    </main>
 </div>
 @stack('scripts')
 </body>

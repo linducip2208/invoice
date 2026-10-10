@@ -97,16 +97,16 @@
                     <div class="col-sm-6">
                         <x-tabler.field :label="__('Primary Color')" name="primary_color">
                             <div class="d-flex align-items-center gap-2">
-                                <input type="color" name="primary_color" id="primary_color" value="{{ old('primary_color', '#A78BFA') }}" class="form-control form-control-color" style="width: 4rem;">
-                                <input type="text" value="{{ old('primary_color', '#A78BFA') }}" id="primary_color_text" class="form-control form-control-sm" style="max-width: 8rem;" oninput="document.getElementById('primary_color').value = this.value">
+                                <input type="color" name="primary_color" id="primary_color" value="{{ old('primary_color', '#A78BFA') }}" class="form-control form-control-color" style="width: 4rem;" aria-label="{{ __('Primary color picker') }}">
+                                <input type="text" value="{{ old('primary_color', '#A78BFA') }}" id="primary_color_text" aria-label="{{ __('Primary color hex code') }}" class="form-control form-control-sm" style="max-width: 8rem;" oninput="document.getElementById('primary_color').value = this.value">
                             </div>
                         </x-tabler.field>
                     </div>
                     <div class="col-sm-6">
                         <x-tabler.field :label="__('Accent Color')" name="accent_color">
                             <div class="d-flex align-items-center gap-2">
-                                <input type="color" name="accent_color" id="accent_color" value="{{ old('accent_color', '#FF7AC6') }}" class="form-control form-control-color" style="width: 4rem;">
-                                <input type="text" value="{{ old('accent_color', '#FF7AC6') }}" id="accent_color_text" class="form-control form-control-sm" style="max-width: 8rem;" oninput="document.getElementById('accent_color').value = this.value">
+                                <input type="color" name="accent_color" id="accent_color" value="{{ old('accent_color', '#FF7AC6') }}" class="form-control form-control-color" style="width: 4rem;" aria-label="{{ __('Accent color picker') }}">
+                                <input type="text" value="{{ old('accent_color', '#FF7AC6') }}" id="accent_color_text" aria-label="{{ __('Accent color hex code') }}" class="form-control form-control-sm" style="max-width: 8rem;" oninput="document.getElementById('accent_color').value = this.value">
                             </div>
                         </x-tabler.field>
                     </div>
@@ -173,6 +173,7 @@
                                 <td>
                                     <select class="form-select form-select-sm"
                                             :name="'items[' + index + '][product_id]'"
+                                            :aria-label="'{{ __('Product') }} ' + (index + 1)"
                                             x-model="item.product_id"
                                             @change="onProductSelect(index, $event.target.value)">
                                         <option value="">— {{ __('Pick product') }} —</option>
@@ -182,13 +183,14 @@
                                     </select>
                                     <input type="text" required
                                            :name="'items[' + index + '][description]'"
+                                           :aria-label="'{{ __('Description') }} ' + (index + 1)"
                                            x-model="item.description"
                                            placeholder="{{ __('Description') }}"
                                            class="mt-1 form-control form-control-sm">
                                 </td>
-                                <td><input type="number" step="0.01" min="0.01" required :name="'items[' + index + '][quantity]'" x-model.number="item.quantity" class="form-control form-control-sm text-end"></td>
-                                <td><input type="number" step="0.01" min="0" required :name="'items[' + index + '][unit_price]'" x-model.number="item.unit_price" class="form-control form-control-sm text-end"></td>
-                                <td><input type="number" step="0.01" min="0" max="100" :name="'items[' + index + '][tax_rate]'" x-model.number="item.tax_rate" class="form-control form-control-sm text-end"></td>
+                                <td><input type="number" step="0.01" min="0.01" required :aria-label="'{{ __('Qty') }} ' + (index + 1)" :name="'items[' + index + '][quantity]'" x-model.number="item.quantity" class="form-control form-control-sm text-end"></td>
+                                <td><input type="number" step="0.01" min="0" required :aria-label="'{{ __('Unit price') }} ' + (index + 1)" :name="'items[' + index + '][unit_price]'" x-model.number="item.unit_price" class="form-control form-control-sm text-end"></td>
+                                <td><input type="number" step="0.01" min="0" max="100" :aria-label="'{{ __('Tax rate') }} ' + (index + 1)" :name="'items[' + index + '][tax_rate]'" x-model.number="item.tax_rate" class="form-control form-control-sm text-end"></td>
                                 <td class="text-end fw-bold small" x-text="formatCurrency(lineTotal(index))"></td>
                                 <td class="text-center">
                                     <button type="button" @click="removeItem(index)" x-show="items.length > 1" class="btn btn-sm btn-link text-danger p-0"><x-ti name="x" /></button>

@@ -24,7 +24,7 @@ class BlogController extends Controller
             'posts' => $posts,
             'categories' => $categories,
             'seoMeta' => [
-                'title' => 'Blog — ' . config('app.name'),
+                'title' => 'Blog',
                 'description' => 'Tips, trik, dan panduan seputar invoicing, freelancing, dan manajemen bisnis UKM.',
             ],
         ]);
@@ -49,7 +49,7 @@ class BlogController extends Controller
             'post' => $post,
             'relatedPosts' => $relatedPosts,
             'seoMeta' => [
-                'title' => $post->meta_title . ' — ' . config('app.name'),
+                'title' => $post->meta_title,
                 'description' => $post->meta_description,
                 'og_type' => 'article',
                 'published_time' => $post->published_at?->toIso8601String(),
@@ -76,7 +76,7 @@ class BlogController extends Controller
             'categories' => $categories,
             'currentCategory' => $category,
             'seoMeta' => [
-                'title' => $category->name . ' — Blog ' . config('app.name'),
+                'title' => $category->name . ' — Blog',
                 'description' => $category->description ?? 'Artikel tentang ' . $category->name,
             ],
         ]);

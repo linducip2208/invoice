@@ -37,6 +37,7 @@
     @stack('head')
 </head>
 <body>
+<a href="#main-content" class="skip-link">{{ __('Skip to main content') }}</a>
 <div class="page">
     <!-- ============ Sidebar ============ -->
     <aside class="navbar navbar-vertical navbar-expand-lg invocely-nav d-print-none" data-bs-theme="dark">
@@ -245,7 +246,7 @@
                         @isset($pretitle)
                             <div class="page-pretitle">{{ $pretitle }}</div>
                         @endisset
-                        <h2 class="page-title">{{ $title ?? branding('app_name') }}</h2>
+                        <h1 class="page-title">{{ $title ?? branding('app_name') }}</h1>
                         @isset($subtitle)
                             <div class="text-muted mt-1">{{ $subtitle }}</div>
                         @endisset
@@ -259,12 +260,12 @@
             </div>
         </div>
 
-        <div class="page-body">
+        <main class="page-body" id="main-content">
             <div class="container-xl">
                 <x-tabler.alert />
                 {{ $slot }}
             </div>
-        </div>
+        </main>
 
         <footer class="footer footer-transparent d-print-none">
             <div class="container-xl">
