@@ -175,9 +175,20 @@ class PaymentGatewayService
         }
 
         $resp = $response->json();
+        $transactionId = $resp['id'] ?? $resp['reference_id'] ?? null;
+
+        // Fail closed: never report success when the provider rejected the
+        // charge (HTTP error or missing transaction reference). Callers
+        // create local Payment rows only after this returns success.
+        if (! $response->successful() || ! $transactionId) {
+            throw new \RuntimeException(
+                'Xendit charge failed: ' . ($resp['message'] ?? $resp['error'] ?? 'HTTP ' . $response->status())
+            );
+        }
+
         return [
             'success' => true,
-            'transaction_id' => $resp['id'] ?? $resp['reference_id'] ?? null,
+            'transaction_id' => $transactionId,
             'status' => $resp['status'] ?? 'PENDING',
             'payment_url' => $resp['actions'][0]['url'] ?? null,
             'va_number' => $resp['account_number'] ?? null,
@@ -306,9 +317,18 @@ class PaymentGatewayService
         ]);
 
         $resp = $response->json();
+        $transactionId = $resp['order']['invoice_number'] ?? null;
+
+        // Fail closed: never report success when DOKU rejected the payment.
+        if (! $response->successful() || ! $transactionId) {
+            throw new \RuntimeException(
+                'DOKU charge failed: ' . ($resp['error']['message'] ?? $resp['message'] ?? 'HTTP ' . $response->status())
+            );
+        }
+
         return [
             'success' => true,
-            'transaction_id' => $resp['order']['invoice_number'] ?? null,
+            'transaction_id' => $transactionId,
             'status' => 'PENDING',
             'payment_url' => $resp['response']['url'] ?? null,
             'raw' => $resp,

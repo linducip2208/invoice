@@ -23,24 +23,28 @@ class EfakturGenerator
         $xml = new \SimpleXMLElement('<?xml version="1.0" encoding="UTF-8"?><TaxInvoiceBundle/>');
         $tax = $xml->addChild('TaxInvoice');
 
+        // Verified empirically (PHP 8.3): addChild() escapes < and > but
+        // passes a raw & through, which corrupts the document (warning +
+        // empty element). htmlspecialchars() is therefore REQUIRED here and
+        // does NOT double-escape: '&' -> '&amp;' parses back to '&'.
         $tax->addChild('NomorFaktur', $td->efaktur_no ?: ('-/' . $invoice->invoice_no));
         $tax->addChild('TanggalFaktur', $invoice->issue_date->format('Y-m-d'));
         $tax->addChild('JenisFaktur', '01');
 
         $seller = $tax->addChild('Seller');
         $seller->addChild('NPWP', $this->cleanNpwp($workspace->tax_id ?? ''));
-        $seller->addChild('Nama', htmlspecialchars($workspace->name ?? ''));
-        $seller->addChild('Alamat', htmlspecialchars(trim(($workspace->address ?? '') . ' ' . ($workspace->city ?? ''))));
+        $seller->addChild('Nama', htmlspecialchars((string) ($workspace->name ?? ''), ENT_XML1 | ENT_COMPAT, 'UTF-8'));
+        $seller->addChild('Alamat', htmlspecialchars(trim(($workspace->address ?? '') . ' ' . ($workspace->city ?? '')), ENT_XML1 | ENT_COMPAT, 'UTF-8'));
 
         $buyer = $tax->addChild('Buyer');
         $buyer->addChild('NPWP', $this->cleanNpwp($client?->tax_id ?? '0000000000000000'));
-        $buyer->addChild('Nama', htmlspecialchars($client?->company_name ?: $client?->name ?? ''));
-        $buyer->addChild('Alamat', htmlspecialchars(trim(($client?->address ?? '') . ' ' . ($client?->city ?? ''))));
+        $buyer->addChild('Nama', htmlspecialchars((string) ($client?->company_name ?: $client?->name ?? ''), ENT_XML1 | ENT_COMPAT, 'UTF-8'));
+        $buyer->addChild('Alamat', htmlspecialchars(trim(($client?->address ?? '') . ' ' . ($client?->city ?? '')), ENT_XML1 | ENT_COMPAT, 'UTF-8'));
 
         $items = $tax->addChild('Items');
         foreach ($invoice->items as $item) {
             $i = $items->addChild('Item');
-            $i->addChild('Nama', htmlspecialchars($item->description ?? ''));
+            $i->addChild('Nama', htmlspecialchars((string) ($item->description ?? ''), ENT_XML1 | ENT_COMPAT, 'UTF-8'));
             $i->addChild('Quantity', number_format($item->quantity, 2, '.', ''));
             $i->addChild('UnitPrice', number_format($item->unit_price, 2, '.', ''));
             $i->addChild('Subtotal', number_format($item->subtotal ?? ($item->quantity * $item->unit_price), 2, '.', ''));
@@ -61,13 +65,25 @@ class EfakturGenerator
     public function saveXml(Invoice $invoice): string
     {
         $xml = $this->generateXml($invoice);
-        $filename = 'efaktur/' . $invoice->workspace_id . '/' . $invoice->invoice_no . '.xml';
+        // Sanitize: invoice_prefix is workspace-controlled, so allow only
+        // alphanumerics and dash — this kills ../ traversal AND dotfiles.
+        $safeNo = preg_replace('/[^A-Za-z0-9-]+/', '_', $invoice->invoice_no);
+        $safeNo = trim($safeNo, '_') ?: 'invoice';
+        $filename = 'efaktur/' . (int) $invoice->workspace_id . '/' . $safeNo . '.xml';
         Storage::disk('public')->put($filename, $xml);
 
-        InvoiceTaxDetail::updateOrCreate(
-            ['invoice_id' => $invoice->id],
-            ['workspace_id' => $invoice->workspace_id, 'efaktur_xml_path' => $filename, 'efaktur_status' => 'draft']
-        );
+        // Never regress an approved e-faktur back to draft on re-export.
+        $detail = InvoiceTaxDetail::firstOrNew(['invoice_id' => $invoice->id]);
+        $detail->workspace_id = $invoice->workspace_id;
+        $detail->efaktur_xml_path = $filename;
+        if (! $detail->exists) {
+            $detail->efaktur_status = 'draft';
+        }
+        $detail->save();
+
+        // generateXml() above loaded (and cached) a null taxDetail relation
+        // on this instance — drop the cache so callers see the fresh row.
+        $invoice->unsetRelation('taxDetail');
 
         return $filename;
     }
