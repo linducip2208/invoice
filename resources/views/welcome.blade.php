@@ -17,7 +17,7 @@
     <div class="landing-hero mb-4">
         <div class="row g-4 align-items-center">
             <div class="col-lg-5">
-                <p class="mb-2"><span class="badge bg-white-lt text-white">{{ __('Invoicing & collections · ID + EN') }}</span></p>
+                <p class="mb-2"><span class="badge bg-white-lt text-white text-wrap text-start">{{ __('Invoicing & collections · ID + EN') }}</span></p>
                 <h1 class="display-4 fw-bold mb-3">{{ __('Get paid faster, without the chase') }}</h1>
                 <p class="fs-3 text-muted mb-1">{{ __('The calm billing workspace for freelancers and small teams.') }}</p>
                 <p class="text-muted">{{ __('Professional invoices, secure client links, automatic balances, and recurring billing — with an audit trail your accountant will accept.') }}</p>

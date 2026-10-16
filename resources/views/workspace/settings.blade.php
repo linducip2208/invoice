@@ -114,7 +114,7 @@
                     <div class="col-md-6">
                         <x-tabler.field :label="__('Primary Color *')" name="primary_color">
                             <div class="d-flex align-items-center gap-2">
-                                <input type="color" id="primary_color_picker" value="{{ old('primary_color', $workspace->primary_color) }}" class="form-control form-control-color">
+                                <input type="color" id="primary_color_picker" aria-label="{{ __('Primary color picker') }}" value="{{ old('primary_color', $workspace->primary_color) }}" class="form-control form-control-color">
                                 <input type="text" id="primary_color" name="primary_color" value="{{ old('primary_color', $workspace->primary_color) }}" required pattern="^#[0-9A-Fa-f]{6}$" class="form-control @error('primary_color') is-invalid @enderror">
                             </div>
                             @error('primary_color')<div class="invalid-feedback d-block">{{ $message }}</div>@enderror
@@ -123,7 +123,7 @@
                     <div class="col-md-6">
                         <x-tabler.field :label="__('Accent Color *')" name="accent_color">
                             <div class="d-flex align-items-center gap-2">
-                                <input type="color" id="accent_color_picker" value="{{ old('accent_color', $workspace->accent_color) }}" class="form-control form-control-color">
+                                <input type="color" id="accent_color_picker" aria-label="{{ __('Accent color picker') }}" value="{{ old('accent_color', $workspace->accent_color) }}" class="form-control form-control-color">
                                 <input type="text" id="accent_color" name="accent_color" value="{{ old('accent_color', $workspace->accent_color) }}" required pattern="^#[0-9A-Fa-f]{6}$" class="form-control @error('accent_color') is-invalid @enderror">
                             </div>
                             @error('accent_color')<div class="invalid-feedback d-block">{{ $message }}</div>@enderror

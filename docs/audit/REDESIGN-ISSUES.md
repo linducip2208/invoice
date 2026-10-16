@@ -52,3 +52,12 @@ PWA device nyata, screen reader manusia — lihat FINAL-AUDIT.md.
     tanpa suffix app.name (`BlogController`, karena layout sudah menambahkannya).
 18. Lompat heading h1→h3 di hero landing → judul preview jadi `h2`.
 19.axe tetap acuan otomatis (8/8); screen-reader manusia tetap manual.
+
+## Ronde 4 (2026-10-16, sudah diperbaiki + hijau 84/84 serial)
+
+20. axe `color-contrast` di /clients & /quotes (`btn-outline-warning/success`)
+    → override AA global + hover fill gelap (`tabler-branding.css`).
+21. axe `label` di settings (color picker) → `aria-label`.
+22. Zoom 180px: tombol header nowrap → wrap ≤400px; display fluid `clamp()`,
+    `btn-group`/datagrid/`card-actions` wrap, badge hero `text-wrap`.
+23. Suite E2E wajib `--workers=1` (paralel flaky di SQLite/server tunggal).

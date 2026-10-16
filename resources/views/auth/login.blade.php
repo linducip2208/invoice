@@ -43,16 +43,12 @@
             <div class="card-body">
                 <h3 class="card-title">{{ __('Demo Login') }}</h3>
                 <p class="text-muted">{{ __('Local environment only — never shown in production.') }}</p>
-                <div class="datagrid">
-                    <div class="datagrid-item">
-                        <div class="datagrid-title">{{ __('Superadmin') }}</div>
-                        <div class="datagrid-content"><code>superadmin@invocely.test / superadmin123</code></div>
-                    </div>
-                    <div class="datagrid-item">
-                        <div class="datagrid-title">{{ __('Demo Admin') }}</div>
-                        <div class="datagrid-content"><code>demo@invocely.test / password</code></div>
-                    </div>
-                </div>
+                <dl class="row g-2 mb-0">
+                    <dt class="col-12 text-muted small">{{ __('Superadmin') }}</dt>
+                    <dd class="col-12"><code class="text-break">superadmin@invocely.test / superadmin123</code></dd>
+                    <dt class="col-12 text-muted small">{{ __('Demo Admin') }}</dt>
+                    <dd class="col-12"><code class="text-break">demo@invocely.test / password</code></dd>
+                </dl>
             </div>
         </div>
     @endif

@@ -1,10 +1,23 @@
-# REDESIGN TEST RESULTS (2026-10-10, ronde 2 — rerun penuh)
+# REDESIGN TEST RESULTS (2026-10-16, ronde 4 — rerun penuh serial)
 
-- phpunit: **138/138 passed** (451 assertions) — rerun setelah semua
-  perubahan view ronde 1+2.
-- Playwright: **64/64 passed** — app 14 + quote 12 + responsive 30 + a11y 8,
-  NOL console error. Rerun penuh setelah reseed (stop-server + hapus
-  `e2e.sqlite` + `migrate:fresh --seeder=E2eSeeder`, serve :8001).
+- phpunit: **144/144 passed** (513 assertions).
+- Playwright `--workers=1`: **84/84 passed** — app 14 + quote 12 +
+  responsive 30 + a11y 18 + zoom 10, NOL console error, overflow 0 di
+  11 viewport (320→1920) + 4 lebar zoom-200 (180/195/512/683).
+- Temuan ronde 4 (diperbaiki, lalu hijau):
+  - axe `color-contrast` serius di halaman authed baru: tombol
+    `btn-outline-warning` (/clients) dan `btn-outline-success` (/quotes) →
+    override global AA di `tabler-branding.css` (teks gelap + hover fill gelap).
+  - axe `label` serius di /workspace/settings: dua color picker tanpa label
+    → `aria-label`.
+  - zoom 180px: tombol header "Bandingkan semua fitur" nowrap →
+    `.page-header .btn` wrap di ≤400px.
+  - Diadopsi dari WIP: display fluid `clamp()`, `btn-group`/datagrid/
+    `card-actions` wrap, badge hero wrap, login demo jadi definition list,
+    metodologi zoom jujur (setengah-viewport, bukan properti CSS `zoom`).
+- Pelajaran proses: E2E wajib serial di lingkungan ini — run paralel
+  default flaky (server PHP + SQLite tunggal dibagi worker browser);
+  reseed tetap stop-server + hapus file + `migrate:fresh --seeder=E2eSeeder`.
 - Temuan ronde 2 (diperbaiki, lalu hijau):
   - Landing rewrite menyebabkan overflow horizontal 4–23px di ≤768px:
     `row g-4`/`row-deck` di seksi capabilities/FAQ (`welcome.blade.php`).

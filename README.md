@@ -33,8 +33,8 @@ Login dev (local saja): `superadmin@invocely.test / superadmin123`,
 ## Perintah penting
 
 ```bash
-php artisan test                 # 138 tests, sqlite memory (451 assertions)
-npx playwright test              # 64 E2E browser (butuh server + e2e.sqlite, lihat tests-e2e/)
+php artisan test                 # 144 tests, sqlite memory (513 assertions)
+npx playwright test --workers=1  # 84 E2E browser serial (server + e2e.sqlite, lihat tests-e2e/)
 npm run build                    # build aset produksi
 php artisan schedule:run         # scheduler (cron tiap menit di prod)
 php artisan queue:work           # worker antrean

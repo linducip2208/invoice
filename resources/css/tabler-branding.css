@@ -43,6 +43,17 @@ body {
   letter-spacing: -0.01em;
 }
 
+/* Fluid display sizes: Tabler/Bootstrap display-* are fixed rem and
+   overflow at 200% zoom on small screens (E2E-proven). Clamp keeps
+   desktop presence while shrinking gracefully. */
+.display-4 { font-size: clamp(2rem, 1.4rem + 3.5vw, 3.5rem) !important; }
+.display-5 { font-size: clamp(1.75rem, 1.1rem + 3vw, 3rem) !important; }
+.display-6 { font-size: clamp(1.25rem, 1rem + 1.5vw, 1.75rem) !important; }
+/* Last-resort wrapping for very long words at extreme zoom (hyphenated
+   compounds like "kejar-kejaran" already break at hyphens). */
+.display-4, .display-5, .display-6,
+.page-title, .card-title { overflow-wrap: break-word; }
+
 /* Brand sidebar: dark violet, active item pill */
 .navbar-vertical.invocely-nav {
   background: var(--invocely-sidebar-bg);
@@ -120,6 +131,23 @@ body {
   .btn { min-height: 2.5rem; }
   .nav-link { min-height: 2.75rem; }
 }
+
+/* Toggle button groups (pricing period/currency) must wrap instead of
+   overflowing on very narrow screens; restore individual radii there. */
+@media (max-width: 400px) {
+  .btn-group { flex-wrap: wrap; gap: 0.25rem; }
+  .btn-group > .btn { border-radius: var(--tblr-border-radius) !important; }
+  .btn-group > .btn + .btn { margin-left: 0; }
+  /* Tabler datagrid tracks refuse below 15rem: relax for tiny screens. */
+  .datagrid { --tblr-datagrid-item-width: 10rem; }
+  .datagrid > * { min-width: 0; }
+  .datagrid-content.h2 { font-size: 1.25rem; }
+  /* Long header buttons (e.g. "Compare all features") must wrap. */
+  .page-header .btn { white-space: normal; }
+}
+
+/* Card header actions (e.g. stacked badges) must wrap on narrow screens. */
+.card-actions { display: flex; flex-wrap: wrap; gap: 0.25rem; justify-content: flex-end; align-items: center; min-width: 0; }
 
 /* ---------- Landing premium ---------- */
 .landing-hero {
@@ -235,3 +263,30 @@ body {
 .alert.alert-success { color: #18702c; }
 .alert.alert-warning { color: #7a4d00; }
 .alert.alert-danger { color: #a11a0e; }
+
+/* Outline button text: Tabler/Bootstrap warning (#f59e0c) and success
+   (#2fb344) text on white fail WCAG AA at small sizes (axe-proven on
+   /clients and /quotes). Dark variants verified 5.9:1+; overrides are
+   !important because button utilities are. Hover uses dark fill + white. */
+.btn-outline-warning {
+  color: #7a4d00 !important;
+  border-color: #7a4d00 !important;
+}
+.btn-outline-warning:hover,
+.btn-outline-warning:focus-visible,
+.btn-outline-warning.active {
+  background-color: #7a4d00 !important;
+  border-color: #7a4d00 !important;
+  color: #fff !important;
+}
+.btn-outline-success {
+  color: #18702c !important;
+  border-color: #18702c !important;
+}
+.btn-outline-success:hover,
+.btn-outline-success:focus-visible,
+.btn-outline-success.active {
+  background-color: #18702c !important;
+  border-color: #18702c !important;
+  color: #fff !important;
+}

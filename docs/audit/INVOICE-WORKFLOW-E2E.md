@@ -2,7 +2,9 @@
 
 Suite: `tests-e2e/app.spec.js` (7 flows × desktop/mobile) +
 `tests-e2e/quote-approval.spec.js` (flow1/2/3/5/8 × desktop/mobile).
-Run: reseed e2e DB (`migrate:fresh` + `E2eSeeder`), serve :8001, `npx playwright test`.
+Run: reseed e2e DB (`migrate:fresh` + `E2eSeeder`), serve :8001,
+`npx playwright test --workers=1` (wajib serial: paralel flaky di
+SQLite/server tunggal).
 
 | Flow | Result |
 |---|---|

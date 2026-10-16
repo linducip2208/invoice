@@ -1,7 +1,7 @@
 # FINAL AUDIT — Invocely (revisi quote-approval 2026-10-10)
 
-Branch `main`. 138 automated tests + 64 E2E browser, semua hijau
-(rerun penuh ronde 2, bukti: REDESIGN-TEST-RESULTS.md).
+Branch `main`. 144 automated tests + 84 E2E browser serial, semua hijau
+(rerun penuh ronde 4, bukti: REDESIGN-TEST-RESULTS.md).
 
 ## Skor acceptance (berbasis bukti)
 
@@ -24,6 +24,19 @@ Branch `main`. 138 automated tests + 64 E2E browser, semua hijau
 
 **Keputusan: STAGING ONLY (93/100).** Menuju production: secret provider +
 sandbox (B1/B2) + PWA device. Rincian: RELEASE-CHECKLIST.md.
+
+## Adendum ronde 4 (2026-10-16)
+
+144/144 phpunit (513 assertions); 84/84 Playwright `--workers=1`
+(app 14 + quote 12 + responsive 30 + a11y 18 + zoom 10), NOL console error,
+overflow 0 di 11 viewport + 4 lebar zoom-200.
+Temuan & perbaikan: kontras `btn-outline-warning/success` (axe di
+/clients & /quotes) → override AA global; label color-picker settings;
+tombol header yang nowrap di 180px → wrap ≤400px; display fluid clamp +
+`btn-group`/datagrid/`card-actions` wrap. Suite E2E wajib serial
+(`--workers=1`): run paralel default flaky di SQLite/server tunggal.
+Skor tidak berubah (93): temuan baru nihil kritis; screen-reader manusia,
+PWA device nyata, dan sandbox gateway tetap manual/blocked.
 
 ## Adendum redesign frontend ronde 2 (2026-10-10)
 
