@@ -12,7 +12,7 @@ class Workspace extends Model
 
     protected $fillable = [
         'name', 'slug', 'logo_path', 'address', 'city', 'state',
-        'country', 'postal_code', 'phone', 'email', 'tax_id',
+        'country', 'postal_code', 'phone', 'email', 'google_review_url', 'tax_id',
         'invoice_prefix', 'next_invoice_no', 'default_template',
         'primary_color', 'accent_color', 'currency',
         'is_pkp', 'pkp_no', 'quote_prefix', 'next_quote_no', 'quote_auto_convert',

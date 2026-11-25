@@ -201,4 +201,89 @@ class QuoteConversionService
             return ['invoice' => $invoice];
         });
     }
+
+    /**
+     * Buat invoice PELUNASAN: sisa total quote dikurangi semua DP
+     * yang sudah dibuat untuk revisi tsb. Idempoten 1 pelunasan/revisi.
+     *
+     * @return array{invoice?: Invoice, error?: string, duplicate?: bool}
+     */
+    public function convertRemainder(Quote $quote, string $actor): array
+    {
+        return DB::transaction(function () use ($quote, $actor) {
+            $locked = Quote::where('id', $quote->id)->lockForUpdate()->firstOrFail();
+
+            $existing = Invoice::where('quote_id', $locked->id)
+                ->where('quote_revision', $locked->revision)
+                ->where('quote_conversion_type', 'remainder')
+                ->first();
+            if ($existing) {
+                return ['invoice' => $existing, 'duplicate' => true];
+            }
+
+            $dpTotal = (float) Invoice::where('quote_id', $locked->id)
+                ->where('quote_revision', $locked->revision)
+                ->where('quote_conversion_type', 'down_payment')
+                ->sum('total');
+
+            if ($dpTotal <= 0) {
+                return ['error' => 'no_down_payment'];
+            }
+
+            $amount = round(((float) $locked->total) - $dpTotal, 2);
+            if ($amount <= 0) {
+                return ['error' => 'nothing_remaining'];
+            }
+
+            $workspace = $locked->workspace;
+            if (! $workspace) {
+                return ['error' => 'no_workspace'];
+            }
+
+            $invoiceNo = app(InvoiceService::class)->generateInvoiceNo($workspace);
+
+            $invoice = Invoice::create([
+                'workspace_id' => $locked->workspace_id,
+                'client_id' => $locked->client_id,
+                'quote_id' => $locked->id,
+                'quote_revision' => $locked->revision,
+                'quote_conversion_type' => 'remainder',
+                'invoice_no' => $invoiceNo,
+                'status' => 'draft',
+                'template' => $workspace->default_template ?? 'classic',
+                'issue_date' => now()->toDateString(),
+                'due_date' => now()->addDays(14)->toDateString(),
+                'subtotal' => $amount,
+                'tax_rate' => 0,
+                'tax_amount' => 0,
+                'discount_type' => 'none',
+                'discount_value' => 0,
+                'discount_amount' => 0,
+                'total' => $amount,
+                'amount_paid' => 0,
+                'balance_due' => $amount,
+                'currency' => $locked->currency,
+                'notes' => "Pelunasan {$locked->quote_no} (total {$locked->currency} " . number_format((float) $locked->total, 2) . ", DP terbayar " . number_format($dpTotal, 2) . ').',
+                'terms' => $locked->terms,
+            ]);
+
+            $invoice->items()->create([
+                'description' => "Pelunasan — {$locked->quote_no}",
+                'quantity' => 1,
+                'unit_price' => $amount,
+                'tax_rate' => 0,
+                'tax_amount' => 0,
+                'subtotal' => $amount,
+                'total' => $amount,
+                'sort_order' => 0,
+            ]);
+
+            Log::info('Quote remainder converted', [
+                'quote_id' => $locked->id, 'revision' => $locked->revision,
+                'invoice_id' => $invoice->id, 'actor' => $actor,
+            ]);
+
+            return ['invoice' => $invoice];
+        });
+    }
 }

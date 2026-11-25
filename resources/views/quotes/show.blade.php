@@ -21,6 +21,10 @@
                 <input type="number" name="percent" value="50" min="1" max="99" class="form-control form-control-sm" style="width:4.5rem;" aria-label="{{ __('DP percent') }}">
                 <button class="btn btn-sm btn-outline-primary" title="{{ __('Buat invoice DP dari quote ini') }}"><x-ti name="percentage" /> {{ __('Buat DP') }}</button>
             </form>
+            @php $hasDp = \App\Models\Invoice::where('quote_id', $quote->id)->where('quote_revision', $quote->revision)->where('quote_conversion_type', 'down_payment')->exists(); @endphp
+            @if($hasDp)
+                <form method="POST" action="{{ route('quotes.remainder', $quote) }}" class="d-inline">@csrf<button class="btn btn-sm btn-outline-success" title="{{ __('Buat invoice pelunasan sisa quote') }}"><x-ti name="check" /> {{ __('Buat Pelunasan') }}</button></form>
+            @endif
         @endif
         <form method="POST" action="{{ route('quotes.rotate-link', $quote) }}" class="d-inline" onsubmit="return confirm({{ Js::from(__('Rotate the public link? The old link stops working.')) }});">@csrf<button class="btn btn-sm btn-ghost-secondary" title="{{ __('Rotate public link') }}"><x-ti name="refresh" /></button></form>
     </x-slot>

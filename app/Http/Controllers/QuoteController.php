@@ -182,6 +182,24 @@ class QuoteController extends Controller
                 : __('DP invoice created.'));
     }
 
+    public function remainder(Quote $quote)
+    {
+        abort_unless($quote->workspace_id === workspace()?->id, 403);
+
+        $result = app(\App\Services\QuoteConversionService::class)
+            ->convertRemainder($quote, 'user:' . auth()->id());
+
+        if (isset($result['error'])) {
+            return back()->with('error', __('Pelunasan needs an existing DP invoice with remaining balance.'));
+        }
+
+        return redirect()
+            ->route('invoices.show', $result['invoice'])
+            ->with('success', $result['duplicate'] ?? false
+                ? __('Remainder invoice already exists — showing the existing one.')
+                : __('Remainder invoice created.'));
+    }
+
     public function rotateLink(Quote $quote, \App\Services\QuoteApprovalService $approvals)
     {
         abort_unless($quote->workspace_id === workspace()?->id, 403);

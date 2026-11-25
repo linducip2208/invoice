@@ -12,6 +12,12 @@
                     <p class="text-muted">{{ __('Your feedback means a lot to our team. We read everything and keep improving our service quality.') }}</p>
                     @if($nps->score >= 9)
                         <div class="alert alert-success mt-3 mb-0">{{ __('You are one of our favorite clients!') }}</div>
+                        @if($nps->workspace?->google_review_url)
+                            <a href="{{ $nps->workspace->google_review_url }}" target="_blank" rel="noopener" class="btn btn-primary w-100 mt-3">
+                                ⭐ {{ __('Beri ulasan Google untuk kami') }}
+                            </a>
+                            <p class="text-muted small mt-1 mb-0">{{ __('Butuh 1 menit, sangat berarti bagi kami.') }}</p>
+                        @endif
                     @endif
                 </div>
             </div>

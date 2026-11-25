@@ -38,6 +38,11 @@
                             <input type="email" id="email" name="email" value="{{ old('email', $workspace->email) }}" class="form-control">
                         </x-tabler.field>
                     </div>
+                    <div class="col-md-6">
+                        <x-tabler.field :label="__('Google Review Link')" name="google_review_url" :help="__('Dipakai di halaman terima kasih NPS untuk skor 9–10.')">
+                            <input type="url" id="google_review_url" name="google_review_url" value="{{ old('google_review_url', $workspace->google_review_url) }}" class="form-control" placeholder="https://g.page/...">
+                        </x-tabler.field>
+                    </div>
                     <div class="col-12">
                         <x-tabler.field :label="__('Address')" name="address">
                             <textarea id="address" name="address" rows="2" class="form-control">{{ old('address', $workspace->address) }}</textarea>

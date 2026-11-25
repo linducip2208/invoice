@@ -84,6 +84,7 @@ class WorkspaceController extends Controller
             'postal_code' => ['nullable', 'string', 'max:20'],
             'phone' => ['nullable', 'string', 'max:50'],
             'email' => ['nullable', 'email', 'max:255'],
+            'google_review_url' => ['nullable', 'url', 'max:500'],
             'tax_id' => ['nullable', 'string', 'max:100'],
             'invoice_prefix' => ['required', 'string', 'max:20'],
             'currency' => ['required', 'string', Rule::in(['IDR', 'USD', 'EUR', 'GBP', 'SGD', 'AUD', 'JPY', 'CNY'])],

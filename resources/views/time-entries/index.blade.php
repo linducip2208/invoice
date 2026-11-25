@@ -6,6 +6,26 @@
 
     <div class="card mb-3">
         <div class="card-header">
+            <h3 class="card-title"><x-ti name="clock" /> {{ __('Timer') }}</h3>
+        </div>
+        <div class="card-body">
+            @if(session()->has('timer_started_at'))
+                <div class="d-flex align-items-center gap-2 flex-wrap">
+                    <span class="badge bg-green-lt">● {{ __('Berjalan sejak') }} {{ \Carbon\Carbon::parse(session('timer_started_at'))->format('H:i') }}</span>
+                    <form method="POST" action="{{ route('time-entries.timer-stop') }}" class="d-inline">@csrf<button class="btn btn-sm btn-danger"><x-ti name="square" /> {{ __('Stop & isi form') }}</button></form>
+                </div>
+            @else
+                <form method="POST" action="{{ route('time-entries.timer-start') }}" class="d-inline-flex gap-2 align-items-center flex-wrap">
+                    @csrf
+                    <input type="text" name="note" class="form-control form-control-sm" style="max-width:16rem;" placeholder="{{ __('Kerjakan apa? (opsional)') }}">
+                    <button class="btn btn-sm btn-success"><x-ti name="play" /> {{ __('Mulai timer') }}</button>
+                </form>
+            @endif
+        </div>
+    </div>
+
+    <div class="card mb-3">
+        <div class="card-header">
             <h3 class="card-title"><x-ti name="plus" /> {{ __('Tambah Time Entry') }}</h3>
         </div>
         <div class="card-body">
@@ -26,10 +46,16 @@
                         </x-tabler.field>
                     </div>
                     <div class="col-md-3">
-                        <x-tabler.field name="description" type="text" attrs='required placeholder="Apa yang dikerjakan"' />
+                        <x-tabler.field :label="__('Deskripsi')" name="description">
+                            <input type="text" id="description" name="description" required placeholder="{{ __('Apa yang dikerjakan') }}"
+                                value="{{ request('prefill_desc') }}" class="form-control @error('description') is-invalid @enderror">
+                        </x-tabler.field>
                     </div>
                     <div class="col-md-2">
-                        <x-tabler.field name="hours" type="number" attrs='step="0.25" min="0.01" required placeholder="Jam (mis: 2.5)"' />
+                        <x-tabler.field :label="__('Jam')" name="hours">
+                            <input type="number" id="hours" name="hours" step="0.25" min="0.01" required placeholder="{{ __('Jam (mis: 2.5)') }}"
+                                value="{{ request('prefill_hours') }}" class="form-control @error('hours') is-invalid @enderror">
+                        </x-tabler.field>
                     </div>
                     <div class="col-md-3">
                         <x-tabler.field name="hourly_rate" type="number" attrs='step="0.01" min="0" required placeholder="Rate / jam"' />

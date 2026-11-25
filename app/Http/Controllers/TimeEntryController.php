@@ -49,6 +49,32 @@ class TimeEntryController extends Controller
         return back()->with('success', 'Entry deleted.');
     }
 
+    public function timerStart()
+    {
+        if (session()->has('timer_started_at')) {
+            return back()->with('error', __('Timer already running.'));
+        }
+        session(['timer_started_at' => now()->toDateTimeString(), 'timer_note' => request('note')]);
+        return back()->with('success', __('Timer started.'));
+    }
+
+    public function timerStop()
+    {
+        $started = session('timer_started_at');
+        if (! $started) {
+            return back()->with('error', __('No timer running.'));
+        }
+        $hours = round(now()->diffInMinutes(\Carbon\Carbon::parse($started)) / 60, 2);
+        $hours = max($hours, 0.25);
+        $note = session('timer_note') ?? request('note') ?? '';
+        session()->forget(['timer_started_at', 'timer_note']);
+
+        return redirect()->route('time-entries.index', [
+            'prefill_hours' => $hours,
+            'prefill_desc' => $note,
+        ])->with('success', __('Timer stopped: :h h. Review & save below.', ['h' => $hours]));
+    }
+
     /**
      * Buat draft invoice dari time entries terpilih.
      * Semua entry harus: billable, belum ditagih, dan milik SATU klien.

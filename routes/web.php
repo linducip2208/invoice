@@ -267,6 +267,8 @@ Route::middleware(['auth', 'verified', 'workspace'])->group(function () {
     // ─── Real implemented features ─────────────────────────────────
     Route::get   ('time-entries',                 [TimeEntryController::class, 'index'])->middleware('plan:time_tracking')->name('time-entries.index');
     Route::post  ('time-entries',                 [TimeEntryController::class, 'store'])->middleware('plan:time_tracking')->name('time-entries.store');
+    Route::post  ('time-entries/timer-start',     [TimeEntryController::class, 'timerStart'])->middleware('plan:time_tracking')->name('time-entries.timer-start');
+    Route::post  ('time-entries/timer-stop',      [TimeEntryController::class, 'timerStop'])->middleware('plan:time_tracking')->name('time-entries.timer-stop');
     Route::post  ('time-entries/invoice',         [TimeEntryController::class, 'invoiceFromEntries'])->middleware(['plan:time_tracking', 'plan:invoice.create'])->name('time-entries.invoice');
     Route::delete('time-entries/{timeEntry}',     [TimeEntryController::class, 'destroy'])->middleware('plan:time_tracking')->name('time-entries.destroy');
 
@@ -277,6 +279,7 @@ Route::middleware(['auth', 'verified', 'workspace'])->group(function () {
     Route::resource('quotes', QuoteController::class)->except(['edit', 'update']);
     Route::post  ('quotes/{quote}/convert',       [QuoteController::class, 'convertToInvoice'])->name('quotes.convert');
     Route::post  ('quotes/{quote}/down-payment',  [QuoteController::class, 'downPayment'])->name('quotes.down-payment');
+    Route::post  ('quotes/{quote}/remainder',     [QuoteController::class, 'remainder'])->name('quotes.remainder');
     Route::post  ('quotes/{quote}/send',          [QuoteController::class, 'send'])->name('quotes.send');
     Route::post  ('quotes/{quote}/withdraw',      [QuoteController::class, 'withdraw'])->name('quotes.withdraw');
     Route::post  ('quotes/{quote}/reopen',        [QuoteController::class, 'reopen'])->name('quotes.reopen');
