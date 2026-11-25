@@ -15,6 +15,14 @@
                             class="form-control font-monospace @error('to_phone') is-invalid @enderror" placeholder="08123456789 atau +6281234...">
                     </x-tabler.field>
 
+                    <x-tabler.field :label="__('Template Pesan')" name="tpl">
+                        <select id="tpl" class="form-select">
+                            @foreach(['tagihan_baru' => __('Tagihan baru'), 'pengingat_h3' => __('Pengingat H-3'), 'overdue' => __('Overdue / menunggak'), 'kwitansi' => __('Kwitansi lunas')] as $key => $label)
+                                <option value="{{ $key }}">{{ $label }}</option>
+                            @endforeach
+                        </select>
+                    </x-tabler.field>
+
                     <x-tabler.field :label="__('Isi Pesan')" name="message" :help="__('WhatsApp formatting: *tebal*, _miring_, ~coret~')">
                         <textarea id="message" name="message" rows="10" required maxlength="4000"
                                   class="form-control font-monospace @error('message') is-invalid @enderror">{{ $defaultMessage }}</textarea>
@@ -34,3 +42,15 @@
         </div>
     </div>
 </x-tabler.layout>
+@push('scripts')
+<script>
+(function () {
+    var tpl = document.getElementById('tpl');
+    var msg = document.getElementById('message');
+    var all = @json($templates);
+    if (tpl && msg) tpl.addEventListener('change', function () {
+        if (all[tpl.value]) msg.value = all[tpl.value];
+    });
+})();
+</script>
+@endpush

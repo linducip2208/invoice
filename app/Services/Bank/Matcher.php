@@ -8,8 +8,66 @@ use App\Models\Invoice;
 class Matcher
 {
     /**
-     * For each line, find best matching invoice & set match_confidence.
+     * Top-N saran invoice untuk satu baris, beserta alasannya.
+     * @return array<int, array{invoice: Invoice, confidence: string, reason: string}>
      */
+    public function suggest(BankReconcileLine $line, int $limit = 3): array
+    {
+        $candidates = Invoice::query()
+            ->whereIn('status', ['sent', 'partial', 'overdue'])
+            ->where('balance_due', '>', 0)
+            ->with('client')
+            ->get();
+
+        $scored = [];
+        foreach ($candidates as $inv) {
+            // Referensi nomor invoice di deskripsi (terkuat).
+            if ($inv->invoice_no && stripos($line->description, $inv->invoice_no) !== false) {
+                $scored[] = ['invoice' => $inv, 'confidence' => 'high', 'reason' => __('No. invoice cocok di keterangan'), 'score' => 100];
+                continue;
+            }
+            $score = 0;
+            $reasons = [];
+
+            if (abs((float) $inv->balance_due - (float) $line->amount) < 0.01) {
+                $score += 50;
+                $reasons[] = __('nominal pas');
+                $diff = abs($line->trx_date->diffInDays($inv->issue_date));
+                if ($diff <= 7) {
+                    $score += 30;
+                    $reasons[] = __('tanggal dekat');
+                } elseif ($diff <= 30) {
+                    $score += 10;
+                    $reasons[] = __('tanggal ≤30 hari');
+                }
+            } elseif (abs((float) $inv->total - (float) $line->amount) < 0.01) {
+                $score += 20;
+                $reasons[] = __('nominal = total invoice');
+            }
+
+            // Nama klien / perusahaan muncul di deskripsi.
+            foreach ([$inv->client?->name, $inv->client?->company_name] as $needle) {
+                if ($needle && mb_strlen($needle) >= 4 && stripos($line->description, $needle) !== false) {
+                    $score += 25;
+                    $reasons[] = __('nama klien cocok') . " ({$needle})";
+                    break;
+                }
+            }
+
+            if ($score > 0) {
+                $scored[] = [
+                    'invoice' => $inv,
+                    'confidence' => $score >= 70 ? 'high' : ($score >= 35 ? 'medium' : 'low'),
+                    'reason' => implode(', ', $reasons),
+                    'score' => $score,
+                ];
+            }
+        }
+
+        usort($scored, fn ($a, $b) => $b['score'] <=> $a['score']);
+
+        return array_slice($scored, 0, $limit);
+    }
     public function autoMatch(BankReconcileLine $line): void
     {
         $candidates = Invoice::query()

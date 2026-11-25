@@ -16,6 +16,12 @@
         @if(in_array($quote->status, ['accepted', 'converted']))
             <form method="POST" action="{{ route('quotes.convert', $quote) }}" class="d-inline">@csrf<button class="btn btn-primary"><x-ti name="file-invoice" /> {{ $quote->status === 'converted' ? __('View Invoice') : __('Convert to Invoice') }}</button></form>
         @endif
+        @if($quote->status === 'accepted')
+            <form method="POST" action="{{ route('quotes.down-payment', $quote) }}" class="d-inline-flex align-items-center gap-1">@csrf
+                <input type="number" name="percent" value="50" min="1" max="99" class="form-control form-control-sm" style="width:4.5rem;" aria-label="{{ __('DP percent') }}">
+                <button class="btn btn-sm btn-outline-primary" title="{{ __('Buat invoice DP dari quote ini') }}"><x-ti name="percentage" /> {{ __('Buat DP') }}</button>
+            </form>
+        @endif
         <form method="POST" action="{{ route('quotes.rotate-link', $quote) }}" class="d-inline" onsubmit="return confirm({{ Js::from(__('Rotate the public link? The old link stops working.')) }});">@csrf<button class="btn btn-sm btn-ghost-secondary" title="{{ __('Rotate public link') }}"><x-ti name="refresh" /></button></form>
     </x-slot>
 

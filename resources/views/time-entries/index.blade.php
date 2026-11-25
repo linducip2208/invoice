@@ -52,11 +52,20 @@
         </div>
     </div>
 
+    <form method="POST" action="{{ route('time-entries.invoice') }}" id="time-invoice-form">
+        @csrf
     <div class="card">
+        <div class="card-header">
+            <h3 class="card-title">{{ __('Entries') }}</h3>
+            <div class="card-actions">
+                <button type="submit" class="btn btn-sm btn-primary" onclick="return confirm('{{ __('Buat draft invoice dari entry terpilih? Hanya 1 klien per invoice.') }}')"><x-ti name="file-invoice" /> {{ __('Invoice-kan terpilih') }}</button>
+            </div>
+        </div>
         <div class="table-responsive">
             <table class="table table-vcenter card-table">
                 <thead>
                     <tr>
+                        <th class="w-1"><input type="checkbox" class="form-check-input" id="check-all" aria-label="{{ __('Select all') }}"></th>
                         <th>{{ __('Tanggal') }}</th>
                         <th>{{ __('Klien') }}</th>
                         <th>{{ __('Deskripsi') }}</th>
@@ -69,6 +78,15 @@
                 <tbody>
                     @forelse($entries as $e)
                         <tr>
+                            <td>
+                                @if($e->billable && ! $e->invoiced)
+                                    <input type="checkbox" name="ids[]" value="{{ $e->id }}" class="form-check-input row-check" aria-label="{{ $e->description }}">
+                                @elseif($e->invoiced)
+                                    <span class="badge bg-success-lt" title="{{ __('Invoiced') }}: {{ $e->invoice_id }}">✓</span>
+                                @else
+                                    <span class="text-muted">—</span>
+                                @endif
+                            </td>
                             <td class="text-muted">{{ $e->entry_date?->format('d M Y') }}</td>
                             <td class="text-muted">{{ $e->client?->name ?? '—' }}</td>
                             <td>{{ $e->description }}</td>
@@ -81,7 +99,7 @@
                         </tr>
                     @empty
                         <tr>
-                            <td colspan="7">
+                            <td colspan="8">
                                 <x-tabler.empty icon="clock" :title="__('Belum ada entry.')" />
                             </td>
                         </tr>
@@ -93,4 +111,12 @@
             <div class="card-footer d-flex justify-content-center">{{ $entries->links() }}</div>
         @endif
     </div>
+    </form>
 </x-tabler.layout>
+@push('scripts')
+<script>
+document.getElementById('check-all')?.addEventListener('change', function () {
+    document.querySelectorAll('.row-check').forEach(function (c) { c.checked = document.getElementById('check-all').checked; });
+});
+</script>
+@endpush

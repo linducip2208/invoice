@@ -39,8 +39,10 @@
 
     <div class="row row-decks row-cards mb-3">
         <x-tabler.stat :label="__('Total Proyeksi') . ' ' . $days . ' ' . __('hari')" :value="number_format($totalProjected, 0)" icon="chart-line" />
+        <x-tabler.stat :label="__('Proyeksi Biaya')" :value="number_format($totalOutflow, 0)" icon="receipt" />
+        <x-tabler.stat :label="__('Net Proyeksi')" :value="number_format($totalNet, 0)" icon="wallet" />
     </div>
-    <p class="text-muted small mb-3">{{ __('Skenario') }}: {{ ucfirst($scenario) }} · {{ __('Proyeksi pendapatan') }} {{ $days }} {{ __('hari ke depan') }}</p>
+    <p class="text-muted small mb-3">{{ __('Skenario') }}: {{ ucfirst($scenario) }} · {{ __('Proyeksi pendapatan') }} {{ $days }} {{ __('hari ke depan') }} · {{ __('Outflow dari rata-rata expense 3 bulan') }} ({{ number_format($monthlyAvgOutflow, 0) }}/{{ __('bln') }})</p>
 
     <div class="card mb-3">
         <div class="card-header">
@@ -52,7 +54,7 @@
                 <div class="mb-3">
                     <div class="d-flex justify-content-between small mb-1">
                         <span class="fw-semibold">{{ $w->label }}</span>
-                        <span class="fw-bold">{{ number_format($w->inflow, 0) }}</span>
+                        <span><span class="text-success fw-bold">+{{ number_format($w->inflow, 0) }}</span> <span class="text-danger">−{{ number_format($w->outflow, 0) }}</span> = <span class="fw-bold {{ $w->net >= 0 ? 'text-success' : 'text-danger' }}">{{ number_format($w->net, 0) }}</span></span>
                     </div>
                     <div class="progress" style="height: 1.5rem;">
                         <div class="progress-bar bg-primary" style="width: {{ $w->inflow > 0 ? max(2, $w->inflow / $maxInflow * 100) : 0 }}%;">

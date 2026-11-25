@@ -47,12 +47,25 @@
                                 @if($line->matched_payment_id)
                                     <span class="text-success small fw-bold"><x-ti name="check" /> {{ __('Payment created') }}</span>
                                 @else
-                                    <select name="matches[{{ $line->id }}]" class="form-select form-select-sm">
+                                    <select name="matches[{{ $line->id }}]" class="form-select form-select-sm" id="match-{{ $line->id }}">
                                         <option value="">— {{ __('pilih') }} —</option>
                                         @foreach($candidates as $inv)
                                             <option value="{{ $inv->id }}" {{ $line->matched_invoice_id === $inv->id ? 'selected' : '' }}>{{ $inv->invoice_no }} — {{ $inv->client?->name }} ({{ number_format($inv->balance_due, 0) }})</option>
                                         @endforeach
                                     </select>
+                                    @if(! empty($suggestions[$line->id]))
+                                        <div class="mt-1 d-grid gap-1">
+                                            @foreach($suggestions[$line->id] as $s)
+                                                <button type="button" class="btn btn-sm btn-outline-info text-start suggest-btn"
+                                                    data-target="match-{{ $line->id }}" data-invoice="{{ $s['invoice']->id }}"
+                                                    title="{{ $s['reason'] }}">
+                                                    {{ $s['invoice']->invoice_no }} · {{ $s['invoice']->client?->name }}
+                                                    <span class="badge bg-info-lt ms-1">{{ $s['confidence'] }}</span>
+                                                    <span class="text-muted small d-block">{{ $s['reason'] }}</span>
+                                                </button>
+                                            @endforeach
+                                        </div>
+                                    @endif
                                 @endif
                             </td>
                             <td class="text-center">
@@ -71,3 +84,13 @@
         @endif
     </form>
 </x-tabler.layout>
+@push('scripts')
+<script>
+document.querySelectorAll('.suggest-btn').forEach(function (btn) {
+    btn.addEventListener('click', function () {
+        var sel = document.getElementById(btn.getAttribute('data-target'));
+        if (sel) { sel.value = btn.getAttribute('data-invoice'); sel.classList.add('border-info'); }
+    });
+});
+</script>
+@endpush

@@ -154,6 +154,28 @@ class QuoteController extends Controller
         return $this->convertToInvoice($quote, app(InvoiceService::class));
     }
 
+    public function downPayment(Request $request, Quote $quote)
+    {
+        abort_unless($quote->workspace_id === workspace()?->id, 403);
+
+        $validated = $request->validate([
+            'percent' => 'required|numeric|min:1|max:99',
+        ]);
+
+        $result = app(\App\Services\QuoteConversionService::class)
+            ->convertDownPayment($quote, (float) $validated['percent'], 'user:' . auth()->id());
+
+        if (isset($result['error'])) {
+            return back()->with('error', __('DP can only be created from an accepted quote (1–99%).'));
+        }
+
+        return redirect()
+            ->route('invoices.show', $result['invoice'])
+            ->with('success', $result['duplicate'] ?? false
+                ? __('DP invoice already exists — showing the existing one.')
+                : __('DP invoice created.'));
+    }
+
     public function rotateLink(Quote $quote, \App\Services\QuoteApprovalService $approvals)
     {
         abort_unless($quote->workspace_id === workspace()?->id, 403);

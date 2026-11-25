@@ -265,7 +265,23 @@ class ReportController extends Controller
 
         $totalProjected = $weeks->sum('inflow');
 
-        return view('reports.cashflow', compact('weeks', 'totalProjected', 'days', 'scenario'));
+        // Outflow: rata-rata expense bulanan 3 bulan terakhir → sebar per minggu.
+        $monthSums = [];
+        for ($m = 1; $m <= 3; $m++) {
+            $s = now()->subMonthsNoOverflow($m)->startOfMonth();
+            $e = now()->subMonthsNoOverflow($m)->endOfMonth();
+            $monthSums[] = (float) \App\Models\Expense::whereBetween('expense_date', [$s->toDateString(), $e->toDateString()])->sum('amount');
+        }
+        $monthlyAvgOutflow = count($monthSums) ? array_sum($monthSums) / 3 : 0.0;
+        $weeklyOutflow = round($monthlyAvgOutflow * 12 / 52, 2);
+        foreach ($weeks as $w) {
+            $w->outflow = $weeklyOutflow;
+            $w->net = round($w->inflow - $weeklyOutflow, 2);
+        }
+        $totalOutflow = round($weeklyOutflow * $weeks->count(), 2);
+        $totalNet = round($totalProjected - $totalOutflow, 2);
+
+        return view('reports.cashflow', compact('weeks', 'totalProjected', 'days', 'scenario', 'weeklyOutflow', 'monthlyAvgOutflow', 'totalOutflow', 'totalNet'));
     }
 
     /**

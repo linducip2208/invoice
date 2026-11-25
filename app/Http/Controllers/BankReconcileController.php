@@ -75,7 +75,7 @@ class BankReconcileController extends Controller
         return redirect()->route('bank-reconcile.show', $batch)->with('success', "✓ {$batch->total_lines} baris terimport, {$batch->matched_count} auto-matched.");
     }
 
-    public function show(BankReconcileBatch $batch)
+    public function show(BankReconcileBatch $batch, Matcher $matcher)
     {
         $batch->load('lines.matchedInvoice.client');
         $candidates = Invoice::whereIn('status', ['sent', 'partial', 'overdue'])
@@ -84,7 +84,13 @@ class BankReconcileController extends Controller
             ->latest('issue_date')
             ->limit(50)
             ->get();
-        return view('bank-reconcile.show', compact('batch', 'candidates'));
+        $suggestions = [];
+        foreach ($batch->lines as $line) {
+            if (! $line->matched_invoice_id && ! $line->matched_payment_id) {
+                $suggestions[$line->id] = $matcher->suggest($line, 3);
+            }
+        }
+        return view('bank-reconcile.show', compact('batch', 'candidates', 'suggestions'));
     }
 
     public function match(Request $request, BankReconcileBatch $batch)

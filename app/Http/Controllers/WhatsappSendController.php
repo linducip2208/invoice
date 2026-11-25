@@ -12,8 +12,9 @@ class WhatsappSendController extends Controller
     public function preview(Invoice $invoice)
     {
         $invoice->load('client', 'workspace');
-        $defaultMessage = $this->buildDefaultMessage($invoice);
-        return view('invoices.whatsapp-preview', compact('invoice', 'defaultMessage'));
+        $templates = $this->templates($invoice);
+        $defaultMessage = $templates['tagihan_baru'];
+        return view('invoices.whatsapp-preview', compact('invoice', 'defaultMessage', 'templates'));
     }
 
     public function send(Request $request, Invoice $invoice)
@@ -52,6 +53,34 @@ class WhatsappSendController extends Controller
             'fail_reason' => substr($result['error'] ?? '', 0, 500),
         ]);
         return back()->with('error', 'WhatsApp gagal dikirim: ' . $result['error']);
+    }
+
+    /**
+     * 4 template siap pakai. Semua memakai data invoice asli + link bayar publik.
+     * @return array<string,string>
+     */
+    public function templates(Invoice $invoice): array
+    {
+        $publicUrl = route('public.invoice.show', $invoice->public_token);
+        $total = $invoice->currency . ' ' . number_format($invoice->total, 0);
+
+        return [
+            'tagihan_baru' => $this->buildDefaultMessage($invoice),
+            'pengingat_h3' => "Halo {$invoice->client?->name},\n\n"
+                . "Pengingat: invoice *{$invoice->invoice_no}* ({$total}) jatuh tempo "
+                . $invoice->due_date->format('d M Y') . ".\n\n"
+                . "Bayar di sini: {$publicUrl}\n\n"
+                . "Terima kasih! 🙏",
+            'overdue' => "Halo {$invoice->client?->name},\n\n"
+                . "Invoice *{$invoice->invoice_no}* ({$total}) sudah melewati jatuh tempo "
+                . $invoice->due_date->format('d M Y') . ".\n\n"
+                . "Mohon pembayaran via: {$publicUrl}\n"
+                . "Balas pesan ini jika sudah bayar / ada kendala. 🙏",
+            'kwitansi' => "Halo {$invoice->client?->name},\n\n"
+                . "Terima kasih! Pembayaran invoice *{$invoice->invoice_no}* ({$total}) sudah kami terima. ✅\n\n"
+                . "Kwitansi: {$publicUrl}\n\n"
+                . "Sampai jumpa di project berikutnya! 🙏",
+        ];
     }
 
     private function buildDefaultMessage(Invoice $invoice): string

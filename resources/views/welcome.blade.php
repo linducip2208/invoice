@@ -237,12 +237,15 @@
     {{-- 8. PRICING --}}
     <section class="mb-5" aria-labelledby="pricing-heading">
         <div class="row g-2 align-items-center mb-3">
-            <div class="col">
+            <div class="col-lg-7">
                 <div class="page-pretitle">Pricing</div>
                 <h2 id="pricing-heading" class="h1 mb-1">Mulai gratis, upgrade saat sudah menghasilkan</h2>
                 <p class="text-muted mb-0">Harga nyata dari database (tabel plans). Perbandingan Free / Pro / Business.</p>
             </div>
-            <div class="col-auto"><a href="{{ route('pricing') }}" class="btn btn-outline-primary">Bandingkan semua fitur</a></div>
+            <div class="col-lg-5 text-lg-end">
+                <img src="{{ asset('images/pricing-premium.png') }}" alt="{{ __('Ilustrasi paket harga Invocely') }}" class="img-fluid rounded-3 shadow-sm" loading="lazy" width="832" height="480">
+            </div>
+            <div class="col-12 text-lg-end"><a href="{{ route('pricing') }}" class="btn btn-outline-primary mt-2">Bandingkan semua fitur</a></div>
         </div>
         <div class="row row-cards">
             @foreach($plans as $plan)
