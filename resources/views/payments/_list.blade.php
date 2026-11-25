@@ -29,6 +29,7 @@
                     <td class="text-nowrap text-muted">{{ $payment->reference_no ?: '—' }}</td>
                     <td class="text-muted text-truncate" style="max-width: 12rem;">{{ $payment->notes ?: '—' }}</td>
                     <td class="text-nowrap text-end">
+                        <a href="{{ route('payments.receipt', $payment) }}" target="_blank" class="btn btn-sm" title="{{ __('Cetak kwitansi') }}"><x-ti name="printer" /> {{ __('Kwitansi') }}</a>
                         <x-tabler.delete-button :action="route('payments.destroy', $payment)"
                             :confirm="__('Delete this payment?')" :title="__('Delete')" />
                     </td>

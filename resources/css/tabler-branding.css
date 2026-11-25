@@ -301,6 +301,13 @@ body {
 }
 
 /* ---------- Invocely premium SaaS system (Part C) ---------- */
+/* Kunci ukuran ikon SVG: tak pernah raksasa walau class icon hilang. */
+svg.icon { width: var(--tblr-icon-size, 1.25rem); height: var(--tblr-icon-size, 1.25rem); flex: none; }
+.admin-nav-group summary svg.chev,
+summary svg.chev,
+svg.chev { width: 1rem; height: 1rem; flex: none; }
+.btn svg.icon { width: 1rem; height: 1rem; }
+li svg.icon { width: 1.1rem; height: 1.1rem; }
 .card {
   border: 1px solid var(--tblr-card-border-color, var(--tblr-border-color));
   box-shadow: var(--invocely-card-shadow);

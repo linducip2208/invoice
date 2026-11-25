@@ -143,6 +143,18 @@ class PaymentController extends Controller
         return Redirect::back()->with('success', 'Pembayaran dihapus.');
     }
 
+    /**
+     * Kwitansi cetak per pembayaran (print/PDF browser).
+     */
+    public function receipt(Payment $payment)
+    {
+        abort_unless($payment->workspace_id === workspace()?->id, 403);
+        $payment->load('invoice.client');
+        $workspace = $payment->invoice->workspace ?? workspace();
+
+        return view('payments.receipt', compact('payment', 'workspace'));
+    }
+
     // ─── PUBLIC: Create gateway payment from public invoice page ──────────
     public function gatewayPay(Request $request, Invoice $invoice)
     {

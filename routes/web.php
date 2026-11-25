@@ -113,6 +113,7 @@ Route::middleware(['auth', 'verified', 'workspace'])->group(function () {
     Route::get('invoices/{invoice}/pdf',         [InvoiceController::class, 'pdf'])->name('invoices.pdf');
 
     Route::get('payments', [PaymentController::class, 'index'])->name('payments.index');
+    Route::get('payments/{payment}/receipt', [PaymentController::class, 'receipt'])->name('payments.receipt');
     Route::post('payments/invoice/{invoice}', [PaymentController::class, 'store'])->name('payments.store');
     Route::delete('payments/{payment}', [PaymentController::class, 'destroy'])->name('payments.destroy');
 
