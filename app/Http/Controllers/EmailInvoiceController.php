@@ -44,4 +44,53 @@ class EmailInvoiceController extends Controller
 
         return redirect()->back()->with('success', 'Invoice sent successfully to ' . $validated['to_email']);
     }
+
+    /**
+     * Kirim massal (maks 10/request): antre email + PDF per invoice,
+     * draft ikut berubah jadi sent. Tanpa email klien = dilewati.
+     */
+    public function bulkSend(Request $request, InvoiceService $invoiceService)
+    {
+        $validated = $request->validate([
+            'ids' => 'required|array|min:1|max:10',
+            'ids.*' => 'integer',
+        ]);
+
+        $sent = 0;
+        $skipped = 0;
+        $invoices = Invoice::with('client')->whereIn('id', $validated['ids'])->get();
+        foreach ($invoices as $invoice) {
+            if (! in_array($invoice->status, ['draft', 'sent', 'partial', 'overdue'], true)) {
+                $skipped++;
+                continue;
+            }
+            $to = $invoice->client?->email;
+            if (! $to) {
+                $skipped++;
+                continue;
+            }
+            $pdfPath = $invoiceService->generatePdf($invoice);
+            Mail::to($to)->queue(new InvoiceMail(
+                $invoice,
+                __('Invoice :no from :ws', ['no' => $invoice->invoice_no, 'ws' => $invoice->workspace?->name ?? config('app.name')]),
+                '',
+                $pdfPath,
+            ));
+            EmailLog::create([
+                'invoice_id' => $invoice->id,
+                'to_email' => $to,
+                'subject' => $invoice->invoice_no,
+                'body' => '',
+                'status' => 'queued',
+                'sent_at' => now(),
+            ]);
+            $invoice->update([
+                'last_sent_at' => now(),
+                'status' => $invoice->status === 'draft' ? 'sent' : $invoice->status,
+            ]);
+            $sent++;
+        }
+
+        return back()->with('success', __(':s invoice(s) queued, :k skipped (no email/closed).', ['s' => $sent, 'k' => $skipped]));
+    }
 }

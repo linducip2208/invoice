@@ -17,6 +17,12 @@ class QuoteController extends Controller
     {
         $query = Quote::with('client');
         if ($request->filled('status')) $query->where('status', $request->status);
+        if ($request->boolean('expiring')) {
+            $query->whereIn('status', ['sent', 'draft'])
+                ->whereNotNull('expiry_date')
+                ->whereDate('expiry_date', '>=', now()->toDateString())
+                ->whereDate('expiry_date', '<=', now()->addDays(7)->toDateString());
+        }
 
         $quotes = $query->latest()->paginate(20)->withQueryString();
         return view('quotes.index', compact('quotes'));

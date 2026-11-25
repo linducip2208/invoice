@@ -105,6 +105,7 @@ Route::middleware(['auth', 'verified', 'workspace'])->group(function () {
     Route::post('invoices/{invoice}/cancel',     [InvoiceController::class, 'markAsCancelled'])->name('invoices.cancel');
     Route::post('invoices/{invoice}/rotate-link', [InvoiceController::class, 'rotateLink'])->name('invoices.rotate-link');
     Route::post('invoices/{invoice}/send',       [EmailInvoiceController::class, 'send'])->name('invoices.send');
+    Route::post('invoices/bulk-send',             [EmailInvoiceController::class, 'bulkSend'])->name('invoices.bulk-send');
     Route::get('invoices/{invoice}/pdf',         [InvoiceController::class, 'pdf'])->name('invoices.pdf');
 
     Route::get('payments', [PaymentController::class, 'index'])->name('payments.index');

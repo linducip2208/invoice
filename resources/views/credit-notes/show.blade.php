@@ -6,6 +6,7 @@
         @if($cn->status === 'draft')
             <form method="POST" action="{{ route('credit-notes.issue', $cn) }}" class="d-inline">@csrf
                 <button type="submit" class="btn btn-sm btn-primary"><x-ti name="send" /> {{ __('Issue') }}</button>
+                <button type="submit" name="apply" value="1" class="btn btn-sm btn-outline-primary" title="{{ __('Issue sekaligus kurangi sisa tagihan invoice') }}"><x-ti name="check" /> {{ __('Issue + Apply') }}</button>
             </form>
         @endif
         @if($cn->status === 'issued')

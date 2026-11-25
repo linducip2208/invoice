@@ -95,13 +95,19 @@ class CreditNoteController extends Controller
         return view('credit-notes.show', ['cn' => $creditNote]);
     }
 
-    public function issue(CreditNote $creditNote)
+    public function issue(Request $request, CreditNote $creditNote)
     {
         if ($creditNote->status !== 'draft') {
             return back()->with('error', 'Hanya draft yang bisa diissue.');
         }
 
         $creditNote->update(['status' => 'issued']);
+
+        // Opsi 1-klik: issue + langsung apply ke invoice.
+        if ($request->boolean('apply')) {
+            return $this->apply($creditNote->fresh());
+        }
+
         return back()->with('success', "Credit note {$creditNote->credit_no} di-issue.");
     }
 

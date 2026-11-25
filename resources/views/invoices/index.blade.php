@@ -59,6 +59,7 @@
         <div class="card">
             <div class="card-header"><h3 class="card-title">{{ __('Invoice list (:n)', ['n' => $invoices->total()]) }}</h3>
                 <div class="card-actions">
+                    <button type="submit" formaction="{{ route('invoices.bulk-send') }}" class="btn btn-sm btn-outline-primary" onclick="return confirm('{{ __('Kirim (email + PDF) invoice terpilih? Maks 10 per aksi.') }}')">{{ __('Bulk send') }}</button>
                     <button type="submit" class="btn btn-sm btn-outline-danger" onclick="return confirm('{{ __('Delete selected drafts? Only drafts will be removed.') }}')">{{ __('Bulk delete drafts') }}</button>
                 </div>
             </div>

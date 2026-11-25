@@ -7,6 +7,12 @@
 
     <div class="row justify-content-center">
         <div class="col-lg-8">
+            @php $hour = (int) now()->setTimezone('Asia/Jakarta')->format('G'); @endphp
+            @if($hour < 8 || $hour >= 17)
+                <div class="alert alert-warning" role="alert">
+                    {{ __('Di luar jam kerja (08:00–17:00 WIB). Pesan tetap bisa dikirim, tapi respons klien kemungkinan besok pagi.') }}
+                </div>
+            @endif
             <form method="POST" action="{{ route('invoices.whatsapp.send', $invoice) }}" class="card" data-prevent-double-submit>
                 @csrf
                 <div class="card-body">

@@ -5,6 +5,39 @@
         </a>
     </x-slot>
 
+    <div class="card mb-3">
+        <div class="card-body">
+            <form method="GET" action="{{ route('quotes.index') }}">
+                <div class="row g-2 align-items-end">
+                    <div class="col-md-4">
+                        <x-tabler.field :label="__('Status')" name="status">
+                            <select id="status" name="status" class="form-select">
+                                <option value="">{{ __('All') }}</option>
+                                @foreach(['draft','sent','accepted','rejected','expired','withdrawn','converted'] as $s)
+                                    <option value="{{ $s }}" @selected(request('status')===$s)>{{ __(ucfirst($s)) }}</option>
+                                @endforeach
+                            </select>
+                        </x-tabler.field>
+                    </div>
+                    <div class="col-md-4">
+                        <label class="form-check mt-2">
+                            <input type="checkbox" name="expiring" value="1" @checked(request()->boolean('expiring')) class="form-check-input">
+                            <span class="form-check-label">{{ __('Kedaluwarsa ≤7 hari') }}</span>
+                        </label>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="btn-list justify-content-end">
+                            @if(request()->anyFilled(['status']) || request()->boolean('expiring'))
+                                <a href="{{ route('quotes.index') }}" class="btn">{{ __('Reset') }}</a>
+                            @endif
+                            <button type="submit" class="btn btn-primary">{{ __('Filter') }}</button>
+                        </div>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+
     <div class="card">
         <div class="table-responsive">
             <table class="table table-vcenter card-table">
@@ -21,8 +54,9 @@
                 </thead>
                 <tbody>
                     @forelse($quotes as $q)
-                        <tr>
-                            <td class="fw-bold"><a href="{{ route('quotes.show', $q) }}">{{ $q->quote_no }}</a></td>
+                        @php $soon = in_array($q->status, ['sent','draft']) && $q->expiry_date && $q->expiry_date->isFuture() && $q->expiry_date->lte(now()->addDays(7)); @endphp
+                        <tr @if($soon) class="table-warning" @endif>
+                            <td class="fw-bold"><a href="{{ route('quotes.show', $q) }}">{{ $q->quote_no }}</a>@if($soon)<span class="badge bg-warning-lt ms-1">{{ __('≤7 hari') }}</span>@endif</td>
                             <td class="text-muted">{{ $q->client?->name }}</td>
                             <td class="text-muted">{{ $q->issue_date?->format('d M Y') }}</td>
                             <td class="text-muted">{{ $q->expiry_date?->format('d M Y') ?? '—' }}</td>
