@@ -1,4 +1,9 @@
-# TILLORA — tema + menu proses bisnis + konektivitas (continuous execution)
+# TILLORA — tema + menu mega + konektivitas (continuous execution)
+
+## Shell Tillora penuh (Tabler tetap)
+- Topbar navy: brand, workspace switcher, global search (Ctrl+K / `/`, + filter menu), quick-create, notification center dropdown, theme toggle, profile dropdown — sesuai pola pos-retail.
+- Mega-menu horizontal per proses bisnis (klik, bukan hover): Dashboard | Penawaran | Penagihan | Pembayaran | Laporan | Otomatisasi | Pengaturan — dengan ikon + deskripsi + panel fitur. Mobile: drawer offcanvas + grup lipat.
+- Bukti: `landing/dashboard-tillora.png`, `landing/dashboard-mega.png`.
 
 ## Tema Tillora (Tabler tetap, Tillora sebagai skin)
 - Sumber: `D:\project laravel\notaris\web\assets\notarius\tillora.css` (+ tokens). Prinsip sama: komponen tetap Tabler murni, skin hanya token + polesan.
