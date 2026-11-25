@@ -113,13 +113,22 @@
                 $mega('embed.demo', 'code', __('Embed Widget'), __('Sematkan invoice'), 'embed.demo'),
             ]],
         ]],
-        ['key' => 'pengaturan', 'label' => __('Pengaturan'), 'icon' => 'settings', 'patterns' => ['workspace.*', 'team.*', 'invoice-layouts.*', 'gateways.*', 'custom-domain.*', 'clients.import.*', 'audit-logs.*', 'billing.*', 'affiliate.*'], 'type' => 'simple-wide', 'items' => [
+        ['key' => 'pengaturan', 'label' => __('Pengaturan'), 'icon' => 'settings', 'patterns' => ['workspace.*', 'team.*', 'invoice-layouts.*', 'gateways.*', 'custom-domain.*', 'clients.import.*', 'audit-logs.*'], 'type' => 'simple-wide', 'items' => [
             $mega('workspace.settings', 'settings', __('Company Settings'), __('Identitas & default'), 'workspace.*'),
             $mega('team.index', 'users', __('Team & Roles'), __('Akses tim'), 'team.*'),
             $mega('invoice-layouts.index', 'template', __('Invoice Templates'), __('Desain invoice'), 'invoice-layouts.*'),
             $mega('gateways.index', 'plug', __('Payment Gateways'), __('Kanal bayar'), 'gateways.*'),
-            $mega('billing.show', 'wallet', __('Current Plan'), __('Langganan'), 'billing.*'),
+            $mega('custom-domain.show', 'globe', __('Custom Domain'), __('Domain sendiri'), 'custom-domain.*'),
+            $mega('clients.import.show', 'upload', __('CSV Import'), __('Impor klien'), 'clients.import.*'),
+            $mega('audit-logs.index', 'history', __('Audit Logs'), __('Jejak audit'), 'audit-logs.*'),
+        ]],
+        ['key' => 'langganan', 'label' => __('Langganan'), 'icon' => 'wallet', 'patterns' => ['billing.*', 'affiliate.*'], 'type' => 'simple', 'items' => [
+            $mega('billing.show', 'wallet', __('Current Plan'), __('Paket & tagihan'), 'billing.*'),
             $mega('affiliate.index', 'star', __('Affiliate'), __('Program referral'), 'affiliate.*'),
+        ]],
+        ['key' => 'bantuan', 'label' => __('Bantuan'), 'icon' => 'lifebuoy', 'patterns' => ['docs', 'support.*'], 'type' => 'simple', 'items' => [
+            $mega('docs', 'book', __('Documentation'), __('Panduan pakai'), 'docs'),
+            $mega('support.index', 'lifebuoy', __('Support'), __('Hubungi bantuan'), 'support.*'),
         ]],
     ];
     $groupActive = fn($g) => collect($g['patterns'] ?? [])->contains(fn($p) => request()->routeIs($p));
