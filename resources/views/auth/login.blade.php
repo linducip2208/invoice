@@ -45,12 +45,32 @@
                 <p class="text-muted">{{ __('Local environment only — never shown in production.') }}</p>
                 <dl class="row g-2 mb-0">
                     <dt class="col-12 text-muted small">{{ __('Superadmin') }}</dt>
-                    <dd class="col-12"><code class="text-break">superadmin@invocely.test / superadmin123</code></dd>
+                    <dd class="col-12 d-flex justify-content-between align-items-center gap-2">
+                        <code class="text-break">superadmin@invocely.test / superadmin123</code>
+                        <button type="button" class="btn btn-sm btn-outline-primary text-nowrap"
+                            data-fill-login="superadmin@invocely.test|superadmin123">{{ __('Isi') }}</button>
+                    </dd>
                     <dt class="col-12 text-muted small">{{ __('Demo Admin') }}</dt>
-                    <dd class="col-12"><code class="text-break">demo@invocely.test / password</code></dd>
+                    <dd class="col-12 d-flex justify-content-between align-items-center gap-2">
+                        <code class="text-break">demo@invocely.test / password</code>
+                        <button type="button" class="btn btn-sm btn-outline-primary text-nowrap"
+                            data-fill-login="demo@invocely.test|password">{{ __('Isi') }}</button>
+                    </dd>
                 </dl>
             </div>
         </div>
+        <script>
+            document.querySelectorAll('[data-fill-login]').forEach(function (btn) {
+                btn.addEventListener('click', function () {
+                    var parts = (btn.getAttribute('data-fill-login') || '').split('|');
+                    var email = document.getElementById('email');
+                    var password = document.getElementById('password');
+                    if (email && parts[0]) email.value = parts[0];
+                    if (password && parts[1]) password.value = parts[1];
+                    if (email) email.focus();
+                });
+            });
+        </script>
     @endif
     <div class="text-center text-muted mt-3">
         <a href="{{ route('home') }}">{{ __('Back to home') }}</a>

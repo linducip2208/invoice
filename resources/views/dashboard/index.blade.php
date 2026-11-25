@@ -21,6 +21,13 @@
     </div>
 
     <div class="row row-deck row-cards mb-3">
+        <div class="col-sm-6 col-lg-3"><div class="card invocely-kpi"><div class="card-body"><div class="subheader">{{ __('Collection rate') }}</div><div class="h1 mb-0">{{ $collectionRate }}%</div><div class="text-muted small">{{ __('Collected vs invoiced (excl. draft/cancelled)') }}</div></div></div></div>
+        <div class="col-sm-6 col-lg-3"><div class="card invocely-kpi"><div class="card-body"><div class="subheader">{{ __('Total customers') }}</div><div class="h1 mb-0">{{ number_format($clientCount) }}</div><div class="text-muted small"><a href="{{ route('clients.index') }}">{{ __('Manage customers →') }}</a></div></div></div></div>
+        <div class="col-sm-6 col-lg-3"><div class="card invocely-kpi"><div class="card-body"><div class="subheader">{{ __('Total invoiced') }}</div><div class="h1 mb-0">{{ $fmt($totalInvoiced) }}</div><div class="text-muted small">{{ __('Sent/paid/overdue lifetime') }}</div></div></div></div>
+        <div class="col-sm-6 col-lg-3"><div class="card invocely-kpi"><div class="card-body"><div class="subheader">{{ __('Upcoming due (5)') }}</div><div class="h1 mb-0">{{ count($upcomingDue) }}</div><div class="text-muted small">{{ __('Due today or later, unpaid') }}</div></div></div></div>
+    </div>
+
+    <div class="row row-deck row-cards mb-3">
         <div class="col-lg-8">
             <div class="card h-100">
                 <div class="card-header">
@@ -274,6 +281,44 @@
             ['label' => __('Record payment'), 'desc' => __('Manual / partial'), 'href' => route('payments.index'), 'icon' => 'credit-card'],
         ];
     @endphp
+    <div class="row row-deck row-cards mb-3">
+        <div class="col-lg-4">
+            <div class="card h-100">
+                <div class="card-header"><h3 class="card-title">{{ __('Top customers (paid)') }}</h3><div class="card-actions"><a href="{{ route('clients.index') }}" class="btn btn-sm">{{ __('View') }}</a></div></div>
+                <div class="list-group list-group-flush">
+                    @forelse($topCustomers as $c)
+                        <a href="{{ route('clients.show', $c) }}" class="list-group-item list-group-item-action"><div class="row align-items-center g-2"><div class="col text-truncate"><div class="fw-semibold text-truncate">{{ $c->name }}</div><div class="text-muted small">{{ $c->company_name ?? $c->email }}</div></div><div class="col-auto fw-bold">{{ number_format($c->revenue ?? 0, 0) }}</div></div></a>
+                    @empty
+                        <div class="p-3 text-muted">{{ __('No paid revenue yet.') }}</div>
+                    @endforelse
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-4">
+            <div class="card h-100">
+                <div class="card-header"><h3 class="card-title">{{ __('Upcoming due dates') }}</h3><div class="card-actions"><a href="{{ route('reports.aging') }}" class="btn btn-sm">{{ __('Aging') }}</a></div></div>
+                <div class="list-group list-group-flush">
+                    @forelse($upcomingDue as $inv)
+                        <a href="{{ route('invoices.show', $inv) }}" class="list-group-item list-group-item-action"><div class="row align-items-center g-2"><div class="col text-truncate"><div class="fw-semibold text-truncate">{{ $inv->invoice_no }}</div><div class="text-muted small">{{ $inv->client?->name }} · {{ $inv->due_date?->format('d M Y') }}</div></div><div class="col-auto fw-bold">{{ number_format($inv->balance_due, 0) }}</div></div></a>
+                    @empty
+                        <div class="p-3 text-muted">{{ __('Nothing due soon.') }}</div>
+                    @endforelse
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-4">
+            <div class="card h-100">
+                <div class="card-header"><h3 class="card-title">{{ __('Recent payments') }}</h3><div class="card-actions"><a href="{{ route('payments.index') }}" class="btn btn-sm">{{ __('View') }}</a></div></div>
+                <div class="list-group list-group-flush">
+                    @forelse($recentPayments as $p)
+                        <div class="list-group-item"><div class="row align-items-center g-2"><div class="col text-truncate"><div class="fw-semibold text-truncate">{{ $p->invoice?->invoice_no ?? $p->reference_no }}</div><div class="text-muted small">{{ $p->payment_date?->format('d M Y') }} · {{ $p->payment_method }}</div></div><div class="col-auto fw-bold text-success">{{ number_format($p->amount, 0) }}</div></div></div>
+                    @empty
+                        <div class="p-3 text-muted">{{ __('No payments recorded.') }}</div>
+                    @endforelse
+                </div>
+            </div>
+        </div>
+    </div>
     <div class="row row-deck row-cards">
         @foreach($quickActions as $action)
             <div class="col-sm-6 col-lg-3">

@@ -88,6 +88,7 @@ Route::middleware(['auth', 'verified', 'workspace'])->group(function () {
 
     // Invoices (create/edit/delete gated by plan)
     Route::get('invoices',              [InvoiceController::class, 'index'])->name('invoices.index');
+    Route::post('invoices/bulk-destroy', [InvoiceController::class, 'bulkDestroy'])->middleware('plan:invoice.delete')->name('invoices.bulk-destroy');
     Route::middleware('plan:invoice.create')->group(function () {
         Route::get('invoices/create',   [InvoiceController::class, 'create'])->name('invoices.create');
         Route::post('invoices',         [InvoiceController::class, 'store'])->name('invoices.store');
@@ -353,6 +354,10 @@ Route::middleware(['auth', 'verified', 'workspace'])->group(function () {
 // Superadmin
 Route::middleware(['auth', 'superadmin'])->prefix('admin')->name('admin.')->group(function () {
     Route::get('/',                          [AdminDashboardController::class, 'index'])->name('dashboard');
+    Route::get('/analytics',                 [\App\Http\Controllers\Admin\AdminAnalyticsController::class, 'index'])->name('analytics');
+    Route::get('/revenue',                   [\App\Http\Controllers\Admin\AdminRevenueController::class, 'index'])->name('revenue');
+    Route::get('/settings',                  [\App\Http\Controllers\Admin\AdminSettingsController::class, 'index'])->name('settings');
+    Route::get('/audit-logs',                [\App\Http\Controllers\Admin\AdminAuditLogController::class, 'index'])->name('audit-logs');
     Route::resource('plans',                 AdminPlanController::class);
     Route::resource('users',                 AdminUserController::class)->only(['index', 'show', 'destroy']);
     Route::resource('workspaces',            AdminWorkspaceController::class)->only(['index', 'show']);
@@ -384,6 +389,8 @@ Route::middleware('auth')->group(function () {
 });
 
 Route::get('/docs', fn() => view('docs'))->name('docs');
+Route::view('/privacy', 'legal.privacy')->name('privacy');
+Route::view('/terms', 'legal.terms')->name('terms');
 
 Route::get('/pricing', [PricingController::class, 'index'])->name('pricing');
 

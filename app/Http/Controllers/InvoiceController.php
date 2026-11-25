@@ -30,7 +30,7 @@ class InvoiceController extends Controller
             'client_id'       => ['required', Rule::exists('clients', 'id')->where('workspace_id', $workspaceId)],
             'issue_date'      => 'required|date',
             'due_date'        => 'required|date|after_or_equal:issue_date',
-            'template'         => 'required|string|in:classic,modern,minimal,bold,elegant',
+            'template'         => 'required|string|in:classic,modern,minimal,bold,elegant,bilingual',
             'invoice_layout_id' => 'nullable|exists:invoice_layouts,id',
             'primary_color'   => 'nullable|string|max:7',
             'accent_color'    => 'nullable|string|max:7',
@@ -57,6 +57,10 @@ class InvoiceController extends Controller
             $query->where('status', $request->status);
         }
 
+        if ($request->filled('client_id')) {
+            $query->where('client_id', $request->client_id);
+        }
+
         if ($request->filled('search')) {
             $search = $request->search;
             $query->where(function ($q) use ($search) {
@@ -74,9 +78,30 @@ class InvoiceController extends Controller
             $query->whereDate('issue_date', '<=', $request->date_to);
         }
 
-        $invoices = $query->latest()->paginate(20)->withQueryString();
+        $allowedSorts = ['issue_date', 'due_date', 'total', 'balance_due', 'invoice_no', 'created_at'];
+        $sort = in_array($request->get('sort'), $allowedSorts, true) ? $request->get('sort') : 'created_at';
+        $order = $request->get('order') === 'asc' ? 'asc' : 'desc';
+        $query->orderBy($sort, $order);
 
-        return view('invoices.index', compact('invoices'));
+        $invoices = $query->paginate(20)->withQueryString();
+        $clients = Client::orderBy('name')->get(['id', 'name', 'company_name']);
+
+        return view('invoices.index', compact('invoices', 'clients', 'sort', 'order'));
+    }
+
+    public function bulkDestroy(Request $request)
+    {
+        $validated = $request->validate(['ids' => 'required|array|min:1', 'ids.*' => 'integer']);
+        $deleted = 0;
+        foreach (Invoice::whereIn('id', $validated['ids'])->get() as $inv) {
+            if ($inv->workspace_id !== workspace()?->id) continue;
+            if ($inv->status !== 'draft') continue;
+            $inv->items()->delete();
+            $inv->delete();
+            $deleted++;
+        }
+
+        return back()->with('success', __(':n draft invoice(s) deleted.', ['n' => $deleted]));
     }
 
     public function create()

@@ -11,6 +11,9 @@
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="default">
     <meta name="apple-mobile-web-app-title" content="Invocely">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 
     <script>
         try {
@@ -51,7 +54,7 @@
                 <span class="font-display">{{ branding('app_name') }}</span>
             </a>
             <div class="collapse navbar-collapse" id="sidebar-menu">
-                <ul class="navbar-nav pt-lg-3">
+                <ul class="navbar-nav pt-lg-3" id="ws-nav">
                     @php
                         $ws = workspace();
                         $isSuper = Auth::user()?->isSuperadmin();
@@ -115,9 +118,10 @@
                         ];
                     @endphp
                     @foreach($sections as $heading => $items)
-                        <li class="nav-item navbar-heading">{{ $heading }}</li>
+                        <details class="admin-nav-group" open data-ws-group>
+                            <summary aria-label="{{ $heading }}"><span>{{ $heading }}</span><x-ti name="chevron-down" class="chev" /></summary>
                         @foreach($items as $item)
-                            <li class="nav-item{{ $item['active'] ? ' active' : '' }}">
+                            <li class="nav-item{{ $item['active'] ? ' active' : '' }}" data-ws-label="{{ strtolower($item['label']) }}">
                                 <a class="nav-link{{ $item['active'] ? ' active' : '' }}" href="{{ $item['href'] }}"
                                     @if($item['active']) aria-current="page" @endif>
                                     <span class="nav-link-icon d-md-none d-lg-inline-block">
@@ -127,6 +131,7 @@
                                 </a>
                             </li>
                         @endforeach
+                        </details>
                     @endforeach
                     @if($isSuper)
                         <li class="nav-item navbar-heading">{{ __('Platform') }}</li>
@@ -152,7 +157,13 @@
                     aria-controls="sidebar-menu" aria-expanded="false" aria-label="{{ __('Toggle navigation') }}">
                     <span class="navbar-toggler-icon"></span>
                 </button>
-                <div class="navbar-nav flex-row order-md-last ms-auto">
+                <div class="navbar-nav flex-row order-md-last ms-auto align-items-center">
+                    <form method="GET" action="{{ route('invoices.index') }}" class="d-none d-lg-block me-2" role="search" aria-label="{{ __('Global search') }}">
+                        <div class="input-icon">
+                            <span class="input-icon-addon"><x-ti name="search" /></span>
+                            <input type="search" name="search" value="{{ request('search') }}" class="form-control form-control-sm" style="min-width:13rem;" placeholder="{{ __('Search invoices, customers… (/)') }}" aria-label="{{ __('Global search') }}" id="ws-global-search">
+                        </div>
+                    </form>
                     <div class="nav-item dropdown me-2 d-flex">
                         <a href="#" class="btn btn-primary d-flex align-items-center gap-1" data-bs-toggle="dropdown"
                             aria-label="{{ __('Quick create') }}" aria-expanded="false">
@@ -285,5 +296,23 @@
     </div>
 </div>
 @stack('scripts')
+<script>
+(function () {
+    var input = document.getElementById('ws-global-search');
+    if (input) {
+        document.addEventListener('keydown', function (e) {
+            if (e.key === '/' && !/INPUT|TEXTAREA|SELECT/.test(document.activeElement.tagName)) { e.preventDefault(); input.focus(); }
+        });
+        var items = Array.prototype.slice.call(document.querySelectorAll('#ws-nav [data-ws-label]'));
+        input.addEventListener('input', function () {
+            var q = input.value.trim().toLowerCase();
+            items.forEach(function (li) {
+                var hit = !q || (li.getAttribute('data-ws-label') || '').indexOf(q) !== -1;
+                li.style.display = hit ? '' : 'none';
+            });
+        });
+    }
+})();
+</script>
 </body>
 </html>

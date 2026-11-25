@@ -88,6 +88,19 @@ class DashboardController extends Controller
             $aging[$bucket] += (float) $inv->balance_due;
         }
 
+        $totalInvoiced = (float) Invoice::whereNotIn('status', ['draft', 'cancelled'])->sum('total');
+        $collectionRate = $totalInvoiced > 0 ? round(($totalRevenue / $totalInvoiced) * 100, 1) : 0.0;
+
+        $topCustomers = Client::withSum(['invoices as revenue' => fn ($q) => $q->where('status', 'paid')], 'total')
+            ->orderByDesc('revenue')->take(5)->get();
+
+        $upcomingDue = Invoice::with('client:id,name')
+            ->whereIn('status', ['sent', 'partial'])
+            ->whereDate('due_date', '>=', now()->toDateString())
+            ->orderBy('due_date')->take(5)->get();
+
+        $recentPayments = Payment::with('invoice:id,invoice_no,client_id')->latest('payment_date')->take(5)->get();
+
         return view('dashboard.index', compact(
             'totalRevenue',
             'outstandingAmount',
@@ -100,7 +113,12 @@ class DashboardController extends Controller
             'overdueInvoices',
             'pendingQuotes',
             'statusCounts',
-            'aging'
+            'aging',
+            'collectionRate',
+            'totalInvoiced',
+            'topCustomers',
+            'upcomingDue',
+            'recentPayments'
         ));
     }
 }

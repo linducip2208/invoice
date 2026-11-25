@@ -50,7 +50,7 @@
             <div class="card-body">
                 <h3 class="card-title mb-3">{{ __('Template & Colors') }}</h3>
                 <div class="row g-2 mb-3">
-                    @php $templates = ['classic', 'modern', 'minimal', 'bold', 'elegant']; @endphp
+                    @php $templates = ['classic', 'modern', 'minimal', 'bold', 'elegant', 'bilingual']; @endphp
                     @foreach ($templates as $tpl)
                         <div class="col-6 col-sm-4 col-lg-2">
                             <label class="form-selectgroup-item w-100">
