@@ -30,5 +30,25 @@
                 </div>
             </div>
         </div>
+        <div class="col-md-4">
+            <div class="card">
+                <div class="card-body text-center">
+                    <div class="text-muted mb-2"><x-ti name="file-text" class="icon icon-lg" /></div>
+                    <h3 class="card-title">{{ __('Quotations') }}</h3>
+                    <p class="text-muted small">{{ __('CSV semua quotation') }}</p>
+                    <a href="{{ route('exports.quotes') }}" class="btn btn-primary"><x-ti name="download" /> {{ __('Quotes') }}</a>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card">
+                <div class="card-body text-center">
+                    <div class="text-muted mb-2"><x-ti name="package" class="icon icon-lg" /></div>
+                    <h3 class="card-title">{{ __('Products') }}</h3>
+                    <p class="text-muted small">{{ __('CSV semua produk') }}</p>
+                    <a href="{{ route('exports.products') }}" class="btn btn-primary"><x-ti name="download" /> {{ __('Products') }}</a>
+                </div>
+            </div>
+        </div>
     </div>
 </x-tabler.layout>

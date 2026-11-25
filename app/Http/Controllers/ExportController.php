@@ -5,6 +5,8 @@ namespace App\Http\Controllers;
 use App\Models\Client;
 use App\Models\Invoice;
 use App\Models\Payment;
+use App\Models\Product;
+use App\Models\Quote;
 use Symfony\Component\HttpFoundation\StreamedResponse;
 
 class ExportController extends Controller
@@ -45,6 +47,29 @@ class ExportController extends Controller
             Client::cursor()->map(fn($c) => [
                 $c->name, $c->company_name, $c->email, $c->phone,
                 $c->city, $c->country, $c->is_active ? 'yes' : 'no',
+            ])
+        );
+    }
+
+    public function quotes(): StreamedResponse
+    {
+        return $this->csv('quotes-' . now()->format('Ymd') . '.csv',
+            ['Quote No', 'Client', 'Status', 'Revision', 'Issue Date', 'Expiry Date', 'Subtotal', 'Tax', 'Total', 'Currency'],
+            Quote::with('client')->cursor()->map(fn($q) => [
+                $q->quote_no, $q->client?->name, $q->status, $q->revision,
+                $q->issue_date?->format('Y-m-d'), $q->expiry_date?->format('Y-m-d'),
+                $q->subtotal, $q->tax_amount, $q->total, $q->currency,
+            ])
+        );
+    }
+
+    public function products(): StreamedResponse
+    {
+        return $this->csv('products-' . now()->format('Ymd') . '.csv',
+            ['Name', 'Category', 'Description', 'Unit Price', 'Tax Rate', 'Active'],
+            Product::cursor()->map(fn($p) => [
+                $p->name, $p->category, $p->description,
+                $p->unit_price, $p->tax_rate, $p->is_active ? 'yes' : 'no',
             ])
         );
     }

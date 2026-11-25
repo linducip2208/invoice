@@ -320,6 +320,8 @@ Route::middleware(['auth', 'verified', 'workspace'])->group(function () {
     Route::get   ('exports/invoices.csv',         [ExportController::class, 'invoices'])->name('exports.invoices');
     Route::get   ('exports/payments.csv',         [ExportController::class, 'payments'])->name('exports.payments');
     Route::get   ('exports/clients.csv',          [ExportController::class, 'clients'])->name('exports.clients');
+    Route::get   ('exports/quotes.csv',           [ExportController::class, 'quotes'])->name('exports.quotes');
+    Route::get   ('exports/products.csv',         [ExportController::class, 'products'])->name('exports.products');
 
     Route::middleware('plan:api.access')->group(function () {
         Route::get   ('api-tokens',               [ApiTokenController::class, 'index'])->name('api-tokens.index');
