@@ -173,6 +173,13 @@
                         <span>{{ __('Balance Due') }}</span>
                         <span class="{{ $invoice->balance_due > 0 ? 'text-danger' : 'text-success' }}">{{ number_format((float) $invoice->balance_due, 2) }}</span>
                     </div>
+                    @php $idrEquiv = $invoice->currency !== 'IDR' ? \App\Services\CurrencyRateService::convert((float) $invoice->total, $invoice->currency, 'IDR') : null; @endphp
+                    @if($idrEquiv !== null)
+                        <div class="d-flex justify-content-between small text-muted mt-1">
+                            <span>{{ __('Setara Rp (kurs hari ini)') }}</span>
+                            <span>≈ Rp{{ number_format($idrEquiv, 0, ',', '.') }}</span>
+                        </div>
+                    @endif
                 </div>
             </div>
         </div>

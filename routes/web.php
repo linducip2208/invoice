@@ -13,6 +13,7 @@ use App\Http\Controllers\BillingWebhookController;
 use App\Http\Controllers\AffiliateController;
 use App\Http\Controllers\ApiTokenController;
 use App\Http\Controllers\AuditLogController;
+use App\Http\Controllers\BundleController;
 use App\Http\Controllers\ClientController;
 use App\Http\Controllers\ClientImportController;
 use App\Http\Controllers\ComingSoonController;
@@ -76,6 +77,10 @@ Route::middleware(['auth', 'verified', 'workspace'])->group(function () {
 
     Route::resource('products', ProductController::class)->except(['show']);
     Route::post('products/{product}/duplicate', [ProductController::class, 'duplicate'])->name('products.duplicate');
+
+    Route::resource('bundles', BundleController::class)->except(['show']);
+    Route::get('bundles/{bundle}', [BundleController::class, 'show'])->name('bundles.show');
+    Route::post('bundles/{bundle}/invoice', [BundleController::class, 'toInvoice'])->middleware('plan:invoice.create')->name('bundles.invoice');
 
     // Recurring (entire feature gated to Pro+)
     Route::get('recurring', [RecurringInvoiceController::class, 'index'])->name('recurring.index');
@@ -369,6 +374,8 @@ Route::middleware(['auth', 'superadmin'])->prefix('admin')->name('admin.')->grou
     Route::get('/analytics',                 [\App\Http\Controllers\Admin\AdminAnalyticsController::class, 'index'])->name('analytics');
     Route::get('/revenue',                   [\App\Http\Controllers\Admin\AdminRevenueController::class, 'index'])->name('revenue');
     Route::get('/settings',                  [\App\Http\Controllers\Admin\AdminSettingsController::class, 'index'])->name('settings');
+    Route::post('/settings/fx',              [\App\Http\Controllers\Admin\AdminSettingsController::class, 'updateFx'])->name('settings.fx');
+    Route::post('/settings/fx-refresh',      [\App\Http\Controllers\Admin\AdminSettingsController::class, 'refreshFx'])->name('settings.fx-refresh');
     Route::get('/audit-logs',                [\App\Http\Controllers\Admin\AdminAuditLogController::class, 'index'])->name('audit-logs');
     Route::resource('plans',                 AdminPlanController::class);
     Route::resource('users',                 AdminUserController::class)->only(['index', 'show', 'destroy']);

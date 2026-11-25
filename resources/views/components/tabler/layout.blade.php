@@ -73,6 +73,7 @@
                                 $link('quotes.index', 'quotes.*', 'file-text', __('Quotations')),
                                 $link('clients.index', 'clients.*', 'users', __('Customers')),
                                 $link('products.index', 'products.*', 'package', __('Products & Services')),
+                                $link('bundles.index', 'bundles.*', 'package', __('Bundles')),
                                 $link('projects.index', 'projects.*', 'briefcase', __('Projects')),
                                 $link('credit-notes.index', 'credit-notes.*', 'receipt-refund', __('Credit Notes')),
                             ],

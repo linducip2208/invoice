@@ -72,9 +72,14 @@ class AdminDashboardController extends Controller
         $newWorkspaces = Workspace::latest()->take(5)->get();
         $recentAudit = \App\Models\AuditLog::with(['user', 'workspace'])->latest()->take(8)->get();
 
+        $fxRate = \App\Services\CurrencyRateService::rate('USD', 'IDR');
+        $fxDate = \App\Services\CurrencyRateService::rateDate('USD', 'IDR');
+        $mrrUsdIdr = $fxRate ? round((float) $mrrUsd * $fxRate, 0) : null;
+
         return view('admin.dashboard', compact(
             'totalUsers', 'totalWorkspaces', 'activeSubs', 'pendingSubs', 'expiredSubs', 'freeWorkspaces',
             'mrrIdr', 'mrrUsd', 'lastMrrIdr', 'lastMrrUsd', 'growthIdr', 'growthUsd',
+            'fxRate', 'fxDate', 'mrrUsdIdr',
             'userGrowth', 'workspaceGrowth', 'mrrSeries',
             'planDistribution', 'revenueByCurrency', 'conversion', 'churnRate', 'churned',
             'recentSubs', 'upcomingRenewals', 'pendingPayments', 'approvedPayments', 'recentInvoices',

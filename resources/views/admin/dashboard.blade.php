@@ -25,6 +25,9 @@
                 <div class="subheader">{{ __('MRR This Month (USD)') }}</div>
                 <div class="h1 mb-0">${{ number_format($mrrUsd, 2) }}</div>
                 <div class="small {{ $growthUsd >= 0 ? 'text-success' : 'text-danger' }}">{{ ($growthUsd >= 0 ? '+' : '') . $growthUsd }}% {{ __('vs last month') }} (${{ number_format($lastMrrUsd, 2) }})</div>
+                @if($mrrUsdIdr !== null)
+                    <div class="small text-muted mt-1">≈ Rp{{ number_format($mrrUsdIdr, 0, ',', '.') }} <span title="{{ __('Kurs') }} 1 USD = Rp{{ number_format($fxRate, 0, ',', '.') }}{{ $fxDate ? ' · ' . $fxDate : '' }}">({{ __('kurs') }} {{ $fxDate ?? __('hari ini') }})</span></div>
+                @endif
             </div></div>
         </div>
         <div class="col-sm-12 col-lg-4">
