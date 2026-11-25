@@ -152,6 +152,16 @@ class BankReconcileController extends Controller
             $batch->update(['status' => 'completed']);
         });
 
+        \App\Models\AppNotification::create([
+            'workspace_id' => $batch->workspace_id,
+            'user_id' => auth()->id(),
+            'type' => 'reconcile',
+            'title' => __('Rekonsiliasi selesai: :n payment', ['n' => $created]),
+            'message' => $batch->bank_name . ' ' . $batch->account_no,
+            'action_url' => route('bank-reconcile.show', $batch),
+            'icon' => '🏦',
+        ]);
+
         return back()->with('success', "✓ {$created} payment dibuat dari batch ini.");
     }
 }

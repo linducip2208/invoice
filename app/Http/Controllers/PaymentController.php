@@ -119,6 +119,16 @@ class PaymentController extends Controller
 
         $this->recalculateInvoice($invoice);
 
+        \App\Models\AppNotification::create([
+            'workspace_id' => $invoice->workspace_id,
+            'user_id' => auth()->id(),
+            'type' => 'payment',
+            'title' => __('Pembayaran dicatat: :no', ['no' => $invoice->invoice_no]),
+            'message' => $invoice->currency . ' ' . number_format((float) $validated['amount'], 0) . ' — ' . ($invoice->client?->name ?? ''),
+            'action_url' => route('invoices.show', $invoice),
+            'icon' => '💰',
+        ]);
+
         return Redirect::route('invoices.show', $invoice)
             ->with('success', 'Pembayaran berhasil dicatat.');
     }
@@ -272,6 +282,16 @@ class PaymentController extends Controller
                     ]);
                 }
                 $this->recalculateInvoice($payment->invoice);
+
+                \App\Models\AppNotification::create([
+                    'workspace_id' => $payment->workspace_id,
+                    'user_id' => null,
+                    'type' => 'payment',
+                    'title' => __('Pembayaran gateway lunas: :no', ['no' => $payment->invoice?->invoice_no ?? ('#' . $payment->id)]),
+                    'message' => ($payment->invoice?->currency ?? '') . ' ' . number_format((float) $payment->amount, 0),
+                    'action_url' => $payment->invoice ? route('invoices.show', $payment->invoice) : null,
+                    'icon' => '💰',
+                ]);
             }
         });
 

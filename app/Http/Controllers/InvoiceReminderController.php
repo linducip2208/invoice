@@ -25,6 +25,35 @@ class InvoiceReminderController extends Controller
         return back()->with('success', "{$count} reminder dijadwalkan.");
     }
 
+    /**
+     * Jadwalkan pengingat massal (maks 20/invoice): lewati yg lunas,
+     * batal, atau klien opt-out — sesuai aturan scheduler.
+     */
+    public function bulkSchedule(Request $request)
+    {
+        $validated = $request->validate([
+            'ids' => 'required|array|min:1|max:20',
+            'ids.*' => 'integer',
+        ]);
+
+        $scheduled = 0;
+        $skipped = 0;
+        foreach (Invoice::whereIn('id', $validated['ids'])->with('client')->get() as $invoice) {
+            if ($invoice->workspace_id !== workspace()?->id) {
+                $skipped++;
+                continue;
+            }
+            $n = $this->scheduler->scheduleFor($invoice);
+            if ($n > 0) {
+                $scheduled++;
+            } else {
+                $skipped++;
+            }
+        }
+
+        return back()->with('success', __(':s invoice dijadwalkan pengingat, :k dilewati (lunas/batal/opt-out).', ['s' => $scheduled, 'k' => $skipped]));
+    }
+
     public function store(Request $request, Invoice $invoice)
     {
         $validated = $request->validate([

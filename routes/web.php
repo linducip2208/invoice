@@ -125,6 +125,7 @@ Route::middleware(['auth', 'verified', 'workspace'])->group(function () {
     Route::get   ('invoices/{invoice}/reminders',           [InvoiceReminderController::class, 'index'])->name('invoices.reminders.index');
     Route::post  ('invoices/{invoice}/reminders/schedule',  [InvoiceReminderController::class, 'schedule'])->name('invoices.reminders.schedule');
     Route::post  ('invoices/{invoice}/reminders',           [InvoiceReminderController::class, 'store'])->name('invoices.reminders.store');
+    Route::post  ('invoices/bulk-remind',                   [InvoiceReminderController::class, 'bulkSchedule'])->name('invoices.bulk-remind');
     Route::delete('invoices/reminders/{reminder}',          [InvoiceReminderController::class, 'cancel'])->name('invoices.reminders.cancel');
 
     // Late Fees
