@@ -35,6 +35,7 @@ class BillingController extends Controller
             'period'         => 'required|in:monthly,yearly',
             'currency'       => 'required|in:IDR,USD',
             'payment_method' => 'nullable|in:gateway,manual',
+            'coupon_code'    => 'nullable|string|max:50',
         ]);
         $validated['payment_method'] = $validated['payment_method'] ?? 'gateway';
 
@@ -63,11 +64,37 @@ class BillingController extends Controller
             return redirect()->route('billing.show')->with('error', __('Harga plan ini belum di-set.'));
         }
 
+        // Kupon hanya untuk pembayaran manual (nominal gateway ditentukan provider).
+        $couponMeta = null;
+        if (! empty($validated['coupon_code'])) {
+            if ($validated['payment_method'] !== 'manual') {
+                return redirect()->route('pricing')->with('error', __('Kupon hanya berlaku untuk Pay Manual (Transfer).'));
+            }
+            $coupon = \App\Models\Coupon::where('code', $validated['coupon_code'])->first();
+            if (! $coupon || ! $coupon->isUsable()) {
+                return back()->with('error', __('Kode kupon tidak valid / sudah habis.'))->withInput();
+            }
+            if ($coupon->plan_id && (int) $coupon->plan_id !== (int) $plan->id) {
+                return back()->with('error', __('Kupon tidak berlaku untuk plan ini.'))->withInput();
+            }
+            if ($coupon->currency && strtoupper($coupon->currency) !== strtoupper($validated['currency'])) {
+                return back()->with('error', __('Kupon tidak berlaku untuk mata uang ini.'))->withInput();
+            }
+            $price = $plan->priceFor($validated['currency'], $validated['period']);
+            $couponMeta = [
+                'coupon_id' => $coupon->id,
+                'coupon_code' => $coupon->code,
+                'price_before' => $price,
+                'discount' => round($price - $coupon->applyTo($price), 2),
+            ];
+        }
+
         $subscription->update([
             'plan_id'        => $plan->id,
             'billing_period' => $validated['period'],
             'currency'       => $validated['currency'],
             'payment_method' => $validated['payment_method'],
+            'metadata'       => array_merge($subscription->metadata ?? [], $couponMeta ? ['coupon' => $couponMeta] : []),
         ]);
 
         // Manual payment route — show instructions page, await admin verification

@@ -2,6 +2,14 @@
     @php
         $plan = $subscription->plan;
         $amount = $plan->priceFor($subscription->currency, $subscription->billing_period);
+        $coupon = $subscription->metadata['coupon'] ?? null;
+        $discount = 0;
+        if ($coupon && (float) ($coupon['price_before'] ?? -1) === (float) $amount) {
+            $discount = (float) ($coupon['discount'] ?? 0);
+            $amount = max(0, $amount - $discount);
+        } else {
+            $coupon = null;
+        }
         $amountFormatted = $subscription->currency === 'IDR'
             ? 'Rp ' . number_format($amount, 0, ',', '.')
             : '$ ' . number_format($amount, 2);
@@ -13,6 +21,9 @@
                 <div class="subheader">{{ __('Order Summary') }}</div>
                 <div class="h2 mb-0">{{ $plan->name }}</div>
                 <div class="text-muted">{{ ucfirst($subscription->billing_period) }} · {{ $subscription->currency }}</div>
+                @if($coupon)
+                    <div class="mt-1"><span class="badge bg-success-lt">{{ __('Kupon') }} {{ $coupon['coupon_code'] }}: −{{ $subscription->currency === 'IDR' ? 'Rp ' . number_format($discount, 0, ',', '.') : '$ ' . number_format($discount, 2) }}</span></div>
+                @endif
             </div>
             <div class="h1 mb-0">{{ $amountFormatted }}</div>
         </div>

@@ -113,6 +113,7 @@
                                             <input type="hidden" name="period" :value="period">
                                             <input type="hidden" name="currency" :value="currency">
                                             <input type="hidden" name="payment_method" value="manual">
+                                            <input type="text" name="coupon_code" class="form-control form-control-sm mb-1" maxlength="50" placeholder="{{ __('Kode kupon (opsional)') }}" aria-label="{{ __('Kode kupon') }}">
                                             <button type="submit" class="btn btn-sm w-100"><x-ti name="cash" /> {{ __('Pay Manual (Transfer)') }}</button>
                                         </form>
                                     </div>

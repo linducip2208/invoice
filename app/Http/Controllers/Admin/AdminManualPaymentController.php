@@ -48,24 +48,54 @@ class AdminManualPaymentController extends Controller
     public function approve(Subscription $subscription): RedirectResponse
     {
         $period = $subscription->billing_period === 'yearly' ? now()->addYear() : now()->addMonth();
+        $fullPrice = $subscription->plan->priceFor($subscription->currency, $subscription->billing_period);
+
+        // Kupon manual: validasi ulang saat approve, catat redemption.
+        $coupon = $subscription->metadata['coupon'] ?? null;
+        $discount = 0;
+        $couponModel = null;
+        if ($coupon && ($coupon['price_before'] ?? null) == $fullPrice) {
+            $couponModel = \App\Models\Coupon::find($coupon['coupon_id'] ?? null);
+            if ($couponModel && $couponModel->isUsable()
+                && (! $couponModel->plan_id || (int) $couponModel->plan_id === (int) $subscription->plan_id)) {
+                $discount = min((float) ($coupon['discount'] ?? 0), $fullPrice);
+            } else {
+                $couponModel = null;
+            }
+        }
+        $finalAmount = round($fullPrice - $discount, 2);
+
         $subscription->update([
             'status'                   => 'active',
             'last_payment_at'          => now(),
             'current_period_starts_at' => now(),
             'current_period_ends_at'   => $period,
+            'metadata'                 => array_merge($subscription->metadata ?? [], ['coupon_used' => $couponModel?->code]),
         ]);
 
         \App\Models\SubscriptionInvoice::create([
             'subscription_id' => $subscription->id,
             'workspace_id'    => $subscription->workspace_id,
             'reference_no'    => 'MAN-' . $subscription->id . '-' . now()->format('YmdHis'),
-            'amount'          => $subscription->plan->priceFor($subscription->currency, $subscription->billing_period),
+            'amount'          => $finalAmount,
             'currency'        => $subscription->currency,
             'status'          => 'paid',
             'paid_at'         => now(),
             'period_starts_at' => now(),
             'period_ends_at'  => $period,
         ]);
+
+        if ($couponModel) {
+            $couponModel->increment('uses_count');
+            \App\Models\CouponRedemption::create([
+                'coupon_id' => $couponModel->id,
+                'workspace_id' => $subscription->workspace_id,
+                'subject_type' => Subscription::class,
+                'subject_id' => $subscription->id,
+                'discount_applied' => $discount,
+                'redeemed_at' => now(),
+            ]);
+        }
 
         return back()->with('success', 'Subscription di-approve. Workspace sudah aktif.');
     }

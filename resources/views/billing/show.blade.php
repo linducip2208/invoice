@@ -56,6 +56,13 @@
                 </div>
             @endif
 
+            @if($subscription->status === 'past_due')
+                <div class="alert alert-danger mt-3 d-flex justify-content-between flex-wrap gap-2">
+                    <div><x-ti name="alert-triangle" /> {{ __('Pembayaran terakhir gagal / menunggak. Layanan bisa terhenti — perbarui pembayaran sekarang.') }}</div>
+                    <a href="#plan-list" class="btn btn-sm btn-danger">{{ __('Bayar Sekarang') }}</a>
+                </div>
+            @endif
+
             @if($cancelling)
                 <div class="alert alert-warning mt-3 d-flex justify-content-between flex-wrap gap-2">
                     <div><x-ti name="alert-triangle" /> {{ __('Subscription akan dibatalkan di akhir periode.') }}</div>
@@ -78,7 +85,7 @@
         <x-tabler.stat :label="__('Recurring')" :value="$usage['recurring']" icon="repeat" />
     </div>
 
-    <div class="card mb-3">
+    <div class="card mb-3" id="plan-list">
         <div class="card-header"><h3 class="card-title">{{ __('Ubah Plan') }}</h3></div>
         <div class="card-body">
             <div x-data="{ period: '{{ $subscription->billing_period === 'yearly' ? 'yearly' : 'monthly' }}', currency: '{{ $subscription->currency }}' }">
