@@ -41,7 +41,7 @@
         <div class="col-lg-9">
             <div class="mb-3">
                 <h1 class="page-title">{{ __('Invocely Documentation') }}</h1>
-                <p class="text-muted">{{ __('Practical guides that match the actual application: routes, buttons, statuses and settings as they exist today.') }}</p>
+                <p class="docs-lead">{{ __('Practical guides that match the actual application: routes, buttons, statuses and settings as they exist today.') }}</p>
             </div>
             <div id="docs-empty" class="alert alert-info d-none" role="status">
                 {{ __('No sections match your search.') }}

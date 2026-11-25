@@ -3,8 +3,11 @@
         <a href="{{ route('reports.index') }}" class="btn">
             <x-ti name="arrow-left" /> {{ __('Reports') }}
         </a>
-        <a href="{{ route('reports.aging', array_merge(request()->query(), ['format' => 'csv'])) }}" class="btn btn-primary">
+        <a href="{{ route('reports.aging', array_merge(request()->query(), ['format' => 'csv'])) }}" class="btn">
             <x-ti name="download" /> CSV
+        </a>
+        <a href="{{ route('reports.aging', array_merge(request()->query(), ['format' => 'pdf'])) }}" class="btn btn-primary">
+            <x-ti name="download" /> PDF
         </a>
     </x-slot>
 

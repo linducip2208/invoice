@@ -67,11 +67,11 @@
                         </div>
                     </div>
                     <div class="table-responsive">
-                        <table class="table table-vcenter card-table">
-                            <thead><tr><th>Item</th><th class="text-end">Qty</th><th class="text-end">Jumlah</th></tr></thead>
+                        <table class="table table-vcenter card-table landing-shot-table">
+                            <thead><tr><th>Item</th><th class="text-end col-qty">Qty</th><th class="text-end">Jumlah</th></tr></thead>
                             <tbody>
-                                <tr><td>Paket identitas brand</td><td class="text-end text-muted">1</td><td class="text-end">Rp 1.500.000</td></tr>
-                                <tr><td>Pembuatan landing page</td><td class="text-end text-muted">1</td><td class="text-end">Rp 950.000</td></tr>
+                                <tr><td>Paket identitas brand</td><td class="text-end text-muted col-qty">1</td><td class="text-end">Rp 1.500.000</td></tr>
+                                <tr><td>Pembuatan landing page</td><td class="text-end text-muted col-qty">1</td><td class="text-end">Rp 950.000</td></tr>
                             </tbody>
                         </table>
                     </div>
@@ -152,7 +152,7 @@
     <section id="showcase" class="mb-5" aria-labelledby="showcase-heading">
         <div class="page-pretitle">Product showcase</div>
         <h2 id="showcase-heading" class="h1 mb-2">Lihat struktur layar yang sebenarnya</h2>
-        <p class="text-muted mb-3">Ringkasan berbasis route asli aplikasi (bukan screenshot palsu). Setiap panel tertaut ke halaman/dokumentasi yang relevan. <span class="badge bg-azure-lt">Pratinjau ilustratif · field sesuai aplikasi</span></p>
+        <p class="text-muted mb-3">Ringkasan berbasis route asli aplikasi (bukan screenshot palsu). Setiap panel tertaut ke halaman/dokumentasi yang relevan. <span class="badge bg-azure-lt text-wrap">Pratinjau ilustratif · field sesuai aplikasi</span></p>
         <div class="row row-cards">
             @foreach([
                 ['Dashboard', 'Total ditagih, terkumpul, outstanding, overdue + quick actions.', 'dashboard', 'route: dashboard'],
@@ -193,12 +193,14 @@
                             <div class="small" style="opacity:.85;">{{ $tpl->name }} · Contoso Studio → Acme Corp</div>
                         </div>
                         <div class="p-3">
-                            <div class="d-flex justify-content-between small text-muted mb-2"><span>Item (2)</span><span>Total Rp 2.450.000</span></div>
+                            <div class="d-flex justify-content-between small text-muted mb-2 flex-wrap gap-1"><span>Item (2)</span><span>Total Rp 2.450.000</span></div>
                             <div class="progress mb-2" style="height:.4rem;"><div class="progress-bar" style="width:72%;background:var(--tblr-primary);"></div></div>
                             <h3 class="h4 mb-1">{{ $tpl->name }}</h3>
                             <p class="text-muted small mb-2">{{ $tpl->description }}</p>
-                            <span class="badge bg-secondary-lt">slug: {{ $tpl->slug }}</span>
-                            <a href="{{ route('seo.templates') }}" class="btn btn-sm btn-outline-primary ms-1">Lihat template</a>
+                            <div class="d-flex flex-wrap gap-1 align-items-center">
+                                <span class="badge bg-secondary-lt">slug: {{ $tpl->slug }}</span>
+                                <a href="{{ route('seo.templates') }}" class="btn btn-sm btn-outline-primary">Lihat template</a>
+                            </div>
                         </div>
                     </div>
                 </div>

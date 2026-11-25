@@ -3,6 +3,9 @@
         <a href="{{ route('reports.index') }}" class="btn">
             <x-ti name="arrow-left" /> {{ __('Reports') }}
         </a>
+        <a href="{{ route('reports.pl', array_merge(request()->query(), ['format' => 'pdf'])) }}" class="btn btn-primary">
+            <x-ti name="download" /> PDF
+        </a>
     </x-slot>
 
     <div class="card mb-3">

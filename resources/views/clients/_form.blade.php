@@ -47,6 +47,10 @@
     </div>
 
     <div class="col-md-6">
+        <x-tabler.field :label="__('Credit Limit')" name="credit_limit" type="number" :help="__('Batas total piutang aktif. Kosong = tanpa batas.')" :value="old('credit_limit', $client?->credit_limit)" attrs='min="0" step="0.01" placeholder="0 = tanpa batas"' />
+    </div>
+
+    <div class="col-md-6">
         <x-tabler.field :label="__('Status')" name="is_active">
             <select id="is_active" name="is_active" class="form-select">
                 <option value="1" @selected(old('is_active', $client?->is_active ?? 1) == '1')>{{ __('Active') }}</option>

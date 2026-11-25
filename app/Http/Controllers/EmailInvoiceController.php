@@ -46,6 +46,47 @@ class EmailInvoiceController extends Controller
     }
 
     /**
+     * Antrekan kirim terjadwal — diproses command per jam.
+     */
+    public function schedule(Request $request, Invoice $invoice): RedirectResponse
+    {
+        abort_unless($invoice->workspace_id === workspace()?->id, 403);
+
+        $validated = $request->validate([
+            'subject'  => 'required|string|max:255',
+            'message'  => 'nullable|string|max:5000',
+            'to_email' => 'required|email|max:255',
+            'send_at'  => 'required|date|after:now',
+        ]);
+
+        if (in_array($invoice->status, ['paid', 'cancelled'], true)) {
+            return back()->with('error', __('Invoice lunas/batal tidak bisa dijadwalkan.'));
+        }
+
+        \App\Models\ScheduledInvoiceSend::create([
+            'workspace_id' => $invoice->workspace_id,
+            'invoice_id'   => $invoice->id,
+            'to_email'     => $validated['to_email'],
+            'subject'      => $validated['subject'],
+            'message'      => $validated['message'] ?? null,
+            'send_at'      => $validated['send_at'],
+            'status'       => 'pending',
+        ]);
+
+        return back()->with('success', __('Pengiriman dijadwalkan.'));
+    }
+
+    public function cancelSchedule(\App\Models\ScheduledInvoiceSend $scheduled): RedirectResponse
+    {
+        abort_unless($scheduled->workspace_id === workspace()?->id, 403);
+        if ($scheduled->status === 'pending') {
+            $scheduled->update(['status' => 'cancelled']);
+        }
+
+        return back()->with('success', __('Jadwal dibatalkan.'));
+    }
+
+    /**
      * Kirim massal (maks 10/request): antre email + PDF per invoice,
      * draft ikut berubah jadi sent. Tanpa email klien = dilewati.
      */

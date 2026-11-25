@@ -166,9 +166,10 @@ h1, h2, h3, .card-title, .page-title { font-family: var(--app-font-display); col
 .card-body { padding: 1.25rem; color: var(--app-body); }
 .table thead th {
   padding: 0.65rem 1rem; font-size: 0.68rem; font-weight: 700; letter-spacing: 0.07em;
-  text-transform: uppercase; color: var(--app-muted); white-space: nowrap;
+  text-transform: uppercase; color: #52657f; white-space: nowrap;
   background-color: var(--app-bg); border-bottom: 1px solid var(--app-border);
 }
+[data-bs-theme="dark"] .table thead th { color: var(--app-muted); }
 .table tbody td { padding: 0.8rem 1rem; font-size: 0.85rem; color: var(--app-body); vertical-align: middle; border-bottom: 1px solid var(--app-border); }
 .table tbody tr:last-child td { border-bottom: 0; }
 .table tbody tr { transition: background-color 0.12s ease; }

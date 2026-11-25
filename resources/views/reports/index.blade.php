@@ -1,5 +1,8 @@
 <x-tabler.layout :title="__('Reports')" :pretitle="__('Reports')">
     <x-slot name="actions">
+        <a href="{{ route('reports.index', array_merge(request()->query(), ['format' => 'pdf'])) }}" class="btn btn-primary">
+            <x-ti name="download" /> PDF
+        </a>
         <form method="GET">
             <select name="period" onchange="this.form.submit()" class="form-select">
                 <option value="7" @selected($period === '7')>{{ __('Last 7 days') }}</option>

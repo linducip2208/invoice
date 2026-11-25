@@ -24,9 +24,13 @@
                     <x-tabler.field :label="__('Message')" name="message">
                         <textarea id="message" name="message" rows="4" class="form-control @error('message') is-invalid @enderror" placeholder="{{ __('Add a personal sparkle…') }}">{{ old('message') }}</textarea>
                     </x-tabler.field>
+                    <x-tabler.field :label="__('Jadwalkan (opsional)')" name="send_at" :help="__('Kosongkan untuk kirim sekarang.')">
+                        <input type="datetime-local" id="send_at" name="send_at" value="{{ old('send_at') }}" min="{{ now()->format('Y-m-d\TH:i') }}" class="form-control">
+                    </x-tabler.field>
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn" data-bs-dismiss="modal">{{ __('Cancel') }}</button>
+                    <button type="submit" formaction="{{ route('invoices.schedule', $invoice) }}" class="btn btn-outline-primary"><x-ti name="clock" /> {{ __('Jadwalkan') }}</button>
                     <button type="submit" class="btn btn-primary"><x-ti name="send" /> {{ __('Send Invoice') }}</button>
                 </div>
             </form>

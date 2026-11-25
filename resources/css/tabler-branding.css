@@ -198,6 +198,15 @@ body {
   border-radius: 1rem;
   box-shadow: 0 24px 60px -24px rgba(20, 27, 51, 0.55);
   border: 1px solid rgba(255, 255, 255, 0.14);
+  min-width: 0;
+}
+.landing-shot .table { margin-bottom: 0; }
+@media (max-width: 400px) {
+  .landing-shot .table { font-size: 0.78rem; }
+  .landing-shot th, .landing-shot td { padding: 0.4rem 0.5rem; white-space: normal; }
+  .landing-shot td:first-child { overflow-wrap: anywhere; }
+  .landing-shot .col-qty { display: none; }
+  .landing-shot .card-header { flex-direction: column; align-items: flex-start; gap: 0.5rem; }
 }
 .icon-tile {
   display: inline-flex;
@@ -249,6 +258,24 @@ body {
    keep their muted styling via more specific rules elsewhere. */
 .footer .list-inline a {
   color: var(--tblr-body-color);
+}
+
+/* Docs lead paragraph: AA-safe secondary text. */
+.docs-lead {
+  color: #52657f;
+}
+[data-bs-theme="dark"] .docs-lead {
+  color: #aab4c5;
+}
+.footer,
+.footer .text-muted,
+.quote-powered {
+  color: #52657f;
+}
+[data-bs-theme="dark"] .footer,
+[data-bs-theme="dark"] .footer .text-muted,
+[data-bs-theme="dark"] .quote-powered {
+  color: #aab4c5;
 }
 
 /* Status tint badges: Tabler's own -lt text colors fail WCAG AA at small
@@ -411,3 +438,10 @@ li svg.icon { width: 1.1rem; height: 1.1rem; }
 .skeleton::after { content: ""; position: absolute; inset: 0; background: linear-gradient(90deg, transparent, rgba(255,255,255,0.5), transparent); animation: shimmer 1.4s infinite; }
 @keyframes shimmer { from { transform: translateX(-100%); } to { transform: translateX(100%); } }
 @media (prefers-reduced-motion: reduce) { .skeleton::after { animation: none; } }
+
+/* Layar mungil: longgarkan hero + izinkan teks tombol wrap. (Di akhir file
+   agar menang atas aturan base dengan spesifisitas setara.) */
+@media (max-width: 400px) {
+  .landing-hero-v2.landing-hero-v2 { padding: 1.5rem 1rem; }
+  .btn { white-space: normal; text-align: center; }
+}

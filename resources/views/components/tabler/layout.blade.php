@@ -210,7 +210,7 @@
                         <a class="notif-foot" href="{{ route('notifications.index') }}">{{ __('Buka pusat notifikasi') }}</a>
                     </div>
                 </div>
-                <button class="topbar-icon-btn d-none d-sm-inline-flex" data-theme-toggle aria-label="{{ __('Toggle dark mode') }}">
+                <button class="topbar-icon-btn" data-theme-toggle aria-label="{{ __('Toggle dark mode') }}">
                     <x-ti name="sparkles" />
                 </button>
                 <div class="dropdown topbar-profile">
@@ -291,7 +291,7 @@
     </header>
 
     <!-- ============ Main ============ -->
-    <main class="app-main" id="main-content">
+    <main class="app-main page-body" id="main-content">
         <div class="app-container">
             @isset($breadcrumbs)
                 <nav aria-label="breadcrumb">

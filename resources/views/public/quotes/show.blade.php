@@ -173,5 +173,5 @@
         </div>
     @endif
 
-    <p class="text-center text-muted mt-3">{{ __('Powered by') }} <a href="/" class="fw-bold">Invocely</a></p>
+    <p class="text-center mt-3 quote-powered">{{ __('Powered by') }} <a href="/" class="fw-bold">Invocely</a></p>
 </x-tabler.public>

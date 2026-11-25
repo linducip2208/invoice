@@ -14,8 +14,17 @@ class Client extends Model
     protected $fillable = [
         'workspace_id', 'name', 'company_name', 'email', 'phone',
         'address', 'city', 'state', 'country', 'postal_code',
-        'tax_id', 'notes', 'view_token', 'is_active', 'no_reminders',
+        'tax_id', 'credit_limit', 'notes', 'view_token', 'is_active', 'no_reminders',
     ];
+
+    protected function casts(): array
+    {
+        return [
+            'is_active' => 'boolean',
+            'no_reminders' => 'boolean',
+            'credit_limit' => 'decimal:2',
+        ];
+    }
 
     protected static function booted(): void
     {

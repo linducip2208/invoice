@@ -78,6 +78,42 @@ Link: @{{pay_link}}</textarea>
         </div>
     @endif
 
+    {{-- Kirim terjadwal --}}
+    <div class="card mb-3">
+        <div class="card-header">
+            <h3 class="card-title">{{ __('Kirim Terjadwal') }}
+                <span class="text-muted fw-normal small">({{ $scheduled->where('status', 'pending')->count() }} {{ __('antre') }})</span>
+            </h3>
+        </div>
+        @if($scheduled->isEmpty())
+            <div class="card-body">
+                <p class="text-muted small mb-0">{{ __('Belum ada. Atur lewat tombol Kirim → Jadwalkan di halaman invoice.') }}</p>
+            </div>
+        @else
+            <div class="list-group list-group-flush">
+                @foreach($scheduled as $s)
+                    <div class="list-group-item">
+                        <div class="row align-items-center g-2">
+                            <div class="col">
+                                <div class="fw-semibold">{{ $s->subject }}</div>
+                                <div class="text-muted small">{{ __('Ke') }} {{ $s->to_email }} · {{ __('Kirim') }} {{ $s->send_at->format('d M Y, H:i') }}</div>
+                            </div>
+                            <div class="col-auto d-flex gap-1 align-items-center">
+                                <span class="badge bg-{{ $s->status === 'pending' ? 'warning' : ($s->status === 'sent' ? 'success' : ($s->status === 'failed' ? 'danger' : 'secondary')) }}">{{ ucfirst($s->status) }}</span>
+                                @if($s->status === 'pending')
+                                    <form method="POST" action="{{ route('invoices.schedule.cancel', $s) }}" class="d-inline" onsubmit="return confirm('Batalkan jadwal ini?')">
+                                        @csrf @method('DELETE')
+                                        <button type="submit" class="btn btn-sm btn-outline-danger">{{ __('Batalkan') }}</button>
+                                    </form>
+                                @endif
+                            </div>
+                        </div>
+                    </div>
+                @endforeach
+            </div>
+        @endif
+    </div>
+
     {{-- Timeline reminders --}}
     <div class="card">
         <div class="card-header">

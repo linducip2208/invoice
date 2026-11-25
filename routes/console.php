@@ -10,6 +10,7 @@ Artisan::command('inspire', function () {
 
 Schedule::command('invoices:generate-recurring')->hourly();
 Schedule::command('reminders:process')->hourly();
+Schedule::command('invoices:send-scheduled')->hourly();
 Schedule::command('invoices:escalate-overdue')->hourly();
 Schedule::command('quotes:mark-expired')->hourly();
 Schedule::command('late-fees:apply')->dailyAt('06:00');

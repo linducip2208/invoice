@@ -14,8 +14,10 @@ class InvoiceReminderController extends Controller
     public function index(Invoice $invoice)
     {
         $reminders = $invoice->reminders()->orderBy('scheduled_at')->get();
+        $scheduled = \App\Models\ScheduledInvoiceSend::where('invoice_id', $invoice->id)
+            ->orderBy('send_at')->get();
 
-        return view('invoices.reminders', compact('invoice', 'reminders'));
+        return view('invoices.reminders', compact('invoice', 'reminders', 'scheduled'));
     }
 
     public function schedule(Invoice $invoice)

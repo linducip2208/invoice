@@ -143,6 +143,29 @@ class InvoiceController extends Controller
 
         $workspace = workspace();
         abort_unless($workspace, 403);
+
+        $client = Client::findOrFail($validated['client_id']);
+        abort_unless($client->workspace_id === $workspace->id, 403);
+
+        $taxRate = (float) ($validated['tax_rate'] ?? 0);
+        $discountType = $validated['discount_type'];
+        $discountValue = (float) ($validated['discount_value'] ?? 0);
+
+        $totals = InvoiceService::calculateTotals($validated['items'], $taxRate, $discountType, $discountValue);
+
+        // Credit limit: tolak bila piutang aktif + invoice baru melewati batas.
+        if ($client->credit_limit !== null && (float) $client->credit_limit >= 0) {
+            $outstanding = (float) Invoice::where('client_id', $client->id)
+                ->whereIn('status', ['sent', 'partial', 'overdue'])
+                ->sum('balance_due');
+            if ($outstanding + (float) $totals['total'] > (float) $client->credit_limit) {
+                return back()->with('error', __('Melewati credit limit klien (sisa piutang :o + :n > limit :l).', [
+                    'o' => number_format($outstanding, 0),
+                    'n' => number_format((float) $totals['total'], 0),
+                    'l' => number_format((float) $client->credit_limit, 0),
+                ]))->withInput();
+            }
+        }
         $invoiceNo = $this->invoiceService->generateInvoiceNo($workspace);
 
         $taxRate = (float) ($validated['tax_rate'] ?? 0);

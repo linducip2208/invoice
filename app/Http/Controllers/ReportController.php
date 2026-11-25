@@ -5,13 +5,20 @@ namespace App\Http\Controllers;
 use App\Models\Client;
 use App\Models\Invoice;
 use App\Models\Payment;
+use Barryvdh\DomPDF\Facade\Pdf;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\View\View;
 
 class ReportController extends Controller
 {
-    public function index(Request $request): View
+    protected function pdfDownload(string $view, array $data, string $filename)
+    {
+        $data['workspace'] = workspace();
+        return Pdf::loadView($view, $data)->setPaper('a4')->download($filename);
+    }
+
+    public function index(Request $request)
     {
         $period = $request->input('period', '30');
         $endDate   = Carbon::now()->endOfDay();
@@ -86,6 +93,14 @@ class ReportController extends Controller
             ->groupBy('payment_method')
             ->get();
 
+        if ($request->input('format') === 'pdf') {
+            return $this->pdfDownload('reports.pdf-index', compact(
+                'period', 'startDate', 'endDate',
+                'totals', 'statusBreakdown', 'topClients',
+                'monthly', 'methodBreakdown'
+            ), 'ringkasan-' . $endDate->format('Ymd') . '.pdf');
+        }
+
         return view('reports.index', compact(
             'period', 'startDate', 'endDate',
             'totals', 'statusBreakdown', 'topClients',
@@ -96,7 +111,7 @@ class ReportController extends Controller
     /**
      * Aging report — bucket invoice yang belum lunas berdasarkan umur (hari sejak jatuh tempo).
      */
-    public function aging(Request $request): View
+    public function aging(Request $request)
     {
         $asOf = $request->filled('as_of') ? Carbon::parse($request->as_of) : Carbon::now();
         $currency = $request->input('currency');
@@ -167,6 +182,10 @@ class ReportController extends Controller
             return $this->agingCsv($buckets, $byClient, $asOf);
         }
 
+        if ($request->input('format') === 'pdf') {
+            return $this->pdfDownload('reports.pdf-aging', compact('buckets', 'byClient', 'grandTotal', 'asOf'), 'aging-' . $asOf->format('Y-m-d') . '.pdf');
+        }
+
         return view('reports.aging', compact('buckets', 'byClient', 'grandTotal', 'asOf', 'currencies', 'currency'));
     }
 
@@ -196,7 +215,7 @@ class ReportController extends Controller
     /**
      * Cashflow forecast — projected inflow & outflow next N days.
      */
-    public function cashflow(Request $request): View
+    public function cashflow(Request $request)
     {
         $days = (int) $request->input('days', 90);
         $days = in_array($days, [30, 60, 90, 180]) ? $days : 90;
@@ -281,13 +300,17 @@ class ReportController extends Controller
         $totalOutflow = round($weeklyOutflow * $weeks->count(), 2);
         $totalNet = round($totalProjected - $totalOutflow, 2);
 
+        if ($request->input('format') === 'pdf') {
+            return $this->pdfDownload('reports.pdf-cashflow', compact('weeks', 'totalProjected', 'days', 'scenario', 'weeklyOutflow', 'monthlyAvgOutflow', 'totalOutflow', 'totalNet'), 'cashflow-' . $days . 'd.pdf');
+        }
+
         return view('reports.cashflow', compact('weeks', 'totalProjected', 'days', 'scenario', 'weeklyOutflow', 'monthlyAvgOutflow', 'totalOutflow', 'totalNet'));
     }
 
     /**
      * P&L per Klien — revenue minus expense minus time cost.
      */
-    public function pl(Request $request): View
+    public function pl(Request $request)
     {
         $period = $request->input('period', '90');
         $startDate = match ($period) {
@@ -340,13 +363,17 @@ class ReportController extends Controller
             ? round($totals->profit / $totals->revenue * 100, 1)
             : null;
 
+        if ($request->input('format') === 'pdf') {
+            return $this->pdfDownload('reports.pdf-pl', compact('rows', 'totals', 'period', 'startDate'), 'pl-' . $period . '.pdf');
+        }
+
         return view('reports.pl', compact('rows', 'totals', 'period', 'startDate'));
     }
 
     /**
      * Tax Summary Report — PPN keluaran & PPh23 dipotong klien.
      */
-    public function tax(Request $request): View
+    public function tax(Request $request)
     {
         $type = $request->input('type', 'ppn');
         $period = $request->input('period', now()->format('Y-m'));
@@ -364,6 +391,12 @@ class ReportController extends Controller
         $totalPpn = (float) $taxDetails->sum('ppn_amount');
         $totalPph23 = (float) $taxDetails->sum('pph23_amount');
         $efakturStats = $taxDetails->groupBy('efaktur_status')->map->count();
+
+        if ($request->input('format') === 'pdf') {
+            return $this->pdfDownload('reports.pdf-tax', compact(
+                'taxDetails', 'totalPpn', 'totalPph23', 'efakturStats', 'type', 'period', 'start', 'end'
+            ), 'pajak-' . $period . '.pdf');
+        }
 
         return view('reports.tax', compact(
             'taxDetails', 'totalPpn', 'totalPph23', 'efakturStats', 'type', 'period', 'start', 'end'
