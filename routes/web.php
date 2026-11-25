@@ -92,6 +92,7 @@ Route::middleware(['auth', 'verified', 'workspace'])->group(function () {
     Route::get('invoices',              [InvoiceController::class, 'index'])->name('invoices.index');
     Route::post('invoices/bulk-destroy', [InvoiceController::class, 'bulkDestroy'])->middleware('plan:invoice.delete')->name('invoices.bulk-destroy');
     Route::post('invoices/bulk-pdf', [InvoiceController::class, 'bulkPdf'])->name('invoices.bulk-pdf');
+    Route::post('invoices/bulk-mark-sent', [InvoiceController::class, 'bulkMarkSent'])->name('invoices.bulk-mark-sent');
     Route::middleware('plan:invoice.create')->group(function () {
         Route::get('invoices/create',   [InvoiceController::class, 'create'])->name('invoices.create');
         Route::post('invoices',         [InvoiceController::class, 'store'])->name('invoices.store');

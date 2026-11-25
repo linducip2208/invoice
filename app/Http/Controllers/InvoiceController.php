@@ -368,6 +368,28 @@ class InvoiceController extends Controller
             ->with('success', __('Invoice marked as sent.'));
     }
 
+    /**
+     * Tandai terkirim massal (maks 20/aksi): hanya draft/cancelled,
+     * tanpa kirim email — untuk yang sudah dikirim manual via WA/cetak.
+     */
+    public function bulkMarkSent(Request $request)
+    {
+        $validated = $request->validate([
+            'ids' => 'required|array|min:1|max:20',
+            'ids.*' => 'integer',
+        ]);
+
+        $n = 0;
+        foreach (Invoice::whereIn('id', $validated['ids'])->get() as $inv) {
+            if ($inv->workspace_id !== workspace()?->id) continue;
+            if (! in_array($inv->status, ['draft', 'cancelled'])) continue;
+            $inv->update(['status' => 'sent', 'last_sent_at' => $inv->last_sent_at ?? now()]);
+            $n++;
+        }
+
+        return back()->with('success', __(':n invoice ditandai terkirim (tanpa email).', ['n' => $n]));
+    }
+
     public function markAsCancelled(Invoice $invoice)
     {
         if (in_array($invoice->status, ['paid'])) {
