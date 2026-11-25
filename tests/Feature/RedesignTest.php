@@ -78,6 +78,7 @@ class RedesignTest extends TestCase
         session(['current_workspace_id' => $ws->id]);
         $r = $this->actingAs($user)->get(route('dashboard'));
         $r->assertOk();
+        $r->assertSee('kpi-card', false);
         $r->assertSee('Collection rate', false);
         $r->assertSee('Total customers', false);
         $r->assertSee('Top customers', false);
