@@ -1,4 +1,4 @@
-<x-tabler.layout :title="__('Discount Coupons')" :pretitle="__('Workspace')">
+<x-tabler.layout :title="__('Discount Coupons')" :pretitle="__('Workspace')" :breadcrumbs="[['label' => __('Dashboard'), 'url' => route('dashboard')], ['label' => __('Discount Coupons')]]">
     <div class="card mb-3">
         <div class="card-header">
             <h3 class="card-title"><x-ti name="plus" /> {{ __('Buat Coupon Baru') }}</h3>

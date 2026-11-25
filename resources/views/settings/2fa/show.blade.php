@@ -1,4 +1,4 @@
-<x-tabler.layout :title="__('Two-Factor Authentication')" :pretitle="__('Settings')">
+<x-tabler.layout :title="__('Two-Factor Authentication')" :pretitle="__('Settings')" :breadcrumbs="[['label' => __('Profile'), 'url' => route('profile.edit')], ['label' => __('Two-Factor Authentication')]]">
     <div class="row justify-content-center">
         <div class="col-lg-8">
             @if(session('recovery_codes'))

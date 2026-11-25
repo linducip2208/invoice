@@ -1,4 +1,4 @@
-<x-tabler.layout :title="__('Quick Payment')" :pretitle="__('Mobile')">
+<x-tabler.layout :title="__('Quick Payment')" :pretitle="__('Mobile')" :breadcrumbs="[['label' => __('Dashboard'), 'url' => route('dashboard')], ['label' => __('Quick Payment')]]">
     <div class="row justify-content-center">
         <div class="col-md-6">
             <div class="card">

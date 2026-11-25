@@ -13,6 +13,13 @@
                     @include('profile.partials.update-password-form')
                 </div>
             </div>
+            <div class="card mb-3">
+                <div class="card-header"><h3 class="card-title">{{ __('Two-Factor Authentication') }}</h3></div>
+                <div class="card-body">
+                    <p class="text-muted">{{ __('Lapisan keamanan ekstra via aplikasi authenticator.') }}</p>
+                    <a href="{{ route('2fa.show') }}" class="btn btn-outline-primary"><x-ti name="key" /> {{ __('Kelola 2FA') }}</a>
+                </div>
+            </div>
             <div class="card card-borderless bg-red-lt mb-3">
                 <div class="card-header"><h3 class="card-title text-danger">{{ __('Delete Account') }}</h3></div>
                 <div class="card-body">

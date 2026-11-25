@@ -1,4 +1,4 @@
-<x-tabler.layout :title="__('Email Inbox Forward')" :pretitle="__('Automation')">
+<x-tabler.layout :title="__('Email Inbox Forward')" :pretitle="__('Automation')" :breadcrumbs="[['label' => __('Dashboard'), 'url' => route('dashboard')], ['label' => __('Email Inbox Forward')]]">
     <div class="card mb-3">
         <div class="card-header"><h3 class="card-title">{{ __('Forward Address Kamu') }}</h3></div>
         <div class="card-body">

@@ -1,4 +1,7 @@
 <x-tabler.guest :title="__('Kwitansi') . ' ' . ($payment->reference_no ?: $payment->id)">
+    <div class="d-print-none mb-3">
+        <a href="{{ route('invoices.show', $payment->invoice) }}" class="btn"><x-ti name="arrow-left" /> {{ __('Kembali ke Invoice') }}</a>
+    </div>
     <div class="card">
         <div class="card-body">
             <div class="d-flex justify-content-between align-items-start mb-3">

@@ -41,7 +41,6 @@ use App\Http\Controllers\Settings\CustomDomainController;
 use App\Http\Controllers\Settings\TwoFactorController;
 use App\Http\Controllers\InvoiceLayoutController;
 use App\Http\Controllers\PaymentController;
-use App\Http\Controllers\PlanComparisonController;
 use App\Http\Controllers\PricingController;
 use App\Http\Controllers\ProductController;
 use App\Http\Controllers\ProfileController;
@@ -202,9 +201,6 @@ Route::middleware(['auth', 'verified', 'workspace'])->group(function () {
     Route::get   ('m/quick/payment',                        [\App\Http\Controllers\MobileQuickController::class, 'quickPayment'])->name('mobile.quick-payment');
     Route::post  ('m/quick/payment',                        [\App\Http\Controllers\MobileQuickController::class, 'storeQuickPayment'])->name('mobile.quick-payment.store');
 
-    // Marketplace (coming soon stub)
-    Route::view  ('marketplace',                            'marketplace.index')->name('marketplace.index');
-
     // Embed demo (admin tool — needs auth for x-app-layout)
     Route::get   ('embed/demo',                             [\App\Http\Controllers\EmbedController::class, 'demo'])->name('embed.demo');
 
@@ -336,8 +332,8 @@ Route::middleware(['auth', 'verified', 'workspace'])->group(function () {
         Route::delete('tenant-webhooks/{tenantWebhook}', [TenantWebhookController::class, 'destroy'])->name('tenant-webhooks.destroy');
     });
 
-    // Stubs — replaced with real routes or coming-soon pages
-    // All stub links in sidebar now point to real routes or route('feature.coming', ...)
+    // Stubs — future placeholder pages go through route('feature.coming', ...)
+    // (saat ini tidak ada stub aktif; semua menu menunjuk route nyata).
 
     Route::get   ('team',                         [TeamController::class, 'index'])->name('team.index');
     Route::post  ('team/invite',                  [TeamController::class, 'invite'])->name('team.invite');
@@ -461,9 +457,6 @@ Route::post('/webhooks/billing/{gateway}', [BillingWebhookController::class, 'ha
 
 Route::get('/best-invoicing-tools-{year}', [ProgrammaticSeoController::class, 'bestTools'])->name('seo.best-tools');
 Route::get('/alternatives-to-{slug}',      [ProgrammaticSeoController::class, 'alternatives'])->name('seo.alternatives');
-Route::get('/compare/{a}-vs-{b}',          [PlanComparisonController::class, 'show'])
-    ->where(['a' => 'free|pro|business', 'b' => 'free|pro|business'])
-    ->name('plans.compare');
 Route::get('/compare/{a}-vs-{b}',          [ProgrammaticSeoController::class, 'compare'])->name('seo.compare');
     Route::get('/invoice-templates',         [ProgrammaticSeoController::class, 'templates'])->name('seo.templates');
     Route::get('/sitemap.xml', fn() => response()->view('sitemap')->header('Content-Type', 'application/xml'));

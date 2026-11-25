@@ -64,55 +64,62 @@
                             'icon' => $icon, 'label' => $label, 'badge' => $badge,
                         ];
                         $sections = [
-                            __('WORKSPACE') => [
+                            __('BERANDA') => [
                                 $link('dashboard', 'dashboard', 'layout-dashboard', __('Dashboard')),
                                 $link('notifications.index', 'notifications.*', 'bell', __('Notifications')),
                             ],
-                            __('SALES') => [
-                                $link('invoices.index', 'invoices.*', 'file-invoice', __('Invoices')),
+                            __('01 · PENAWARAN') => [
                                 $link('quotes.index', 'quotes.*', 'file-text', __('Quotations')),
-                                $link('clients.index', 'clients.*', 'users', __('Customers')),
                                 $link('products.index', 'products.*', 'package', __('Products & Services')),
                                 $link('bundles.index', 'bundles.*', 'package', __('Bundles')),
-                                $link('projects.index', 'projects.*', 'briefcase', __('Projects')),
-                                $link('credit-notes.index', 'credit-notes.*', 'receipt-refund', __('Credit Notes')),
+                                $link('clients.index', 'clients.*', 'users', __('Customers')),
                             ],
-                            __('CASH FLOW') => [
-                                $link('payments.index', 'payments.*', 'credit-card', __('Payments')),
-                                $link('reports.aging', 'reports.aging', 'hourglass', __('Outstanding Invoices')),
+                            __('02 · PENAGIHAN') => [
+                                $link('invoices.index', 'invoices.*', 'file-invoice', __('Invoices')),
                                 $link('recurring.index', 'recurring.*', 'repeat', __('Recurring Invoices')),
-                                $link('expenses.index', 'expenses.*', 'receipt', __('Expenses')),
-                                $link('bank-reconcile.index', 'bank-reconcile.*', 'building-bank', __('Reconciliation')),
-                                $link('accounting-exports.index', 'accounting-exports.*', 'file-export', __('Accounting Exports')),
+                                $link('credit-notes.index', 'credit-notes.*', 'receipt-refund', __('Credit Notes')),
+                                $link('approvals.index', 'approvals.*', 'circle-check', __('Persetujuan')),
+                                $link('projects.index', 'projects.*', 'briefcase', __('Projects')),
+                                $link('time-entries.index', 'time-entries.*', 'clock', __('Time Tracking')),
                             ],
-                            __('INSIGHTS') => [
+                            __('03 · PEMBAYARAN') => [
+                                $link('payments.index', 'payments.*', 'credit-card', __('Payments')),
+                                $link('coupons.index', 'coupons.*', 'percentage', __('Kupon Diskon')),
+                                $link('reports.aging', 'reports.aging', 'hourglass', __('Outstanding Invoices')),
+                                $link('bank-reconcile.index', 'bank-reconcile.*', 'building-bank', __('Reconciliation')),
+                                $link('expenses.index', 'expenses.*', 'receipt', __('Expenses')),
+                            ],
+                            __('04 · LAPORAN') => [
                                 $link('reports.index', 'reports.index', 'chart-bar', __('Reports')),
                                 $link('reports.cashflow', 'reports.cashflow', 'chart-line', __('Cash Flow')),
                                 $link('reports.pl', 'reports.pl', 'chart-pie', __('Profit & Loss')),
                                 $link('reports.tax', 'reports.tax', 'percentage', __('Tax Reports')),
+                                $link('accounting-exports.index', 'accounting-exports.*', 'file-export', __('Accounting Exports')),
+                                $link('exports.index', 'exports.*', 'download', __('Exports')),
                             ],
-                            __('AUTOMATION') => [
+                            __('05 · OTOMATISASI') => [
                                 $link('ai-providers.index', 'ai-providers.*', 'robot', __('AI Providers')),
                                 $link('expenses.ocr.upload', 'expenses.ocr.*', 'scan', __('OCR Receipt')),
+                                $link('email-forwards.index', 'email-forwards.*', 'mail', __('Email ke Expense')),
                                 $link('report-subscriptions.index', 'report-subscriptions.*', 'send', __('Scheduled Reports')),
+                                $link('api-tokens.index', 'api-tokens.*', 'key', __('API Tokens')),
+                                $link('tenant-webhooks.index', 'tenant-webhooks.*', 'link', __('Webhooks Out')),
+                                $link('embed.demo', 'embed.demo', 'code', __('Embed Widget')),
                             ],
-                            __('CONFIGURATION') => [
+                            __('06 · PENGATURAN') => [
                                 $link('workspace.settings', 'workspace.*', 'settings', __('Company Settings')),
                                 $link('team.index', 'team.*', 'users', __('Team & Roles')),
                                 $link('invoice-layouts.index', 'invoice-layouts.*', 'template', __('Invoice Templates')),
                                 $link('gateways.index', 'gateways.*', 'plug', __('Payment Gateways')),
-                                $link('api-tokens.index', 'api-tokens.*', 'key', __('API Tokens')),
-                                $link('tenant-webhooks.index', 'tenant-webhooks.*', 'link', __('Webhooks Out')),
-                                $link('audit-logs.index', 'audit-logs.*', 'history', __('Audit Logs')),
                                 $link('custom-domain.show', 'custom-domain.*', 'globe', __('Custom Domain')),
                                 $link('clients.import.show', 'clients.import.*', 'upload', __('CSV Import')),
-                                $link('exports.index', 'exports.*', 'download', __('Exports')),
+                                $link('audit-logs.index', 'audit-logs.*', 'history', __('Audit Logs')),
                             ],
-                            __('BILLING') => [
+                            __('LANGGANAN') => [
                                 $link('billing.show', 'billing.*', 'wallet', __('Current Plan')),
                                 $link('affiliate.index', 'affiliate.*', 'star', __('Affiliate')),
                             ],
-                            __('HELP') => [
+                            __('BANTUAN') => [
                                 $link('docs', 'docs', 'book', __('Documentation')),
                                 $link('support.index', 'support.*', 'lifebuoy', __('Support')),
                             ],

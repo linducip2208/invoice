@@ -1,4 +1,4 @@
-<x-tabler.layout :title="__('Quick Invoice')" :pretitle="__('Mobile')">
+<x-tabler.layout :title="__('Quick Invoice')" :pretitle="__('Mobile')" :breadcrumbs="[['label' => __('Dashboard'), 'url' => route('dashboard')], ['label' => __('Quick Invoice')]]">
     <div class="row justify-content-center">
         <div class="col-md-6">
             <div class="card">

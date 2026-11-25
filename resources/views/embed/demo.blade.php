@@ -1,4 +1,4 @@
-<x-tabler.layout :title="__('Embed Widget Demo')" :pretitle="__('Integrations')">
+<x-tabler.layout :title="__('Embed Widget Demo')" :pretitle="__('Integrations')" :breadcrumbs="[['label' => __('Dashboard'), 'url' => route('dashboard')], ['label' => __('Embed Widget Demo')]]">
     <div class="row row-cards">
         <div class="col-12">
             <div class="card">

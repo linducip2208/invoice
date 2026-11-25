@@ -1,4 +1,4 @@
-<x-tabler.layout :title="__('Time Tracking')" :pretitle="__('Workspace')">
+<x-tabler.layout :title="__('Time Tracking')" :pretitle="__('Workspace')" :breadcrumbs="[['label' => __('Dashboard'), 'url' => route('dashboard')], ['label' => __('Time Tracking')]]">
     <div class="row row-decks row-cards mb-3">
         <x-tabler.stat :label="__('Total Hours')" :value="number_format($totalHours, 2) . 'h'" icon="clock" />
         <x-tabler.stat :label="__('Billable Amount')" :value="number_format($totalAmount, 2)" icon="coins" />

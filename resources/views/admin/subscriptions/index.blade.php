@@ -1,4 +1,5 @@
 <x-tabler.admin-layout :title="__('Subscriptions')" :pretitle="__('Superadmin')">
+    <x-slot name="actions"><a href="{{ route('admin.subscriptions.manual') }}" class="btn btn-primary"><x-ti name="plus" /> {{ __('Manual Assign') }}</a></x-slot>
     <div class="card mb-3">
         <div class="card-body">
             <form method="GET" action="{{ route('admin.subscriptions.index') }}">

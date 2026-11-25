@@ -41,6 +41,7 @@ class RenderSmokeTest extends TestCase
         $a = $this->actingAs($this->user);
         foreach ([
             'dashboard', 'clients.index', 'clients.create', 'products.index',
+            'bundles.index', 'coupons.index', 'approvals.index', 'email-forwards.index',
             'projects.index', 'invoices.index', 'invoices.create', 'quotes.index',
             'quotes.create', 'payments.index', 'recurring.index', 'reports.index',
             'reports.aging', 'reports.cashflow', 'reports.pl', 'reports.tax',
