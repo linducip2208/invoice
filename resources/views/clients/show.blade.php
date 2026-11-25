@@ -6,6 +6,9 @@
         <a href="{{ route('clients.edit', $client) }}" class="btn btn-outline-warning">
             <x-ti name="pencil" /> {{ __('Edit') }}
         </a>
+        <a href="{{ route('clients.statement', $client) }}" class="btn btn-primary">
+            <x-ti name="clipboard-list" /> {{ __('Mutasi') }}
+        </a>
         <x-tabler.delete-button :action="route('clients.destroy', $client)"
             :confirm="__('Delete this client?')" :label="__('Delete')" />
     </x-slot>

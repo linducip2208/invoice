@@ -70,10 +70,12 @@ Route::middleware(['auth', 'verified', 'workspace'])->group(function () {
     Route::post('/workspace/switch/{workspace}', [WorkspaceSwitcherController::class, 'switch'])->name('workspace.switch');
 
     // Clients (create gated by plan limit)
+    Route::get('clients/{client}/statement', [ClientController::class, 'statement'])->name('clients.statement');
     Route::resource('clients', ClientController::class)->except(['store']);
     Route::post('clients', [ClientController::class, 'store'])->middleware('plan:client.create')->name('clients.store');
 
     Route::resource('products', ProductController::class)->except(['show']);
+    Route::post('products/{product}/duplicate', [ProductController::class, 'duplicate'])->name('products.duplicate');
 
     // Recurring (entire feature gated to Pro+)
     Route::get('recurring', [RecurringInvoiceController::class, 'index'])->name('recurring.index');
@@ -89,6 +91,7 @@ Route::middleware(['auth', 'verified', 'workspace'])->group(function () {
     // Invoices (create/edit/delete gated by plan)
     Route::get('invoices',              [InvoiceController::class, 'index'])->name('invoices.index');
     Route::post('invoices/bulk-destroy', [InvoiceController::class, 'bulkDestroy'])->middleware('plan:invoice.delete')->name('invoices.bulk-destroy');
+    Route::post('invoices/bulk-pdf', [InvoiceController::class, 'bulkPdf'])->name('invoices.bulk-pdf');
     Route::middleware('plan:invoice.create')->group(function () {
         Route::get('invoices/create',   [InvoiceController::class, 'create'])->name('invoices.create');
         Route::post('invoices',         [InvoiceController::class, 'store'])->name('invoices.store');

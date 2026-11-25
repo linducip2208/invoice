@@ -104,6 +104,30 @@ class InvoiceController extends Controller
         return back()->with('success', __(':n draft invoice(s) deleted.', ['n' => $deleted]));
     }
 
+    /**
+     * Unduh banyak PDF sekaligus sebagai ZIP (maks 10/invoice per aksi).
+     */
+    public function bulkPdf(Request $request, InvoiceService $invoiceService)
+    {
+        $validated = $request->validate(['ids' => 'required|array|min:1|max:10', 'ids.*' => 'integer']);
+        $invoices = Invoice::whereIn('id', $validated['ids'])->get();
+        if ($invoices->isEmpty()) {
+            return back()->with('error', __('No invoices selected.'));
+        }
+
+        $zipPath = tempnam(sys_get_temp_dir(), 'inv_') . '.zip';
+        $zip = new \ZipArchive();
+        $zip->open($zipPath, \ZipArchive::CREATE);
+        foreach ($invoices as $inv) {
+            if ($inv->workspace_id !== workspace()?->id) continue;
+            $pdfPath = $invoiceService->generatePdf($inv);
+            $zip->addFile(storage_path('app/public/' . $pdfPath), $inv->invoice_no . '.pdf');
+        }
+        $zip->close();
+
+        return response()->download($zipPath, 'invoices-' . now()->format('YmdHis') . '.zip')->deleteFileAfterSend(true);
+    }
+
     public function create()
     {
         $clients = Client::orderBy('name')->get();

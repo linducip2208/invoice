@@ -83,4 +83,15 @@ class ProductController extends Controller
 
         return redirect()->route('products.index')->with('success', 'Product deleted successfully.');
     }
+
+    public function duplicate(Product $product): RedirectResponse
+    {
+        $copy = $product->replicate()->fill([
+            'name' => $product->name . ' (copy)',
+            'is_active' => false,
+        ]);
+        $copy->save();
+
+        return redirect()->route('products.edit', $copy)->with('success', __('Product duplicated as draft — review & activate.'));
+    }
 }

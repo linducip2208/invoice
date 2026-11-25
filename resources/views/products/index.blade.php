@@ -92,6 +92,7 @@
                             </td>
                             <td class="text-end text-nowrap">
                                 <a href="{{ route('products.edit', $product) }}" class="btn btn-sm btn-outline-warning">{{ __('Edit') }}</a>
+                                <form method="POST" action="{{ route('products.duplicate', $product) }}" class="d-inline">@csrf<button class="btn btn-sm" title="{{ __('Duplikat sebagai draf') }}"><x-ti name="copy" /> {{ __('Copy') }}</button></form>
                                 <x-tabler.delete-button :action="route('products.destroy', $product)"
                                     :confirm="__('Delete this product?')" :title="__('Delete')" />
                             </td>

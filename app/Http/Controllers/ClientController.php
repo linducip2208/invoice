@@ -79,6 +79,27 @@ class ClientController extends Controller
         return view('clients.edit', compact('client'));
     }
 
+    /**
+     * Mutasi klien: ringkasan tagihan + pembayaran + sisa.
+     * Bisa diprint / disimpan sebagai PDF browser untuk dikirim ke klien.
+     */
+    public function statement(Client $client): View
+    {
+        abort_unless($client->workspace_id === workspace()?->id, 403);
+
+        $invoices = $client->invoices()->with('payments')->orderBy('issue_date')->get();
+        $payments = \App\Models\Payment::whereHas('invoice', fn ($q) => $q->where('client_id', $client->id))
+            ->orderBy('payment_date')->get();
+
+        $totals = [
+            'invoiced' => (float) $invoices->whereNotIn('status', ['draft', 'cancelled'])->sum('total'),
+            'paid' => (float) $invoices->sum('amount_paid'),
+            'balance' => (float) $invoices->whereNotIn('status', ['draft', 'cancelled'])->sum('balance_due'),
+        ];
+
+        return view('clients.statement', compact('client', 'invoices', 'payments', 'totals'));
+    }
+
     public function update(Request $request, Client $client): RedirectResponse
     {
         abort_unless($client->workspace_id === workspace()?->id, 403);
