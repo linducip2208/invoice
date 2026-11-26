@@ -73,4 +73,17 @@ class Phase11Test extends TestCase
         $r = $this->actingAs($admin)->get(route('admin.dashboard'));
         $r->assertOk();
     }
+
+    #[Test] public function dashboard_currency_toggle_converts_total(): void
+    {
+        $this->seedPlans();
+        $admin = User::factory()->create(['is_superadmin' => true]);
+        \App\Models\AppSetting::updateOrCreate(['key' => 'fx.mode'], ['value' => 'manual', 'group' => 'fx']);
+        \App\Models\AppSetting::updateOrCreate(['key' => 'fx.manual_USD_IDR'], ['value' => 10000, 'group' => 'fx']);
+        CurrencyRateService::flushMemo();
+
+        $r = $this->actingAs($admin)->get(route('admin.dashboard', ['cur' => 'USD']));
+        $r->assertOk();
+        $r->assertSee('setara USD', false);
+    }
 }

@@ -3,7 +3,12 @@
 ## K1. Setting kurs di aplikasi [x] DONE
 - `app_settings` group `fx`: mode Otomatis/Manual + `fx.manual_USD_IDR` + tombol refresh.
 - UI di Superadmin → Settings: kurs berjalan + sumber (live/manual) + tanggal + form simpan.
-- `CurrencyRateService`: prioritas manual-Setting > .env `CURRENCY_RATE_*` > API Frankfurter (fallback open.er-api, cache 12 jam) > manual fallback. Offline → null (angka asli tak tersentuh).
+- `CurrencyRateService`: prioritas manual-Setting > .env `CURRENCY_RATE_*` (+ pasangan terbalik otomatis, mis. IDR→USD = 1/kurs) > API Frankfurter (fallback open.er-api, cache 12 jam) > manual fallback. Offline → null (angka asli tak tersentuh).
+
+## K2. Tampil "setara Rp" + pilihan mata uang tampil per user [x] DONE
+- MRR USD superadmin → "≈ Rp … (kurs …)".
+- Detail invoice non-IDR → "Setara Rp (kurs hari ini)".
+- Toggle IDR/USD di dashboard admin (tersimpan di sesi per user) + kartu "Total MRR (setara …)" yang mengikuti pilihan.
 
 ## K2. Tampil "setara Rp" [x] DONE
 - MRR USD superadmin → "≈ Rp … (kurs …)".

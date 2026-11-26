@@ -7,12 +7,19 @@ use App\Models\Subscription;
 use App\Models\SubscriptionInvoice;
 use App\Models\User;
 use App\Models\Workspace;
+use Illuminate\Http\Request;
 use Illuminate\View\View;
 
 class AdminDashboardController extends Controller
 {
-    public function index(): View
+    public function index(Request $request): View
     {
+        $displayCurrency = strtoupper($request->input('cur', session('admin_currency', 'IDR')));
+        if (! in_array($displayCurrency, ['IDR', 'USD'], true)) {
+            $displayCurrency = 'IDR';
+        }
+        session(['admin_currency' => $displayCurrency]);
+
         $totalUsers = User::count();
         $totalWorkspaces = Workspace::count();
         $activeSubs = Subscription::where('status', 'active')->whereHas('plan', fn ($q) => $q->where('slug', '!=', 'free'))->count();
@@ -75,11 +82,15 @@ class AdminDashboardController extends Controller
         $fxRate = \App\Services\CurrencyRateService::rate('USD', 'IDR');
         $fxDate = \App\Services\CurrencyRateService::rateDate('USD', 'IDR');
         $mrrUsdIdr = $fxRate ? round((float) $mrrUsd * $fxRate, 0) : null;
+        $mrrIdrUsd = \App\Services\CurrencyRateService::convert((float) $mrrIdr, 'IDR', 'USD');
+        $mrrTotalDisplay = $displayCurrency === 'USD'
+            ? ($mrrIdrUsd !== null ? round((float) $mrrUsd + $mrrIdrUsd, 2) : null)
+            : ($mrrUsdIdr !== null ? round((float) $mrrIdr + $mrrUsdIdr, 0) : null);
 
         return view('admin.dashboard', compact(
             'totalUsers', 'totalWorkspaces', 'activeSubs', 'pendingSubs', 'expiredSubs', 'freeWorkspaces',
             'mrrIdr', 'mrrUsd', 'lastMrrIdr', 'lastMrrUsd', 'growthIdr', 'growthUsd',
-            'fxRate', 'fxDate', 'mrrUsdIdr',
+            'fxRate', 'fxDate', 'mrrUsdIdr', 'mrrIdrUsd', 'mrrTotalDisplay', 'displayCurrency',
             'userGrowth', 'workspaceGrowth', 'mrrSeries',
             'planDistribution', 'revenueByCurrency', 'conversion', 'churnRate', 'churned',
             'recentSubs', 'upcomingRenewals', 'pendingPayments', 'approvedPayments', 'recentInvoices',

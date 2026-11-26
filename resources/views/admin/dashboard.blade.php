@@ -1,5 +1,9 @@
 <x-tabler.admin-layout :title="__('Dashboard')" :pretitle="__('Superadmin')">
     <x-slot name="actions">
+        <div class="btn-group" role="group" aria-label="{{ __('Mata uang tampil') }}">
+            <a href="{{ route('admin.dashboard', ['cur' => 'IDR']) }}" class="btn btn-sm {{ $displayCurrency === 'IDR' ? 'btn-primary' : 'btn-outline-primary' }}">IDR</a>
+            <a href="{{ route('admin.dashboard', ['cur' => 'USD']) }}" class="btn btn-sm {{ $displayCurrency === 'USD' ? 'btn-primary' : 'btn-outline-primary' }}">USD</a>
+        </div>
         <a href="{{ route('admin.plans.create') }}" class="btn btn-primary"><x-ti name="plus" /> {{ __('Create plan') }}</a>
         <a href="{{ route('admin.coupons.index') }}" class="btn"><x-ti name="percentage" /> {{ __('Create coupon') }}</a>
         <a href="{{ route('admin.manual-payments.index') }}" class="btn">{{ __('Pending payments') }}</a>
@@ -32,9 +36,16 @@
         </div>
         <div class="col-sm-12 col-lg-4">
             <div class="card invocely-kpi"><div class="card-body">
-                <div class="subheader">{{ __('Monthly Revenue Growth') }}</div>
-                <div class="h1 mb-0">{{ $growthIdr }}% <span class="text-muted h4">IDR</span> · {{ $growthUsd }}% <span class="text-muted h4">USD</span></div>
-                <div class="small text-muted">{{ __('Conversion') }}: {{ $conversion }}% · {{ __('Churn (30d)') }}: {{ $churnRate === null ? __('n/a — insufficient data') : $churnRate . '% (' . $churned . ')' }}</div>
+                <div class="subheader">{{ __('Total MRR (setara :cur)', ['cur' => $displayCurrency]) }}</div>
+                @if($mrrTotalDisplay !== null)
+                    <div class="h1 mb-0">{{ $displayCurrency === 'USD' ? '$' . number_format($mrrTotalDisplay, 2) : 'Rp' . number_format($mrrTotalDisplay, 0, ',', '.') }}</div>
+                    <div class="small text-muted">{{ __('Kurs') }} 1 USD = Rp{{ number_format($fxRate, 0, ',', '.') }}{{ $fxDate ? ' · ' . $fxDate : '' }} · <a href="{{ route('admin.settings') }}">{{ __('Ubah di Settings') }}</a></div>
+                @else
+                    <div class="h1 mb-0 text-muted">—</div>
+                    <div class="small text-muted">{{ __('Kurs belum tersedia. Atur di Settings.') }}</div>
+                @endif
+                <div class="small {{ $growthIdr >= 0 && $growthUsd >= 0 ? 'text-success' : 'text-muted' }} mt-1">{{ __('Growth') }}: {{ $growthIdr }}% IDR · {{ $growthUsd }}% USD</div>
+                <div class="small text-muted mt-1">{{ __('Conversion') }}: {{ $conversion }}% · {{ __('Churn (30d)') }}: {{ $churnRate === null ? __('n/a — insufficient data') : $churnRate . '% (' . $churned . ')' }}</div>
             </div></div>
         </div>
     </div>

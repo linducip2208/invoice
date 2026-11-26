@@ -39,6 +39,11 @@ class CurrencyRateService
         if (is_numeric($v) && (float) $v > 0) return (float) $v;
         $env = env("CURRENCY_RATE_{$from}_{$to}");
         if (is_numeric($env) && (float) $env > 0) return (float) $env;
+        // Pasangan terbalik dari kurs manual (mis. IDR→USD dari USD_IDR).
+        $v2 = static::setting("fx.manual_{$to}_{$from}");
+        if (is_numeric($v2) && (float) $v2 > 0) return 1 / (float) $v2;
+        $env2 = env("CURRENCY_RATE_{$to}_{$from}");
+        if (is_numeric($env2) && (float) $env2 > 0) return 1 / (float) $env2;
         return null;
     }
 
