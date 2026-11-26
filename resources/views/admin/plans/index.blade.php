@@ -23,7 +23,7 @@
                     @forelse($plans as $p)
                         <tr>
                             <td><code>{{ $p->slug }}</code></td>
-                            <td class="fw-semibold">{{ $p->name }}</td>
+                            <td class="fw-semibold"><a href="{{ route('admin.plans.show', $p) }}">{{ $p->name }}</a></td>
                             <td class="text-muted">Rp{{ number_format($p->price_idr_monthly, 0, ',', '.') }}</td>
                             <td class="text-muted">${{ number_format($p->price_usd_monthly, 2) }}</td>
                             <td class="text-center">

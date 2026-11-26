@@ -39,6 +39,19 @@
             <x-tabler.delete-button :action="route('invoices.destroy', $invoice)"
                 :confirm="__('Delete this invoice?')" :label="__('Delete')" :title="__('Delete')" />
         @endif
+        <div class="dropdown d-inline">
+            <button class="btn dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false" aria-label="{{ __('More actions') }}">
+                <x-ti name="dots-vertical" /> {{ __('Lainnya') }}
+            </button>
+            <div class="dropdown-menu dropdown-menu-end">
+                <a class="dropdown-item" href="{{ route('invoices.reminders.index', $invoice) }}"><x-ti name="bell" /> {{ __('Pengingat') }}</a>
+                <a class="dropdown-item" href="{{ route('invoices.whatsapp.preview', $invoice) }}"><x-ti name="brand-whatsapp" /> {{ __('Kirim via WhatsApp') }}</a>
+                <a class="dropdown-item" href="{{ route('invoices.tax-details.edit', $invoice) }}"><x-ti name="receipt" /> {{ __('Pajak & e-Faktur') }}</a>
+                <form method="POST" action="{{ route('invoices.qris.generate', $invoice) }}" class="d-inline">@csrf
+                    <button type="submit" class="dropdown-item"><x-ti name="qrcode" /> {{ __('Buat QRIS') }}</button>
+                </form>
+            </div>
+        </div>
     </x-slot>
 
     @php $ws = workspace(); @endphp

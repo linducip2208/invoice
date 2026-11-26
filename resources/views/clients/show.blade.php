@@ -9,6 +9,9 @@
         <a href="{{ route('clients.statement', $client) }}" class="btn btn-primary">
             <x-ti name="clipboard-list" /> {{ __('Mutasi') }}
         </a>
+        <a href="{{ route('clients.portal-users.show', $client) }}" class="btn">
+            <x-ti name="key" /> {{ __('Portal') }}
+        </a>
         <x-tabler.delete-button :action="route('clients.destroy', $client)"
             :confirm="__('Delete this client?')" :label="__('Delete')" />
     </x-slot>

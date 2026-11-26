@@ -34,7 +34,8 @@ class AdminPlanController extends Controller
 
     public function show(Plan $plan): View
     {
-        return view('admin.plans.show', compact('plan'));
+        $subscriptions = $plan->subscriptions()->with('workspace')->latest()->paginate(15);
+        return view('admin.plans.show', compact('plan', 'subscriptions'));
     }
 
     public function edit(Plan $plan): View
