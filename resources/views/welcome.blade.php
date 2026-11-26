@@ -247,9 +247,15 @@
             <div class="col-lg-5 text-lg-end">
                 <img src="{{ asset('images/pricing-premium.png') }}" alt="{{ __('Ilustrasi paket harga Invocely') }}" class="img-fluid rounded-3 shadow-sm" loading="lazy" width="832" height="480">
             </div>
-            <div class="col-12 text-lg-end"><a href="{{ route('pricing') }}" class="btn btn-outline-primary mt-2">Bandingkan semua fitur</a></div>
+            <div class="col-12 text-lg-end">
+                <div class="btn-group" role="group" aria-label="{{ __('Mata uang') }}" id="landing-cur-toggle">
+                    <button type="button" class="btn btn-sm btn-primary" data-cur="IDR">IDR</button>
+                    <button type="button" class="btn btn-sm" data-cur="USD">USD</button>
+                </div>
+                <a href="{{ route('pricing') }}" class="btn btn-outline-primary mt-2 ms-1">Bandingkan semua fitur</a>
+            </div>
         </div>
-        <div class="row row-cards">
+        <div class="row row-cards" id="landing-plans">
             @foreach($plans as $plan)
                 <div class="col-md-4">
                     <div class="card h-100 {{ $plan->slug === 'pro' ? 'card-active' : '' }}">
@@ -258,18 +264,36 @@
                             <h3 class="card-title justify-content-center">{{ $plan->name }}</h3>
                             <p class="text-muted small">{{ $plan->tagline }}</p>
                             <p class="display-6 mb-1">
-                                @if((float) $plan->price_idr_monthly > 0)
-                                    Rp{{ number_format((float) $plan->price_idr_monthly, 0, ',', '.') }}<span class="text-muted h4">/bln</span>
-                                @else
-                                    Gratis
-                                @endif
+                                <span data-cur-val="IDR">
+                                    @if((float) $plan->price_idr_monthly > 0)
+                                        Rp{{ number_format((float) $plan->price_idr_monthly, 0, ',', '.') }}<span class="text-muted h4">/bln</span>
+                                    @else
+                                        Gratis
+                                    @endif
+                                </span>
+                                <span data-cur-val="USD" class="d-none">
+                                    @if((float) $plan->price_usd_monthly > 0)
+                                        ${{ number_format((float) $plan->price_usd_monthly, 0) }}<span class="text-muted h4">/mo</span>
+                                    @else
+                                        Free
+                                    @endif
+                                </span>
                             </p>
                             <p class="text-muted small">
-                                @if((float) $plan->price_idr_yearly > 0)
-                                    Rp{{ number_format((float) $plan->price_idr_yearly, 0, ',', '.') }}/thn · hemat {{ $plan->yearlySavingsPercent('IDR') }}%
-                                @else
-                                    Gratis selamanya · 1 invoice
-                                @endif
+                                <span data-cur-val="IDR">
+                                    @if((float) $plan->price_idr_yearly > 0)
+                                        Rp{{ number_format((float) $plan->price_idr_yearly, 0, ',', '.') }}/thn · hemat {{ $plan->yearlySavingsPercent('IDR') }}%
+                                    @else
+                                        Gratis selamanya · 1 invoice
+                                    @endif
+                                </span>
+                                <span data-cur-val="USD" class="d-none">
+                                    @if((float) $plan->price_usd_yearly > 0)
+                                        ${{ number_format((float) $plan->price_usd_yearly, 0) }}/yr · save {{ $plan->yearlySavingsPercent('USD') }}%
+                                    @else
+                                        Free forever · 1 invoice
+                                    @endif
+                                </span>
                             </p>
                             <ul class="list-unstyled text-start small mb-3">
                                 @if($plan->slug === 'free')
@@ -294,6 +318,31 @@
             @endforeach
         </div>
     </section>
+    @push('scripts')
+    <script>
+        (function () {
+            var box = document.getElementById('landing-plans');
+            var toggle = document.getElementById('landing-cur-toggle');
+            if (!box || !toggle) return;
+            toggle.addEventListener('click', function (e) {
+                var btn = e.target.closest('button[data-cur]');
+                if (!btn) return;
+                var cur = btn.getAttribute('data-cur');
+                toggle.querySelectorAll('button').forEach(function (b) {
+                    b.classList.toggle('btn-primary', b === btn);
+                });
+                box.querySelectorAll('[data-cur-val]').forEach(function (el) {
+                    el.classList.toggle('d-none', el.getAttribute('data-cur-val') !== cur);
+                });
+                try { localStorage.setItem('invocely-currency', cur); } catch (err) {}
+            });
+            try {
+                var saved = localStorage.getItem('invocely-currency');
+                if (saved === 'USD') toggle.querySelector('[data-cur="USD"]').click();
+            } catch (err) {}
+        })();
+    </script>
+    @endpush
 
     {{-- 9. FAQ --}}
     <section class="row mb-5" aria-labelledby="faq-heading">
