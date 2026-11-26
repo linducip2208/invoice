@@ -39,4 +39,17 @@
             </select>
         </x-tabler.field>
     </div>
+
+    <div class="col-md-4">
+        <label class="form-check mt-2">
+            <input type="checkbox" name="track_stock" value="1" @checked(old('track_stock', $product?->track_stock)) class="form-check-input">
+            <span class="form-check-label">{{ __('Lacak stok') }}</span>
+        </label>
+    </div>
+    <div class="col-md-4">
+        <x-tabler.field :label="__('Stok')" name="stock_qty" type="number" :value="old('stock_qty', $product?->stock_qty ?? 0)" attrs='step="0.01" min="0"' />
+    </div>
+    <div class="col-md-4">
+        <x-tabler.field :label="__('Batas menipis')" name="low_stock_at" type="number" :value="old('low_stock_at', $product?->low_stock_at)" attrs='step="0.01" min="0" placeholder="opsional"' />
+    </div>
 </div>

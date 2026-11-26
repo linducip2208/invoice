@@ -49,7 +49,12 @@ class ProductController extends Controller
             'tax_rate' => ['nullable', 'numeric', 'min:0', 'max:100'],
             'category' => ['nullable', 'string', 'max:100'],
             'is_active' => ['boolean'],
+            'track_stock' => ['boolean'],
+            'stock_qty' => ['nullable', 'numeric', 'min:0'],
+            'low_stock_at' => ['nullable', 'numeric', 'min:0'],
         ]);
+
+        $validated['track_stock'] = ! empty($validated['track_stock']);
 
         Product::create($validated);
 
@@ -70,7 +75,12 @@ class ProductController extends Controller
             'tax_rate' => ['nullable', 'numeric', 'min:0', 'max:100'],
             'category' => ['nullable', 'string', 'max:100'],
             'is_active' => ['boolean'],
+            'track_stock' => ['boolean'],
+            'stock_qty' => ['nullable', 'numeric', 'min:0'],
+            'low_stock_at' => ['nullable', 'numeric', 'min:0'],
         ]);
+
+        $validated['track_stock'] = ! empty($validated['track_stock']);
 
         $product->update($validated);
 

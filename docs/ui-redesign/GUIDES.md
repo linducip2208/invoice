@@ -1,10 +1,9 @@
-# Panduan pola pakai (tanpa ubah skema)
+# Panduan pola pakai
 
-## Paket / bundel produk
-1. Buat produk induk "Paket X" harga paket (fixed) via Products → Create.
-2. Untuk varian cepat: Copy produk → edit harga/nama → nonaktif draf bila belum dipakai.
-3. Di invoice builder: tambah 1 baris paket + baris opsional add-on; diskon paket via discount percent/fixed.
-4. DP 50% via tombol "Buat DP" di quote accepted; pelunasan via "Buat Pelunasan".
+## Paket / bundel produk (fitur nyata: Sales → Bundles)
+1. Buat paket dari produk aktif; opsional harga paket (hemat vs total komponen tampil otomatis).
+2. Dari detail paket → "Buat Draft Invoice": harga paket = 1 baris; tanpa harga paket = 1 baris per komponen (ikut mengurangi stok bila dilacak).
+3. Untuk varian cepat: Copy produk → edit harga/nama.
 
 ## Playbook dunning (tanpa spam)
 1. Aktifkan reminder sequence per invoice (jadwal −3/0/+3/+7 otomatis).

@@ -219,6 +219,8 @@ class InvoiceController extends Controller
                 ]);
             }
 
+            InvoiceService::adjustStock($validated['items'], -1);
+
             return $invoice;
         });
 
@@ -277,6 +279,8 @@ class InvoiceController extends Controller
         $totals = InvoiceService::calculateTotals($validated['items'], $taxRate, $discountType, $discountValue);
 
         DB::transaction(function () use ($invoice, $validated, $taxRate, $discountType, $discountValue, $totals) {
+            $oldItems = $invoice->items()->get(['product_id', 'quantity'])->all();
+            InvoiceService::adjustStock($oldItems, +1);
             $invoice->update([
                 'client_id'        => $validated['client_id'],
                 'template'         => $validated['template'],
@@ -318,6 +322,8 @@ class InvoiceController extends Controller
                     'sort_order'    => $i,
                 ]);
             }
+
+            InvoiceService::adjustStock($validated['items'], -1);
         });
 
         return redirect()
@@ -335,7 +341,10 @@ class InvoiceController extends Controller
         }
 
         $invoiceNo = $invoice->invoice_no;
-        DB::transaction(fn () => $invoice->items()->delete());
+        DB::transaction(function () use ($invoice) {
+            InvoiceService::adjustStock($invoice->items()->get(['product_id', 'quantity'])->all(), +1);
+            $invoice->items()->delete();
+        });
         $invoice->delete();
 
         return redirect()
@@ -364,6 +373,10 @@ class InvoiceController extends Controller
             foreach ($invoice->items as $item) {
                 $clone->items()->create($item->replicate()->toArray());
             }
+            InvoiceService::adjustStock(
+                $invoice->items->map(fn ($it) => ['product_id' => $it->product_id, 'quantity' => $it->quantity])->all(),
+                -1
+            );
 
             return $clone;
         });

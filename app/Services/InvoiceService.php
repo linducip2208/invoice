@@ -83,6 +83,30 @@ class InvoiceService
         ];
     }
 
+    /**
+     * Sesuaikan stok produk yang dilacak. $direction -1 = kurangi (invoice
+     * baru), +1 = kembalikan (hapus/ubah). Tanpa produk track_stock = no-op.
+     * Boleh minus (backorder); badge "menipis" memberi peringatan.
+     */
+    public static function adjustStock(array $items, int $direction): void
+    {
+        $byProduct = [];
+        foreach ($items as $item) {
+            $pid = $item['product_id'] ?? null;
+            if (! $pid) continue;
+            $byProduct[$pid] = ($byProduct[$pid] ?? 0) + (float) ($item['quantity'] ?? 0);
+        }
+        foreach ($byProduct as $pid => $qty) {
+            if ($qty <= 0) continue;
+            $query = \App\Models\Product::where('id', $pid)->where('track_stock', true);
+            if ($direction < 0) {
+                $query->decrement('stock_qty', $qty);
+            } else {
+                $query->increment('stock_qty', $qty);
+            }
+        }
+    }
+
     public function generatePdf(Invoice $invoice): string
     {
         return $this->pdfService->generate($invoice);

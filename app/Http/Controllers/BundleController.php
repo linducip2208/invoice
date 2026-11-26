@@ -152,6 +152,7 @@ class BundleController extends Controller
                 $p = $item->product;
                 $lines[] = [
                     'description' => ($p?->name ?? __('Item')) . ' × ' . $item->quantity,
+                    'product_id' => $item->product_id,
                     'quantity' => (float) $item->quantity,
                     'unit_price' => (float) ($p?->unit_price ?? 0),
                     'tax_rate' => (float) ($p?->tax_rate ?? 0),
@@ -188,6 +189,7 @@ class BundleController extends Controller
                 $lineTax = round($lineSub * ($line['tax_rate'] / 100), 2);
                 $inv->items()->create([
                     'description' => $line['description'],
+                    'product_id' => $line['product_id'] ?? null,
                     'quantity' => $line['quantity'],
                     'unit_price' => $line['unit_price'],
                     'tax_rate' => $line['tax_rate'],
@@ -197,6 +199,8 @@ class BundleController extends Controller
                     'sort_order' => $i,
                 ]);
             }
+
+            \App\Services\InvoiceService::adjustStock($lines, -1);
 
             return $inv;
         });

@@ -71,6 +71,9 @@
                                         @if($product->description)
                                             <div class="text-muted small text-truncate" style="max-width: 16rem;">{{ $product->description }}</div>
                                         @endif
+                                        @if($product->track_stock)
+                                            <div class="small mt-1"><span class="badge {{ $product->is_low_stock ? 'bg-warning-lt' : 'bg-azure-lt' }}">{{ __('Stok') }}: {{ number_format($product->stock_qty, 0) }}</span></div>
+                                        @endif
                                     </div>
                                 </div>
                             </td>
