@@ -120,7 +120,7 @@
                             <a class="dropdown-item" href="{{ route('admin.settings') }}"><x-ti name="settings" /> {{ __('Settings') }}</a>
                         </div>
                         <div class="profile-foot">
-                            <span></span>
+                            <a href="{{ route('dashboard') }}">{{ __('Workspace') }}</a>
                             <form method="POST" action="{{ route('logout') }}" class="d-inline">@csrf<button type="submit" style="all:unset;cursor:pointer;width:100%;">{{ __('Log out') }}</button></form>
                         </div>
                     </div>

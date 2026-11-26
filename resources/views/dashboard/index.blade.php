@@ -279,6 +279,8 @@
             ['label' => __('New Product'), 'desc' => __('Price + tax preset'), 'href' => route('products.create'), 'icon' => 'package'],
             ['label' => __('Recurring'), 'desc' => __('Autopilot schedule'), 'href' => route('recurring.create'), 'icon' => 'repeat'],
             ['label' => __('Record payment'), 'desc' => __('Manual / partial'), 'href' => route('payments.index'), 'icon' => 'credit-card'],
+            ['label' => __('Quick Invoice'), 'desc' => __('Kilat di HP'), 'href' => route('mobile.quick-invoice'), 'icon' => 'bolt'],
+            ['label' => __('Quick Payment'), 'desc' => __('Catat bayar cepat'), 'href' => route('mobile.quick-payment'), 'icon' => 'cash'],
         ];
     @endphp
     <div class="row row-deck row-cards mb-3">

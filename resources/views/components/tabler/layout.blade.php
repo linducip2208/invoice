@@ -122,8 +122,9 @@
             $mega('clients.import.show', 'upload', __('CSV Import'), __('Impor klien'), 'clients.import.*'),
             $mega('audit-logs.index', 'history', __('Audit Logs'), __('Jejak audit'), 'audit-logs.*'),
         ]],
-        ['key' => 'langganan', 'label' => __('Langganan'), 'icon' => 'wallet', 'patterns' => ['billing.*', 'affiliate.*'], 'type' => 'simple', 'items' => [
+        ['key' => 'langganan', 'label' => __('Langganan'), 'icon' => 'wallet', 'patterns' => ['billing.*', 'affiliate.*', 'pricing'], 'type' => 'simple', 'items' => [
             $mega('billing.show', 'wallet', __('Current Plan'), __('Paket & tagihan'), 'billing.*'),
+            $mega('pricing', 'tag', __('Lihat Harga'), __('Banding paket publik'), 'pricing'),
             $mega('affiliate.index', 'star', __('Affiliate'), __('Program referral'), 'affiliate.*'),
         ]],
         ['key' => 'bantuan', 'label' => __('Bantuan'), 'icon' => 'lifebuoy', 'patterns' => ['docs', 'support.*'], 'type' => 'simple', 'items' => [

@@ -31,29 +31,88 @@
 <body>
 <a href="#main-content" class="skip-link">{{ __('Skip to main content') }}</a>
 <div class="page">
-    <header class="navbar navbar-expand-md d-print-none">
-        <div class="container-xl">
-            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#public-menu"
+    <header class="app-topbar d-print-none">
+        <div class="app-container topbar-main">
+            <button class="topbar-icon-btn d-xl-none" type="button" data-bs-toggle="collapse" data-bs-target="#public-menu"
                 aria-controls="public-menu" aria-expanded="false" aria-label="{{ __('Toggle navigation') }}">
-                <span class="navbar-toggler-icon"></span>
+                <x-ti name="menu-2" />
             </button>
-            <a href="/" class="navbar-brand navbar-brand-autodark">
-                <span class="logo-tile">I</span>
-                <span class="font-display">{{ branding('app_name') }}</span>
+            <a href="/" class="topbar-brand" aria-label="{{ branding('app_name') }} home">
+                <span class="brand-mark">I</span>
+                <span class="brand-text"><span class="brand-name">{{ branding('app_name') }}</span><span class="brand-sub">{{ __('Billing OS') }}</span></span>
             </a>
-            <div class="collapse navbar-collapse" id="public-menu">
-                <ul class="navbar-nav ms-auto">
-                    <li class="nav-item"><a class="nav-link" href="/">{{ __('Home') }}</a></li>
-                    <li class="nav-item"><a class="nav-link" href="{{ route('pricing') }}">{{ __('Pricing') }}</a></li>
-                    <li class="nav-item"><a class="nav-link" href="{{ route('blog.index') }}">{{ __('Blog') }}</a></li>
-                    <li class="nav-item"><a class="nav-link" href="{{ route('docs') }}">{{ __('Docs') }}</a></li>
-                    @auth
-                        <li class="nav-item"><a class="btn btn-primary ms-md-2" href="{{ route('dashboard') }}">{{ __('Dashboard') }}</a></li>
-                    @else
-                        <li class="nav-item"><a class="nav-link" href="{{ route('login') }}">{{ __('Log in') }}</a></li>
-                        <li class="nav-item"><a class="btn btn-primary ms-md-2" href="{{ route('register') }}">{{ __('Sign Up') }}</a></li>
-                    @endauth
-                </ul>
+            <nav class="topbar-nav d-none d-xl-block" aria-label="{{ __('Navigasi utama') }}" style="height:50px;">
+                <div class="app-container">
+                    <ul class="nav-menu">
+                        <li class="nav-item"><a class="nav-link{{ request()->routeIs('home') ? ' active' : '' }}" href="/"><x-ti name="home" /><span>{{ __('Home') }}</span></a></li>
+                        <li class="nav-item dropdown">
+                            <a class="nav-link dropdown-toggle{{ request()->routeIs('pricing', 'seo.*') ? ' active' : '' }}" href="#" role="button" data-bs-toggle="dropdown" data-bs-display="static" data-bs-auto-close="outside" aria-expanded="false"><x-ti name="package" /><span>{{ __('Produk') }}</span></a>
+                            <div class="dropdown-menu mega-menu has-feature">
+                                <div class="mega-grid" style="--mega-cols: 2;">
+                                    <div class="mega-col">
+                                        <div class="mega-title">{{ __('Jelajah') }}</div>
+                                        <a class="mega-link" href="{{ url('/#showcase') }}"><span class="mega-icon"><x-ti name="star" /></span><span class="mega-text"><strong>{{ __('Fitur') }}</strong><span>{{ __('12 fitur inti') }}</span></span></a>
+                                        <a class="mega-link" href="{{ route('seo.templates') }}"><span class="mega-icon"><x-ti name="template" /></span><span class="mega-text"><strong>{{ __('Template') }}</strong><span>{{ __('6 desain invoice') }}</span></span></a>
+                                        <a class="mega-link" href="{{ route('pricing') }}"><span class="mega-icon"><x-ti name="wallet" /></span><span class="mega-text"><strong>{{ __('Harga') }}</strong><span>{{ __('Free / Pro / Business') }}</span></span></a>
+                                    </div>
+                                    <div class="mega-col">
+                                        <div class="mega-title">{{ __('Banding') }}</div>
+                                        <a class="mega-link" href="{{ route('seo.compare', ['a' => 'free', 'b' => 'pro']) }}"><span class="mega-icon"><x-ti name="chart-bar" /></span><span class="mega-text"><strong>Free vs Pro</strong><span>{{ __('Pilih tier') }}</span></span></a>
+                                        <a class="mega-link" href="{{ route('seo.compare', ['a' => 'pro', 'b' => 'business']) }}"><span class="mega-icon"><x-ti name="chart-line" /></span><span class="mega-text"><strong>Pro vs Business</strong><span>{{ __('Naik kelas') }}</span></span></a>
+                                        <a class="mega-link" href="{{ route('seo.alternatives', ['slug' => 'freshbooks']) }}"><span class="mega-icon"><x-ti name="repeat" /></span><span class="mega-text"><strong>{{ __('Alternatif') }}</strong><span>{{ __('vs kompetitor') }}</span></span></a>
+                                    </div>
+                                    @if(Route::has('register'))
+                                    <a class="mega-feature" href="{{ route('register') }}">
+                                        <span class="mega-feature-icon"><x-ti name="bolt" /></span>
+                                        <span class="mega-feature-title">{{ __('Mulai Gratis') }}</span>
+                                        <span class="mega-feature-text">{{ __('Invoice pertama dalam hitungan menit. Tanpa kartu kredit.') }}</span>
+                                        <span class="mega-feature-cta">{{ __('Daftar →') }}</span>
+                                    </a>
+                                    @endif
+                                </div>
+                            </div>
+                        </li>
+                        <li class="nav-item dropdown">
+                            <a class="nav-link dropdown-toggle{{ request()->routeIs('blog.*', 'docs') ? ' active' : '' }}" href="#" role="button" data-bs-toggle="dropdown" data-bs-display="static" data-bs-auto-close="outside" aria-expanded="false"><x-ti name="book" /><span>{{ __('Sumber Daya') }}</span></a>
+                            <ul class="dropdown-menu nav-dropdown">
+                                <li class="dd-heading">{{ __('Belajar') }}</li>
+                                <li><a class="dropdown-item nav-dd-item" href="{{ route('docs') }}"><span class="dd-icon"><x-ti name="book" /></span><span><strong>{{ __('Docs') }}</strong><small>{{ __('Panduan pakai') }}</small></span></a></li>
+                                <li><a class="dropdown-item nav-dd-item" href="{{ route('blog.index') }}"><span class="dd-icon"><x-ti name="file-text" /></span><span><strong>{{ __('Blog') }}</strong><small>{{ __('Tips & update') }}</small></span></a></li>
+                                @auth
+                                <li><a class="dropdown-item nav-dd-item" href="{{ route('support.index') }}"><span class="dd-icon"><x-ti name="lifebuoy" /></span><span><strong>{{ __('Support') }}</strong><small>{{ __('Hubungi kami') }}</small></span></a></li>
+                                @endauth
+                            </ul>
+                        </li>
+                    </ul>
+                </div>
+            </nav>
+            <div class="topbar-actions">
+                @auth
+                    <a class="btn-quick" href="{{ route('dashboard') }}"><x-ti name="layout-dashboard" /> {{ __('Dashboard') }}</a>
+                @else
+                    <a class="topbar-icon-btn d-none d-sm-inline-flex" href="{{ route('login') }}" aria-label="{{ __('Log in') }}" title="{{ __('Log in') }}"><x-ti name="user" /></a>
+                    @if(Route::has('register'))
+                        <a class="btn-quick" href="{{ route('register') }}"><x-ti name="plus" /> {{ __('Sign Up') }}</a>
+                    @endif
+                @endauth
+            </div>
+        </div>
+        <div class="collapse d-xl-none" id="public-menu">
+            <div class="app-container py-2">
+                <a class="mobile-nav-link" href="/"><x-ti name="home" /> {{ __('Home') }}</a>
+                <a class="mobile-nav-link" href="{{ url('/#showcase') }}"><x-ti name="star" /> {{ __('Fitur') }}</a>
+                <a class="mobile-nav-link" href="{{ route('seo.templates') }}"><x-ti name="template" /> {{ __('Template') }}</a>
+                <a class="mobile-nav-link" href="{{ route('pricing') }}"><x-ti name="wallet" /> {{ __('Pricing') }}</a>
+                <a class="mobile-nav-link" href="{{ route('blog.index') }}"><x-ti name="file-text" /> {{ __('Blog') }}</a>
+                <a class="mobile-nav-link" href="{{ route('docs') }}"><x-ti name="book" /> {{ __('Docs') }}</a>
+                @auth
+                    <a class="mobile-nav-link" href="{{ route('dashboard') }}"><x-ti name="layout-dashboard" /> {{ __('Dashboard') }}</a>
+                @else
+                    <a class="mobile-nav-link" href="{{ route('login') }}"><x-ti name="user" /> {{ __('Log in') }}</a>
+                    @if(Route::has('register'))
+                        <a class="mobile-nav-link" href="{{ route('register') }}"><x-ti name="plus" /> {{ __('Sign Up') }}</a>
+                    @endif
+                @endauth
             </div>
         </div>
     </header>
